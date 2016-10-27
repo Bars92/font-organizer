@@ -2,9 +2,14 @@
 class FoSettingsPage
 {
     /**
-     * Holds the values to be used in the fields callbacks
+     * Holds the option values for the general section.
      */
-    private $options;
+    private $general_options;
+
+    /**
+     * Holds the option values for the elements section.
+     */
+    private $elements_options;
 
     /**
      * Holds all the fonts available.
@@ -52,6 +57,17 @@ class FoSettingsPage
     private $upload_error;
 
     /**
+     * Holds the elements id and title to select a font for.
+     */
+    private $elements;
+
+    /**
+     * Holds the value if it should include font link (aka include google fonts for the settings page).
+     * If set to false. loads only the usable fonts.
+     */
+    private $include_font_link;
+
+    /**
      * Start up
      */
     public function __construct()
@@ -63,6 +79,19 @@ class FoSettingsPage
         $this->supported_font_files = array('.woff','.ttf','.otf');
         $this->custom_fonts = array();
         $this->available_fonts = array();
+        $this->google_fonts = array();
+        $this->elements = array('body_font' =>  '<body> Font',
+                                'h1_font'   =>  '<h1> Font',
+                                'h2_font'   =>  '<h2> Font',
+                                'h3_font'   =>  '<h3> Font',
+                                'h4_font'   =>  '<h4> Font',
+                                'h5_font'   =>  '<h5> Font',
+                                'h6_font'   =>  '<h6> Font',
+                                'p_font'    =>  '<p> Font',
+                                'q_font'    =>  '<q> Font',
+                                'li_font'   =>  '<li> Font',
+                                'a_font'    =>  '<a> Font',
+                                );
 
         // An upload is made. Upload the file and proccess it.
         if (isset($_POST['submit_upload_font'])){  
@@ -74,10 +103,18 @@ class FoSettingsPage
         }
 
         if (isset($_POST['submit_usable_font'])){  
-            if($args = $this->validate_usable()){
+            if($args = $this->validate_add_usable()){
                 $this->use_font($args);
             }else{
                 add_action( 'admin_notices', array($this, 'use_font_failed_admin_notice') );
+            }
+        }
+
+         if (isset($_POST['delete_usable_font'])){  
+            if($args = $this->validate_delete_usable()){
+                $this->delete_font($args);
+            }else{
+                add_action( 'admin_notices', array($this, 'delete_font_failed_admin_notice') );
             }
         }
     }
@@ -113,17 +150,25 @@ class FoSettingsPage
     public function create_font_settings_page(){
         global $wpdb;
         // Set class property
-        $this->options = get_option( 'fo_options' );
-        var_dump($this->options);
+        $this->general_options = get_option( 'fo_general_options' );
+        $this->elements_options = get_option( 'fo_elements_options' );
         
-        // Add Google fonts.
-        set_time_limit(0);
-        $response = wp_remote_get("https://www.googleapis.com/webfonts/v1/webfonts?sort=alpha&key=" . $this->options['google_key']);
-        if( wp_remote_retrieve_response_code( $response ) != 200){
-            var_dump($response);
-        }
+        $this->include_font_link = !isset( $this->general_options['include_font_link'] ) || (isset( $this->general_options['include_font_link'] ) && $this->general_options['include_font_link']);
 
-        $this->google_fonts = json_decode( wp_remote_retrieve_body($response))->items;
+        if(isset($this->general_options['google_key']) && $this->general_options['google_key']){
+            // Add Google fonts.
+            set_time_limit(0);
+            $response = wp_remote_get("https://www.googleapis.com/webfonts/v1/webfonts?sort=alpha&key=" . $this->general_options['google_key']);
+            if( wp_remote_retrieve_response_code( $response ) != 200){
+                    add_settings_error('google_key', '', __('Google API key is not valid!', 'fo'), 'error');
+                    settings_errors( 'google_key' );
+            }
+
+            $this->google_fonts = json_decode( wp_remote_retrieve_body($response))->items;
+        }else{
+            add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'fo'), 'error');
+            settings_errors( 'google_key' );
+        }
 
         // Add known fonts.
         $this->known_fonts = $this->get_known_fonts_array();
@@ -135,7 +180,11 @@ class FoSettingsPage
         foreach ( $usable_fonts as $usable_font) {
 
             // Find the font from the lists.
-            if(!$usable_font->custom){
+            if($usable_font->custom){
+                $font_obj = (object) [ 'family' => $usable_font->name, 'files' => (object) ['regular' => $usable_font->url], 'kind' => 'custom', 'variants' => array('regular')];
+                $this->usable_fonts[] = $font_obj;
+                $this->custom_fonts[] = $font_obj;
+            }else{
                 $i = 0;
                 foreach ($this->available_fonts as $available_font) {
                     if($available_font->family == $usable_font->name){
@@ -150,28 +199,18 @@ class FoSettingsPage
 
                     $i++;
                 }
-            }else{
-                $font_obj = (object) [ 'family' => $usable_font->name, 'files' => array('regular' => $usable_font->url), 'kind' => 'custom', 'variants' => array('regular')];
-                $this->usable_fonts[] = $font_obj;
-                $this->custom_fonts[] = $font_obj;
             }
         }
 
-        // Prepare to load the fonts in bulks to improve performance.
-        $font_names = array_map(function($font) { return str_replace(' ', '+', $font->family); }, $this->google_fonts);
-        for ($i=0; $i < count($font_names); $i+=$this->fonts_per_link) { 
-            $calculated_length = count($font_names) - $i > $this->fonts_per_link ? $this->fonts_per_link : count($font_names) - $i;
-            $font_names_to_load = array_slice($font_names, $i, $calculated_length);
-            //echo "<link href='http://fonts.googleapis.com/css?family=". implode("|", $font_names_to_load) . "' rel='stylesheet' type='text/css'>";
-        }
-
+        // Load the google fonts if selected or if not specified. else load just whats usable.
+        if($this->include_font_link)
+            fo_print_links($this->google_fonts, $this->fonts_per_link);
+        else
+            fo_print_links($this->usable_fonts, $this->fonts_per_link);
+        
         ?>
         <div class="wrap">
             <h1><?php _e('Font Settings', 'fo'); ?></h1>
-                <?php
-                    // This prints out all hidden setting fields
-                    settings_fields( 'fo_options' );
-                ?>
                 <div id="poststuff">  
                     <div id="post-body" class="metabox-holder columns-2">
 
@@ -185,6 +224,8 @@ class FoSettingsPage
                             <div class="inside">
                                 <form method="post" action="options.php">
                                 <?php
+                                    // This prints out all hidden setting fields
+                                    settings_fields( 'fo_general_options' );
                                     fo_do_settings_section( 'font-setting-admin', 'setting_general' );
                                     submit_button();
                                 ?>
@@ -192,13 +233,41 @@ class FoSettingsPage
                             </div>
                         </div>
 
-                          <div class="postbox">
-                            <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Fonts Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                        <div class="postbox">
+                         <button type="button" class="handlediv button-link" aria-expanded="false">
+                                <span class="screen-reader-text"><?php _e('Toggle panel: First Step: Add Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('1. Custom Fonts Settings', 'fo'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('1. Add Fonts', 'fo'); ?></span></h2>
                             <div class="inside">
-                               <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
+                                <span><?php _e('Step 1: Select and add fonts to be used in your website. Select as many as you wish.', 'fo'); ?></span>
+                                <br />
+                                <span><?php _e('You can select google or regular fonts.', 'fo'); ?></span>
+                                <form action="" id="add_usable_font_form" name="add_usable_font_form" method="post"> 
+                                    <table class="form-table">
+                                        <tr>
+                                            <th scope="row"><?php _e('Available Fonts', 'fo'); ?></th>
+                                            <td><?php  $this->print_available_fonts_list('usable_font'); ?></td>
+                                        </tr>   
+                                        <tr>        
+                                            <th scope="row"></th>
+                                            <td>
+                                             <?php wp_nonce_field( 'add_usable_font', 'add_usable_font_nonce' ); ?>
+                                            <input type="submit" name="submit_usable_font" id="submit_usable_font" class="button-primary" value="<?php _e('Use This Font', 'fo'); ?>" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form> 
+                            </div>  
+                        </div>
+                   
+                        <div class="postbox">
+                            <button type="button" class="handlediv button-link" aria-expanded="false">
+                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                            </button>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('2. Custom Fonts', 'fo'); ?></span></h2>
+                            <div class="inside">
+                                <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'fo'); ?></span>
+                                <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><?php _e('Font Name', 'fo'); ?></th>
@@ -220,67 +289,55 @@ class FoSettingsPage
                                         </tr>
                                     </table>
                                 </form>   
+                            </div>
+                        </div>
+   
+                        <div class="postbox">
+                            <button type="button" class="handlediv button-link" aria-expanded="false">
+                                <span class="screen-reader-text"><?php _e('Toggle panel: Elements Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                            </button>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('3. Elements Settings', 'fo'); ?></span></h2>
+                            <div class="inside">
+
+                                <span><?php _e('Step 3: For each element you can assign a font you have added in step 1 & 2.', 'fo'); ?></span>
+                                <p><strong><?php _e('Note: ', 'fo'); ?></strong><?php _e('Custom fonts you uploaded are automaticly used in your website.', 'fo'); ?></p>
+
                                 <table class="widefat">
                                     <thead>
                                     <tr>
                                         <th class="row-title"><?php _e('Font Name', 'fo'); ?></th>
+                                        <th class="row-title"><?php _e('Font Source', 'fo'); ?></th>
                                         <th class="row-title"><?php _e('Font URL', 'fo'); ?></th>
-                                        <th class="row-title"><?php _e('Delete', 'fo'); ?></th>
+                                        <th class="row-title"></th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <?php 
                                         $is_alternate = false;
-                                        foreach ($this->custom_fonts as $custom_font): ?>
+                                        foreach ($this->usable_fonts as $usable_font): ?>
                                              <tr class="<?php echo $is_alternate ? 'alternate' : ''; ?>">
-                                                <td><?php echo $custom_font->family; ?></td>
-                                                <td><?php echo $custom_font->files['regular']; ?></td>
-                                                <td><a href="this page?delete="<?php echo $custom_font->family; ?>"><?php _e('Delete', 'fo'); ?></a></td>
+                                                <td style="font-family: <?php echo $usable_font->family; ?>"><?php echo $usable_font->family; ?></td>
+                                                <td><?php strpos($usable_font->kind, 'webfonts') !== false ? _e('Google', 'fo') : _e(ucfirst($usable_font->kind), 'fo'); ?></td>
+                                                <td><?php echo $usable_font->files->regular; ?></td>
+                                                <td>
+                                                    <form action="" method="post" name="delete_usable_font">
+                                                        <input type="hidden" name="font_name" value="<?php echo $usable_font->family; ?>" />
+                                                      <?php 
+                                                        submit_button(__('Delete', 'fo'), $type = 'delete', $name = 'delete_usable_font', $wrap = false);
+                                                        wp_nonce_field( 'delete_usable_font', 'delete_usable_font_nonce' );
+                                                      ?>
+                                                    </form>
+                                                </td>
                                             </tr>
                                     <?php
                                         $is_alternate = !$is_alternate;
                                         endforeach;
                                    ?>
                                 </table>
-                            </div>
-                        </div>
-
-                        <div class="postbox">
-                         <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Usable Fonts Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('2. Usable Fonts Settings', 'fo'); ?></span></h2>
-                            <div class="inside">
-                                <?php _e('Step 2: Select the fonts to be used in your website. Select as many as you wish.', 'fo'); ?>
-                                <br />
-                                <?php _e('You can select google or regular fonts.', 'fo'); ?>
-                                <strong><?php _e('Note: ', 'fo'); ?></strong><?php _e('Custom fonts you uploaded are automaticly used in your website.', 'fo'); ?>
-                                <form action="" id="add_usable_font_form" name="add_usable_font_form" method="post"> 
-                                    <table class="form-table">
-                                        <tr>
-                                            <th scope="row"><?php _e('Available Fonts', 'fo'); ?></th>
-                                            <td><?php  $this->print_available_fonts_list('usable_font'); ?></td>
-                                        </tr>   
-                                        <tr>        
-                                            <th scope="row"></th>
-                                            <td>
-                                             <?php wp_nonce_field( 'add_usable_font', 'add_usable_font_nonce' ); ?>
-                                            <input type="submit" name="submit_usable_font" id="submit_usable_font" class="button-primary" value="<?php _e('Use This Font', 'fo'); ?>" />
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </form> 
-                            </div>  
-                        </div>
-                      
-                        <div class="postbox">
-                            <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Elements Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('Elements Settings', 'fo'); ?></span></h2>
-                            <div class="inside">
                                 <form method="post" action="options.php">
                                 <?php
+                                    // This prints out all hidden setting fields
+                                    settings_fields( 'fo_elements_options' );
                                     fo_do_settings_section( 'font-setting-admin', 'setting_elements' );
                                     submit_button();
                                 ?>
@@ -338,7 +395,7 @@ class FoSettingsPage
         return $args;
     }
 
-    private function validate_usable(){
+    private function validate_add_usable(){
         if(!isset( $_POST['add_usable_font_nonce'] ) || !wp_verify_nonce( $_POST['add_usable_font_nonce'], 'add_usable_font' )){
             $this->upload_error = __('Session ended, please try again.', 'fo');
             return false;
@@ -347,6 +404,21 @@ class FoSettingsPage
         $args['usable_font'] = sanitize_text_field( $_POST['usable_font'] );
         if(!$args['usable_font']){
             $this->upload_error = __('Usable font is empty or invalid.', 'fo');
+            return false;
+        }
+
+        return $args;
+    }
+
+    private function validate_delete_usable(){
+        if(!isset( $_POST['delete_usable_font_nonce'] ) || !wp_verify_nonce( $_POST['delete_usable_font_nonce'], 'delete_usable_font' )){
+            $this->upload_error = __('Session ended, please try again.', 'fo');
+            return false;
+        }
+
+        $args['font_name'] = sanitize_text_field( $_POST['font_name'] );
+        if(!$args['font_name']){
+            $this->upload_error = __('Something went horribly worng. Ask the support!', 'fo');
             return false;
         }
 
@@ -386,6 +458,18 @@ class FoSettingsPage
             $this->save_to_database($args['usable_font']);
     }
 
+    private function delete_font($args = array()){
+            add_action( 'admin_notices', array($this, 'delete_font_successfull_admin_notice') );
+            $this->delete_from_database($args['font_name']);
+    }
+
+    private function delete_from_database($name){
+        global $wpdb;
+        $table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
+
+        $wpdb->delete( $table_name, array( 'name' => $name ) );
+    }
+
     private function save_to_database($name, $url = '', $is_custom = false){
         global $wpdb;
         $table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
@@ -402,7 +486,15 @@ class FoSettingsPage
     public function use_font_successfull_admin_notice() {
         ?>
         <div class="updated notice">
-            <p><?php _e( 'Font is now usable in your website!', 'fo' ); ?></p>
+            <p><?php _e( 'Font can now be used in your website!', 'fo' ); ?></p>
+        </div>
+        <?php
+    }
+
+    public function delete_font_successfull_admin_notice() {
+        ?>
+        <div class="updated notice">
+            <p><?php _e( 'Font deleted from your website!', 'fo' ); ?></p>
         </div>
         <?php
     }
@@ -426,7 +518,15 @@ class FoSettingsPage
     public function use_font_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error adding font to usable fonts: ', 'fo' ) . $this->upload_error; ?></p>
+            <p><?php _e( 'Error adding font to website fonts: ', 'fo' ) . $this->upload_error; ?></p>
+        </div>
+        <?php
+    }
+
+    public function delete_font_failed_admin_notice() {
+        ?>
+        <div class="error notice">
+            <p><?php _e( 'Error deleted font: ', 'fo' ) . $this->upload_error; ?></p>
         </div>
         <?php
     }
@@ -451,9 +551,14 @@ class FoSettingsPage
     public function page_init()
     {   
         register_setting(
-            'fo_options', // Option group
-            'fo_options', // Option name
-            array( $this, 'sanitize' ) // Sanitize
+            'fo_general_options', // Option group
+            'fo_general_options', // Option name
+            array( $this, 'general_sanitize' ) // Sanitize
+        );
+        register_setting(
+            'fo_elements_options', // Option group
+            'fo_elements_options', // Option name
+            array( $this, 'elements_sanitize' ) // Sanitize
         );
         add_settings_section(
             'setting_general', // ID
@@ -468,100 +573,31 @@ class FoSettingsPage
             'font-setting-admin', // Page
             'setting_general' // Section           
         );   
+        add_settings_field(
+            'include_font_link', // ID
+            'Show Font Family Preview', // Title 
+            array( $this, 'include_font_link_callback' ), // Callback
+            'font-setting-admin', // Page
+            'setting_general' // Section           
+        );   
         add_settings_section(
             'setting_elements', // ID
             '', // Title
             array( $this, 'print_elements_section_info' ), // Callback
             'font-setting-admin' // Page
         );  
-        add_settings_field(
-            'body_font', // ID
-            htmlspecialchars('<body> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'body_font' // Parameter for Callback 
-        );   
-        add_settings_field(
-            'h1_font', // ID
-            htmlspecialchars('<h1> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'h1_font' // Parameter for Callback        
-        );    
-        add_settings_field(
-            'h2_font', // ID
-            htmlspecialchars('<h2> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'h2_font' // Parameter for Callback            
-        );    
-        add_settings_field(
-            'h3_font', // ID
-            htmlspecialchars('<h3> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'h3_font' // Parameter for Callback            
-        );    
-        add_settings_field(
-            'h4_font', // ID
-            htmlspecialchars('<h4> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'h4_font' // Parameter for Callback           
-        );    
-        add_settings_field(
-            'h5_font', // ID
-            htmlspecialchars('<h5> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'h5_font' // Parameter for Callback     
-        );    
-        add_settings_field(
-            'h6_font', // ID
-            htmlspecialchars('<h6> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'h6_font' // Parameter for Callback       
-        );    
-        add_settings_field(
-            'p_font', // ID
-            htmlspecialchars('<p> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'p_font' // Parameter for Callback       
-        );   
-        add_settings_field(
-            'q_font', // ID
-            htmlspecialchars('<q> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'q_font' // Parameter for Callback            
-        );   
-        add_settings_field(
-            'li_font', // ID
-            htmlspecialchars('<li> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'li_font' // Parameter for Callback          
-        );   
-        add_settings_field(
-            'a_font', // ID
-            htmlspecialchars('<a> Font'), // Title 
-            array( $this, 'fonts_list_field_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_elements', // Section 
-            'a_font' // Parameter for Callback           
-        );   
+
+        // Add all the elements to the elements section.
+        foreach ($this->elements as $id => $title) {
+            add_settings_field(
+                $id, // ID
+                htmlspecialchars($title), // Title 
+                array( $this, 'fonts_list_field_callback' ), // Callback
+                'font-setting-admin', // Page
+                'setting_elements', // Section 
+                $id // Parameter for Callback 
+            );   
+        }
     }
 
     /**
@@ -569,14 +605,33 @@ class FoSettingsPage
      *
      * @param array $input Contains all settings fields as array keys
      */
-    public function sanitize( $input )
+    public function general_sanitize( $input )
     {
         $new_input = array();
         if( isset( $input['google_key'] ) )
             $new_input['google_key'] = sanitize_text_field( $input['google_key'] );
 
-        if( isset( $input['main_font'] ) )
-            $new_input['main_font'] = sanitize_text_field( $input['main_font'] );
+        if( !isset( $input['include_font_link'] ) )
+            $new_input['include_font_link'] =  0 ;
+
+        return $new_input;
+    }
+
+    /**
+     * Sanitize each setting field as needed
+     *
+     * @param array $input Contains all settings fields as array keys
+     */
+    public function elements_sanitize( $input )
+    {
+        $new_input = array();
+        foreach ($this->elements as $id => $title) {
+            if( isset( $input[$id] ) ){
+                $new_input[$id] = sanitize_text_field( $input[$id] );
+            }else{
+                $new_input[$id] = '';
+            }
+        }
 
         return $new_input;
     }
@@ -594,11 +649,10 @@ class FoSettingsPage
      */
     public function print_elements_section_info()
     {
-        print 'This is the elements settings for the site.';
     }
 
     /** 
-     * Get the settings option array and print one of its values
+     * Get the settings option for google key array and print one of its values
      */
     public function google_key_callback()
     {
@@ -611,8 +665,28 @@ class FoSettingsPage
         echo '</span> <br />';
 
         printf(
-            '<input type="text" id="google_key" name="fo_options[google_key]" value="%s" class="large-text" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" />',
-            isset( $this->options['google_key'] ) ? esc_attr( $this->options['google_key']) : ''
+            '<input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" />',
+            isset( $this->general_options['google_key'] ) ? esc_attr( $this->general_options['google_key']) : ''
+        );
+    }
+
+    /** 
+     * Get the settings option array and print one of its values
+     */
+    public function include_font_link_callback()
+    {
+        $checked = !isset($this->general_options['include_font_link']) || (isset($this->general_options['include_font_link']) && $this->general_options['include_font_link']) ? 'checked="checked"' : '';
+        printf(
+            '<fieldset>
+                <legend class="screen-reader-text"><span>%s</span></legend>
+                <label for="include_font_link">
+                    <input name="fo_general_options[include_font_link]" type="checkbox" id="include_font_link" value="1" %s>
+                    %s
+                </label>
+            </fieldset>',
+            __('Include Font Family Preview', 'fo'),
+            $checked, 
+            __('Show font preview when listing the fonts (might be slow)', 'fo')
         );
     }
 
@@ -629,26 +703,23 @@ class FoSettingsPage
      */
     private function print_usable_fonts_list($name)
     {
-        $selected = isset( $this->options[$name] ) ? esc_attr( $this->options[$name]) : '';
-        echo '<select id="'.$name.'" name="fo_options['.$name.']">';
-
-        if('' === $selected)
-            echo '<option value="" >' . __('None') . '</option>';
-        else
-            echo '<option value="" selected>' . __('None') . '</option>'; 
+        $selected = isset( $this->elements_options[$name] ) ? esc_attr( $this->elements_options[$name]) : '';
+        echo '<select id="'.$name.'" name="fo_elements_options['.$name.']">';
+        
+        echo '<option value="" '. selected('', $selected, false) . '>' . __('None', 'fo') . '</option>'; 
 
         //fonts section
         foreach($this->usable_fonts as $font)
         {
           $font_name = $font->family;
-          $is_selected = $font_name === $selected ? ' selected' : '';
+          $is_selected = selected($font_name, $selected, false);
           echo '<option value="'.$font_name.'" style="font-family: '.$font_name.';" '.$is_selected.'>'.$font_name.'</option>\n';
         }
 
         echo '</select>';
     }
 
- /** 
+    /** 
      * Get the settings option array and print one of its values
      */
     private function print_available_fonts_list($name)
@@ -669,313 +740,313 @@ class FoSettingsPage
     private function get_known_fonts_array()
     {
         return array(
-(object) [ 'family' => 'Calibri', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Abadi MT Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Adobe Minion Web', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Agency FB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Aharoni', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Aldhabi', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Algerian', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Almanac MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'American Uncial', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Andale Mono', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Andalus', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Andy', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Angsana New', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'AngsanaUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Aparajita', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arabic Transparent', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arabic Typesetting', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arial', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arial Black', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arial Narrow', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arial Narrow Special', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arial Rounded MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arial Special', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Arial Unicode MS', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Augsburger Initials', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Baskerville Old Face', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Batang', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'BatangChe', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bauhaus 93', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Beesknees ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bell MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Berlin Sans FB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bernard MT Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bickley Script', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Blackadder ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bodoni MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bodoni MT Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bon Apetit MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Book Antiqua', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bookman Old Style', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bookshelf Symbol', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Bradley Hand ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Braggadocio', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'BriemScript', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Britannic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Britannic Bold', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Broadway', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Browallia New', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'BrowalliaUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Brush Script MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Calibri', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Californian FB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Calisto MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Cambria', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Cambria Math', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Candara', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Cariadings', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Castellar', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Centaur', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Century', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Century Gothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Century Schoolbook', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Chiller', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Colonna MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Comic Sans MS', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Consolas', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Constantia', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Contemporary Brush', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Cooper Black', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Copperplate Gothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Corbel', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Cordia New', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'CordiaUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Courier New', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Curlz MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'DaunPenh', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'David', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Desdemona', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'DFKai-SB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'DilleniaUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Directions MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'DokChampa', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Dotum', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'DotumChe', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Ebrima', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Eckmann', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Edda', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Edwardian Script ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Elephant', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Engravers MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Enviro', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Eras ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Estrangelo Edessa', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'EucrosiaUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Euphemia', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Eurostile', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'FangSong', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Felix Titling', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Fine Hand', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Fixed Miriam Transparent', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Flexure', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Footlight MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Forte', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Franklin Gothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Franklin Gothic Medium', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'FrankRuehl', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'FreesiaUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Freestyle Script', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'French Script MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Futura', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gabriola', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gadugi', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Garamond', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Garamond MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gautami', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Georgia', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Georgia Ref', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gigi', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gill Sans MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gill Sans MT Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gisha', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gloucester', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Goudy Old Style', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Goudy Stout', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gradl', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gulim', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'GulimChe', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Gungsuh', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'GungsuhChe', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Haettenschweiler', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Harlow Solid Italic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Harrington', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'High Tower Text', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Holidays MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Impact', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Imprint MT Shadow', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Informal Roman', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'IrisUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Iskoola Pota', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'JasmineUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Jokerman', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Juice ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'KaiTi', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Kalinga', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Kartika', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Keystrokes MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Khmer UI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Kino MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'KodchiangUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Kokila', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Kristen ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Kunstler Script', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lao UI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Latha', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'LCD', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Leelawadee', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Levenim MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'LilyUPC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Blackletter', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Bright', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Bright Math', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Calligraphy', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Console', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Fax', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Handwriting', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Sans', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Sans Typewriter', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Lucida Sans Unicode', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Magneto', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Maiandra GD', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Malgun Gothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Mangal', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Map Symbols', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Marlett', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Matisse ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Matura MT Script Capitals', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'McZee', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Mead Bold', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Meiryo', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Meiryo UI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Mercurius Script MT Bold', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft Himalaya', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft JhengHei', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft JhengHei UI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft New Tai Lue', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft PhagsPa', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft Sans Serif', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft Tai Le', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft Uighur', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft YaHei', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft YaHei UI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Microsoft Yi Baiti', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MingLiU', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MingLiU_HKSCS', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MingLiU_HKSCS-ExtB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MingLiU-ExtB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Minion Web', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Miriam', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Miriam Fixed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Mistral', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Modern No. 20', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Mongolian Baiti', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Monotype Corsiva', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Monotype Sorts', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Monotype.com', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MoolBoran', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS Gothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS LineDraw', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS Mincho', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS Outlook', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS PGothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS PMincho', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS Reference', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MS UI Gothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MT Extra', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'MV Boli', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Myanmar Text', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Narkisim', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'New Caledonia', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'News Gothic MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Niagara', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Nirmala UI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'NSimSun', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Nyala', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'OCR A Extended', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'OCRB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'OCR-B-Digits', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Old English Text MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Onyx', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Palace Script MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Palatino Linotype', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Papyrus', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Parade', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Parchment', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Parties MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Peignot Medium', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Pepita MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Perpetua', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Perpetua Titling MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Placard Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Plantagenet Cherokee', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Playbill', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'PMingLiU', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'PMingLiU-ExtB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Poor Richard', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Pristina', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Raavi', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Rage Italic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Ransom', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Ravie', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'RefSpecialty', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Rockwell', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Rockwell Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Rockwell Extra Bold', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Rod', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Runic MT Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Sakkal Majalla', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Script MT Bold', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Segoe Chess', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Segoe Print', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Segoe Pseudo', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Segoe Script', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Segoe UI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Segoe UI Symbol', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Shonar Bangla', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Showcard Gothic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Shruti', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Signs MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'SimHei', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Simplified Arabic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Simplified Arabic Fixed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'SimSun', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'SimSun-ExtB', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Snap ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Sports MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Stencil', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Stop', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Sylfaen', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Symbol', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Tahoma', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Temp Installer Font', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Tempo Grunge', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Tempus Sans ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Times New Roman', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Times New Roman Special', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Traditional Arabic', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Transport MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Trebuchet MS', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Tunga', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Tw Cen MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Tw Cen MT Condensed', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Urdu Typesetting', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Utsaah', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Vacation MT', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Vani', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Verdana', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Verdana Ref', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Vijaya', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Viner Hand ITC', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Vivaldi', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Vixar ASCI', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Vladimir Script', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Vrinda', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Webdings', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Westminster', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Wide Latin', 'kind' => 'standart', 'variants' => array()],
-(object) [ 'family' => 'Wingdings', 'kind' => 'standart', 'variants' => array()],
+(object) [ 'family' => 'Calibri', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Abadi MT Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Adobe Minion Web', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Agency FB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Aharoni', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Aldhabi', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Algerian', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Almanac MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'American Uncial', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Andale Mono', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Andalus', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Andy', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Angsana New', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'AngsanaUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Aparajita', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arabic Transparent', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arabic Typesetting', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arial', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arial Black', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arial Narrow', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arial Narrow Special', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arial Rounded MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arial Special', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Arial Unicode MS', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Augsburger Initials', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Baskerville Old Face', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Batang', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'BatangChe', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bauhaus 93', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Beesknees ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bell MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Berlin Sans FB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bernard MT Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bickley Script', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Blackadder ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bodoni MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bodoni MT Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bon Apetit MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Book Antiqua', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bookman Old Style', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bookshelf Symbol', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Bradley Hand ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Braggadocio', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'BriemScript', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Britannic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Britannic Bold', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Broadway', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Browallia New', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'BrowalliaUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Brush Script MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Calibri', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Californian FB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Calisto MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Cambria', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Cambria Math', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Candara', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Cariadings', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Castellar', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Centaur', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Century', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Century Gothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Century Schoolbook', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Chiller', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Colonna MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Comic Sans MS', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Consolas', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Constantia', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Contemporary Brush', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Cooper Black', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Copperplate Gothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Corbel', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Cordia New', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'CordiaUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Courier New', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Curlz MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'DaunPenh', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'David', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Desdemona', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'DFKai-SB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'DilleniaUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Directions MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'DokChampa', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Dotum', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'DotumChe', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Ebrima', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Eckmann', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Edda', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Edwardian Script ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Elephant', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Engravers MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Enviro', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Eras ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Estrangelo Edessa', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'EucrosiaUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Euphemia', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Eurostile', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'FangSong', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Felix Titling', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Fine Hand', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Fixed Miriam Transparent', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Flexure', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Footlight MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Forte', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Franklin Gothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Franklin Gothic Medium', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'FrankRuehl', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'FreesiaUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Freestyle Script', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'French Script MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Futura', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gabriola', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gadugi', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Garamond', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Garamond MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gautami', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Georgia', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Georgia Ref', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gigi', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gill Sans MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gill Sans MT Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gisha', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gloucester', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Goudy Old Style', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Goudy Stout', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gradl', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gulim', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'GulimChe', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Gungsuh', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'GungsuhChe', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Haettenschweiler', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Harlow Solid Italic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Harrington', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'High Tower Text', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Holidays MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Impact', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Imprint MT Shadow', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Informal Roman', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'IrisUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Iskoola Pota', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'JasmineUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Jokerman', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Juice ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'KaiTi', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Kalinga', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Kartika', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Keystrokes MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Khmer UI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Kino MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'KodchiangUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Kokila', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Kristen ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Kunstler Script', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lao UI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Latha', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'LCD', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Leelawadee', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Levenim MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'LilyUPC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Blackletter', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Bright', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Bright Math', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Calligraphy', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Console', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Fax', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Handwriting', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Sans', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Sans Typewriter', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Lucida Sans Unicode', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Magneto', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Maiandra GD', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Malgun Gothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Mangal', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Map Symbols', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Marlett', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Matisse ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Matura MT Script Capitals', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'McZee', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Mead Bold', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Meiryo', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Meiryo UI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Mercurius Script MT Bold', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft Himalaya', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft JhengHei', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft JhengHei UI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft New Tai Lue', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft PhagsPa', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft Sans Serif', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft Tai Le', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft Uighur', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft YaHei', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft YaHei UI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Microsoft Yi Baiti', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MingLiU', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MingLiU_HKSCS', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MingLiU_HKSCS-ExtB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MingLiU-ExtB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Minion Web', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Miriam', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Miriam Fixed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Mistral', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Modern No. 20', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Mongolian Baiti', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Monotype Corsiva', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Monotype Sorts', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Monotype.com', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MoolBoran', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS Gothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS LineDraw', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS Mincho', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS Outlook', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS PGothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS PMincho', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS Reference', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MS UI Gothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MT Extra', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'MV Boli', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Myanmar Text', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Narkisim', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'New Caledonia', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'News Gothic MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Niagara', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Nirmala UI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'NSimSun', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Nyala', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'OCR A Extended', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'OCRB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'OCR-B-Digits', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Old English Text MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Onyx', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Palace Script MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Palatino Linotype', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Papyrus', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Parade', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Parchment', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Parties MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Peignot Medium', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Pepita MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Perpetua', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Perpetua Titling MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Placard Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Plantagenet Cherokee', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Playbill', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'PMingLiU', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'PMingLiU-ExtB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Poor Richard', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Pristina', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Raavi', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Rage Italic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Ransom', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Ravie', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'RefSpecialty', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Rockwell', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Rockwell Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Rockwell Extra Bold', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Rod', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Runic MT Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Sakkal Majalla', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Script MT Bold', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Segoe Chess', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Segoe Print', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Segoe Pseudo', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Segoe Script', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Segoe UI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Segoe UI Symbol', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Shonar Bangla', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Showcard Gothic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Shruti', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Signs MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'SimHei', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Simplified Arabic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Simplified Arabic Fixed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'SimSun', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'SimSun-ExtB', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Snap ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Sports MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Stencil', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Stop', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Sylfaen', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Symbol', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Tahoma', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Temp Installer Font', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Tempo Grunge', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Tempus Sans ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Times New Roman', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Times New Roman Special', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Traditional Arabic', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Transport MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Trebuchet MS', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Tunga', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Tw Cen MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Tw Cen MT Condensed', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Urdu Typesetting', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Utsaah', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Vacation MT', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Vani', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Verdana', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Verdana Ref', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Vijaya', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Viner Hand ITC', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Vivaldi', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Vixar ASCI', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Vladimir Script', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Vrinda', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Webdings', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Westminster', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Wide Latin', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
+(object) [ 'family' => 'Wingdings', 'kind' => 'standart', 'variants' => array(), 'files' => (object) ['regular' => '']],
         );
     }
 }

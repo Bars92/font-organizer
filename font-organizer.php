@@ -7,7 +7,7 @@
 Plugin Name: Font Organizer
 Plugin URI: https://wordpress.org/plugins/font-organizer/
 Description: afsaf.
-Author: Me
+Author: Hive
 Version: 1.0.0
 Author URI: 
 */
@@ -44,7 +44,7 @@ function fo_allow_upload_types($existing_mimes = array()){
 	$existing_mimes['woff'] = 'application/x-font-woff';
 	$existing_mimes['woff2'] = 'application/x-font-woff';
 	$existing_mimes['otf'] = 'application/x-font-woff';
-	
+
 	return $existing_mimes;
 }
 
@@ -59,7 +59,7 @@ function fo_install() {
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
 		name varchar(255) NOT NULL,
-		url text NOT NULL,
+		url text DEFAULT NULL,
 		custom int(1) DEFAULT 0,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
