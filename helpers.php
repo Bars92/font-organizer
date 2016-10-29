@@ -35,4 +35,39 @@
             echo "<link href='http://fonts.googleapis.com/css?family=". implode("|", $font_names_to_load) . "' rel='stylesheet' type='text/css'>";
         }
     }
+
+    function fo_upload_file($file, $upload_dir_callback, $should_override = false){
+        if ( ! function_exists( 'wp_handle_upload' ) ) 
+            require_once( ABSPATH . 'wp-admin/includes/file.php' );
+
+        $uploadedfile = $args['font_file'];
+
+        $upload_overrides = array( 'test_form' => false );
+        if($should_override){
+            $upload_overrides['unique_filename_callback'] = 'fo_unique_filename_callback';
+        }
+        // Register our path override.
+        add_filter( 'upload_dir', $upload_dir_callback );
+
+        $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+
+        // Set everything back to normal.
+        remove_filter( 'upload_dir', $upload_dir_callback );
+
+        return $movefile;
+    }
+
+    function fo_unique_filename_callback($dir, $name, $ext){
+        return $name.$ext;
+    }
+
+    function fo_get_font_format($font_name){
+        $extension = pathinfo($url, PATHINFO_EXTENSION);
+        switch ($extension) {
+            case 'ttf':
+                return 'truetype';                
+            default:
+                return $extension;
+        }
+    }
 ?>
