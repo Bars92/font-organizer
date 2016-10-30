@@ -150,16 +150,18 @@ class FoSettingsPage
     }
 
     public function create_css_file(){
+        global $css_full_file_path;
+        global $css_directory_path;
+
         if(!isset($_GET['settings-updated']) || !$_GET['settings-updated']){
             return;
         }
         
-        global $css_full_file_path;
         // This is called when the class is rebuilt before the redirect, so we need to initialize
         // some stuff again.
         $this->init();
 
-        $content = '';
+        $content = '/* This Awesome CSS file was created by Font Orgranizer from HiveTeam :) */\n\n';
         $custom_fonts_content = '';
         $google_fonts = array();
         foreach ($this->usable_fonts as $key => $usable_font) {
@@ -174,7 +176,7 @@ class FoSettingsPage
     font-style: normal;
 }\n";
                     break;
-                case 'webfonts#webfont': // Google
+                case 'webfonts#webfont': // Google font
                     $google_fonts[] = str_replace(' ', '+', $usable_font->family);
                 case 'regular':
                 default:
@@ -182,14 +184,17 @@ class FoSettingsPage
             }
         }
 
+        // Add Google fonts to the css. MUST BE FIRST.
         if(!empty($google_fonts)){
-            // We are assuming not to much google fonts. If so, we need to split the request.
+            // We are assuming not to much google fonts. If it is, we need to split the request.
            // $content .= "<link href='http://fonts.googleapis.com/css?family=". implode("|", $google_fonts) . "' rel='stylesheet' type='text/css'>\n";
             $content .= "@import url('http://fonts.googleapis.com/css?family=". implode("|", $google_fonts) . "');\n";
         }
 
+        // Add the custom fonts css that was created before.
         $content .= $custom_fonts_content;
 
+        // Add the known elements css.
         foreach ($this->elements_options as $key => $value) {
             if(strpos($key, 'important') || !$value)
                 continue;
@@ -200,7 +205,17 @@ class FoSettingsPage
         }
 
         if($content){
+            
+            // Make sure directory exists.
+            if(!is_dir($css_directory_path))
+                 mkdir($css_directory_path, 0777, true);
+
             $fhandler = fopen($css_full_file_path, "w");
+            if($fhandler){
+                add_action( 'admin_notices', array($this, 'generate_css_failed_admin_notice') );
+                return;
+            }
+
             fwrite($fhandler, $content);
             fclose($fhandler);
         }
@@ -225,7 +240,7 @@ class FoSettingsPage
                     settings_errors( 'google_key' );
             }
 
-            $this->google_fonts = json_decode( wp_remote_retrieve_body($response))->items;
+            $this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
         }else{
             add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'fo'), 'error');
             settings_errors( 'google_key' );
@@ -656,7 +671,15 @@ class FoSettingsPage
     public function delete_font_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error deleted font: ', 'fo' ) . $this->upload_error; ?></p>
+            <p><?php _e( 'Error deleting font: ', 'fo' ) . $this->upload_error; ?></p>
+        </div>
+        <?php
+    }
+
+    public function generate_css_failed_admin_notice() {
+        ?>
+        <div class="error notice">
+            <p><?php _e( 'Failed to open or create the css file. Check for permissions.', 'fo' ); ?></p>
         </div>
         <?php
     }

@@ -19,8 +19,10 @@ global $fo_db_version;
 $fo_db_version = '1.0.0';
 global $css_full_file_path;
 global $css_full_url_path;
+global $css_directory_path;
 $css_full_file_path = wp_upload_dir()['basedir'] . '/font-organizer' . '/fo-fonts.css';
 $css_full_url_path = wp_upload_dir()['baseurl'] . '/font-organizer' . '/fo-fonts.css';
+$css_directory_path =  wp_upload_dir()['basedir'] . '/font-organizer';
 
 function fo_update_db_check() {
     global $fo_db_version;

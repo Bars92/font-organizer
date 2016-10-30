@@ -61,7 +61,7 @@
         return $name.$ext;
     }
 
-    function fo_get_font_format($font_name){
+    function fo_get_font_format($url){
         $extension = pathinfo($url, PATHINFO_EXTENSION);
         switch ($extension) {
             case 'ttf':
