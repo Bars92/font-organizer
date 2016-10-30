@@ -205,13 +205,13 @@ class FoSettingsPage
         }
 
         if($content){
-            
+
             // Make sure directory exists.
             if(!is_dir($css_directory_path))
                  mkdir($css_directory_path, 0777, true);
 
             $fhandler = fopen($css_full_file_path, "w");
-            if($fhandler){
+            if(!$fhandler){
                 add_action( 'admin_notices', array($this, 'generate_css_failed_admin_notice') );
                 return;
             }
