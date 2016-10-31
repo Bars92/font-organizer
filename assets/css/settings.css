@@ -1,0 +1,108 @@
+/*------------------------------------------------------------------
+Begin [Steps Wizard]
+*/
+.steps {
+	border-top: 1px solid #F3F3F3;
+	border-bottom: 1px solid #F3F3F3
+}
+.steps ol {
+	background-color: #f2f2f2;
+	list-style: none;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	border-top: 1px solid #FFF;
+	border-bottom: 1px solid #FFF
+}
+.steps li {
+	float: left;
+}
+.steps li.level1{z-index: 1; }
+.steps li.level2{z-index: 2; }
+.steps li.level3{z-index: 3; }
+.steps li div {
+	font-size: 14px;
+	font-weight: bold;
+    padding: 4px 0 4px 30px;
+	background-color: #f2f2f2;
+	position: relative;
+}
+.steps li:last-child div {
+	background-color: #f2f2f2;
+	padding-right: 30px
+}
+.steps li div:after {
+	content: " ";
+	display: block;
+	width: 0;
+	height: 0;
+	border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+	border-bottom: 50px solid transparent;
+	border-left: 30px solid #f2f2f2;
+	position: absolute;
+	top: 50%;
+	margin-top: -50px;
+	left: 100%;
+	z-index: 5;
+}
+.steps li:last-child div:after {
+	content: normal;
+}
+.steps li div:before {
+	content: " ";
+	display: block;
+	width: 0;
+	height: 0;
+	border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+	border-bottom: 50px solid transparent;
+	border-left: 30px solid #cfcfcf;
+	position: absolute;
+	top: 50%;
+	margin-top: -50px;
+	margin-left: 1px;
+	left: 100%;
+	z-index: 1;
+}
+.steps li:last-child div:before {
+	content: normal;
+}
+.steps li div a {
+	text-decoration: none;
+    color: #3C3C3C;
+}
+.steps li div span {
+	display: inline-block;
+    width: 25px;
+    height: 25px;
+	text-align: center;
+	line-height: 28px;
+	font-size: 14px;
+}
+.steps li.current div {
+	background-color: #FFF;
+	color: #0076d6
+}
+.steps li.current div span {
+	color: #0076d6;
+}
+.steps li.completed div {
+	color: #395e00
+}
+.steps li.completed div span {
+	color: #66A4E5;
+}
+.steps li.current div:after {
+	border-left: 30px solid #FFF
+}
+.steps li:first-child div {
+	padding-left: 10px;
+}
+/*--
+End [Steps Wizard]
+*/
+
+.fixed {
+  position: absolute;
+  left:0;
+  width: 100%; 
+}

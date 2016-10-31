@@ -78,7 +78,7 @@ class FoSettingsPage
         add_action( 'admin_init', array( $this, 'page_init' ) );
 
         $this->fonts_per_link = 150;
-        $this->supported_font_files = array('.woff','.ttf','.otf');
+        $this->supported_font_files = array('.woff', '.woff2', '.ttf','.otf');
         $this->custom_fonts = array();
         $this->available_fonts = array();
         $this->google_fonts = array();
@@ -127,7 +127,7 @@ class FoSettingsPage
     public function register_scripts() {
         wp_enqueue_script( 'jquery-ui-core' );
         wp_enqueue_script( 'jquery-ui-autocomplete' );
-        wp_register_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
+        wp_enqueue_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
         wp_enqueue_style( 'fo-settings-css', plugins_url( 'assets/css/settings.css', __FILE__ ) );
     }
 
@@ -161,7 +161,7 @@ class FoSettingsPage
         // some stuff again.
         $this->init();
 
-        $content = '/* This Awesome CSS file was created by Font Orgranizer from HiveTeam :) */\n\n';
+        $content = "/* This Awesome CSS file was created by Font Orgranizer from HiveTeam :) */\n\n";
         $custom_fonts_content = '';
         $google_fonts = array();
         foreach ($this->usable_fonts as $key => $usable_font) {
@@ -262,10 +262,6 @@ class FoSettingsPage
         
         $this->init();
 
-        wp_localize_script( 'fo-settings-script', 'usable_fonts', $this->usable_fonts );
-
-        add_action( 'wp_print_footer_scripts', array( $this, 'enqueue_footer' ) );
-
         // Load the google fonts if selected or if not specified. else load just whats usable.
         if($this->include_font_link)
             fo_print_links($this->google_fonts, $this->fonts_per_link);
@@ -275,6 +271,30 @@ class FoSettingsPage
         ?>
         <div class="wrap">
             <h1><?php _e('Font Settings', 'fo'); ?></h1>
+
+          <div class="steps sticky">
+          <ol >
+            <li class="level1">
+              <div><a href="#step1"><span>1.</span><?php _e('General Settings', 'fo'); ?></a></div>
+            </li>
+            <li class="level2">
+              <div><a href="#step2"><span>2.</span><?php _e('Add Fonts', 'fo'); ?></a></div>
+            </li>
+            <li class="level3">
+              <div><a href="#step3"><span>3.</span><?php _e('Custom Fonts', 'fo'); ?></a></div>
+            </li>
+            <li class="level4">
+              <div><a href="#step4"><span>4.</span><?php _e('Known Elements Settings', 'fo'); ?></a></div>
+            </li>
+            <li class="level5">
+              <div><a href="#step5"><span>5.</span><?php _e('Custom Elements Settings', 'fo'); ?></a></div>
+            </li>
+            <li class="level6">
+              <div><a href="#step6"><span>6.</span><?php _e('Manage Fonts', 'fo'); ?></a></div>
+            </li>
+          </ol>
+        </div>
+
                 <div id="poststuff">  
                     <div id="post-body" class="metabox-holder columns-2">
 
@@ -283,6 +303,7 @@ class FoSettingsPage
 
                         <!-- General Settings Section -->
                         <div class="postbox">
+                            <a name="step1"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
                                 <span class="screen-reader-text"><?php _e('Toggle panel: General Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
@@ -301,6 +322,7 @@ class FoSettingsPage
 
                         <!-- Add Google & Regular Fonts To Website Section -->
                         <div class="postbox">
+                            <a name="step2"></a>
                          <button type="button" class="handlediv button-link" aria-expanded="false">
                                 <span class="screen-reader-text"><?php _e('Toggle panel: First Step: Add Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
@@ -329,6 +351,7 @@ class FoSettingsPage
                    
                         <!-- Add Custom Fonts To Website Section -->
                         <div class="postbox">
+                            <a name="step3"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
                                 <span class="screen-reader-text"><?php _e('Toggle panel: Custom Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
@@ -362,6 +385,7 @@ class FoSettingsPage
    
                         <!-- Assign Fonts To Known Elements Section -->
                         <div class="postbox">
+                            <a name="step4"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
                                 <span class="screen-reader-text"><?php _e('Toggle panel: Known Elements Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
@@ -384,6 +408,7 @@ class FoSettingsPage
                         
                         <!-- Assign Fonts To Custom Elements Section -->
                         <div class="postbox">
+                            <a name="step5"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
                                 <span class="screen-reader-text"><?php _e('Toggle panel: Custom Elements Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
@@ -453,6 +478,7 @@ class FoSettingsPage
 
                         <!-- Manage Used fonts Section -->
                         <div class="postbox">
+                            <a name="step6"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
                                 <span class="screen-reader-text"><?php _e('Toggle panel: Manage Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
@@ -517,11 +543,6 @@ class FoSettingsPage
             </form>
         </div>
         <?php
-    }
-
-    private function enqueue_footer(){
-        // Enqueued script with localized data.
-        wp_enqueue_script( 'fo-settings-script' );
     }
 
     private function validate_upload(){
