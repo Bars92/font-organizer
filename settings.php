@@ -119,6 +119,14 @@ class FoSettingsPage
                 add_action( 'admin_notices', array($this, 'delete_font_failed_admin_notice') );
             }
         }
+
+        if(isset($_POST['submit_custom_elements'])){
+            if($args = $this->validate_custom_elements()){
+                $this->add_custom_elements($args);
+            }else{
+                add_action( 'admin_notices', array($this, 'add_custom_elements_failed_admin_notice') );
+            }
+        }
     }
 
     /**
@@ -418,41 +426,6 @@ class FoSettingsPage
                                 <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'fo'); ?></span>
                                 <em><?php _e('Example: #myelementid, .myelementclass, .myelementclass .foo, etc.', 'fo'); ?></em>
                                 <form action="" id="add_usable_font_form" name="add_usable_font_form" method="post"> 
-                                    <table class="widefat">
-                                    <thead>
-                                    <tr>
-                                        <th class="row-title"><?php _e('Font Name', 'fo'); ?></th>
-                                        <th class="row-title"><?php _e('Custom Elements', 'fo'); ?></th>
-                                        <th class="row-title"><?php _e('Font URL', 'fo'); ?></th>
-                                        <th class="row-title"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php 
-                                        $is_alternate = false;
-                                        foreach ($this->usable_fonts_db as $usable_font): ?>
-                                             <tr class="<?php echo $is_alternate ? 'alternate' : ''; ?>">
-                                                <td style="font-family: <?php echo $usable_font->name; ?>"><?php echo $usable_font->name; ?></td>
-                                                <td>
-                                                    <textarea id="custom_elements" name="custom_elements" cols="80" rows="10"><?php echo $usable_font->custom_elements; ?></textarea>
-                                                </td>
-                                                <td><?php echo $usable_font->files->regular; ?></td>
-                                                <td>
-                                                    <form action="" method="post" name="delete_usable_font">
-                                                        <input type="hidden" name="font_name" value="<?php echo $usable_font->family; ?>" />
-                                                      <?php 
-                                                        submit_button(__('Delete', 'fo'), $type = 'delete', $name = 'delete_usable_font', $wrap = false);
-                                                        wp_nonce_field( 'delete_usable_font', 'delete_usable_font_nonce' );
-                                                      ?>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                    <?php
-                                        $is_alternate = !$is_alternate;
-                                        endforeach;
-                                   ?>
-                                   </tbody>
-                                </table>
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><?php _e('Font', 'fo'); ?></th>
@@ -461,8 +434,12 @@ class FoSettingsPage
                                         <tr>        
                                             <th scope="row"><?php _e('Custom Element', 'fo'); ?></th>
                                             <td>
-                                                <textarea id="custom_elements" name="custom_elements" cols="80" rows="10"></textarea>
+                                                <textarea id="custom_elements" name="custom_elements" width="100%" rows="2"></textarea>
                                             </td>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <td><?php $this->print_is_important_checkbox('important'); ?></td>
                                         </tr>
                                         <tr>        
                                             <th scope="row"></th>
@@ -587,6 +564,23 @@ class FoSettingsPage
         return $args;
     }
 
+    private function validate_custom_elements(){
+        if(!isset( $_POST['add_custom_elements_nonce'] ) || !wp_verify_nonce( $_POST['add_custom_elements_nonce'], 'add_custom_elements' )){
+            $this->upload_error = __('Session ended, please try again.', 'fo');
+            return false;
+        }
+
+        $args['custom_elements'] = sanitize_text_field( $_POST['custom_elements'] );
+        if(!$args['custom_elements']){
+            $this->upload_error = __('Custom elements is empty or invalid.', 'fo');
+            return false;
+        }
+
+        $args['important'] = $_POST['important'] ? 1 : 0;
+
+        return $args;        
+    }
+
     private function validate_delete_usable(){
         if(!isset( $_POST['delete_usable_font_nonce'] ) || !wp_verify_nonce( $_POST['delete_usable_font_nonce'], 'delete_usable_font' )){
             $this->upload_error = __('Session ended, please try again.', 'fo');
@@ -621,7 +615,12 @@ class FoSettingsPage
 
     private function use_font($args = array()){
             add_action( 'admin_notices', array($this, 'use_font_successfull_admin_notice') );
-            $this->save_to_database($args['usable_font']);
+            $this->save_usable_font_to_database($args['usable_font']);
+    }
+
+    private function add_custom_elements($args = array()){
+            add_action( 'admin_notices', array($this, 'add_custom_elements_successfull_admin_notice') );
+            $this->save_custom_elements_to_database($args['custom_elements'], $args['important']);
     }
 
     private function delete_font($args = array()){
@@ -636,7 +635,20 @@ class FoSettingsPage
         $wpdb->delete( $table_name, array( 'name' => $name ) );
     }
 
-    private function save_to_database($name, $url = '', $is_custom = false){
+    private function save_custom_elements_to_database($custom_elements, $important){
+        global $wpdb;
+        $table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;
+
+        $wpdb->insert( 
+        $table_name, 
+        array( 
+            'font_id' => $name, 
+            'custom_elements' => $custom_elements, 
+            'important' => $important ? 1 : 0,
+        ));
+    }
+
+    private function save_usable_font_to_database($name, $url = '', $is_custom = false){
         global $wpdb;
         $table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
 
@@ -892,13 +904,13 @@ class FoSettingsPage
      */
     public function is_important_element_field_callback($name)
     {
-        $this->print_is_important_checkbox($name);
+        $this->print_is_important_checkbox_options($name);
     }
 
     /** 
      * Get the settings option array and print one of its values
      */
-    public function print_is_important_checkbox($name)
+    public function print_is_important_checkbox_options($name)
     {
          $checked = !isset($this->elements_options[$name]) || (isset($this->elements_options[$name]) && $this->elements_options[$name]) ? 'checked="checked"' : '';
         printf(
@@ -906,6 +918,23 @@ class FoSettingsPage
                 <legend class="screen-reader-text"><span>%s</span></legend>
                 <label for="%s">
                     <input name="fo_elements_options[%s]" type="checkbox" id="%s" value="1" %s>
+                    %s
+                </label>
+            </fieldset>',
+            __('Important', 'fo'),
+            $name, $name, $name,
+            $checked,
+            __('Include !important to this element to always apply.', 'fo')
+        );
+    }
+
+    public function print_is_important_checkbox($name, $checked = true)
+    {
+        printf(
+            '<fieldset>
+                <legend class="screen-reader-text"><span>%s</span></legend>
+                <label for="%s">
+                    <input name="%s" type="checkbox" id="%s" value="1" %s>
                     %s
                 </label>
             </fieldset>',

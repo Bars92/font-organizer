@@ -13,7 +13,8 @@ Author URI:
 */
 
 define( 'FO_ABSPATH', plugin_dir_path( __FILE__ ) );
-define( 'FO_USABLE_FONTS_DATABASE', 'usable_fonts' );
+define( 'FO_USABLE_FONTS_DATABASE', 'fo_usable_fonts' );
+define( 'FO_ELEMENTS_DATABASE', 'fo_elements' );
 
 global $fo_db_version;
 $fo_db_version = '1.0.0';
@@ -69,20 +70,31 @@ function fo_install() {
 	global $wpdb;
 	global $fo_db_version;
 
-	$table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
+	$usable_table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
+	$elements_table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;
 	
 	$charset_collate = $wpdb->get_charset_collate();
 
-	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+	$sql = "CREATE TABLE IF NOT EXISTS $usable_table_name (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
 		name varchar(255) NOT NULL,
 		url text DEFAULT NULL,
 		custom int(1) DEFAULT 0,
-		custom_elements text DEFAULT NULL,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 
-	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	dbDelta( $sql );
+	
+	$sql = "CREATE TABLE IF NOT EXISTS $elements_table_name (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		font_id mediumint(9) NOT NULL,
+		important int(1) DEFAULT 0,
+		custom_elements TEXT DEFAULT NULL,
+		PRIMARY KEY  (id)
+	) $charset_collate;";
+
 	dbDelta( $sql );
 
 	// Set the db version to current.
