@@ -15,6 +15,7 @@ Author URI:
 define( 'FO_ABSPATH', plugin_dir_path( __FILE__ ) );
 define( 'FO_USABLE_FONTS_DATABASE', 'fo_usable_fonts' );
 define( 'FO_ELEMENTS_DATABASE', 'fo_elements' );
+define( 'FO_DEFAULT_ROLE', 'administrator' );
 
 global $fo_db_version;
 $fo_db_version = '1.0.0';
@@ -34,6 +35,7 @@ function fo_update_db_check() {
 
 add_action( 'plugins_loaded', 'fo_update_db_check' );
 register_activation_hook( __FILE__, 'fo_install' );
+register_deactivation_hook( __FILE__, 'fo_uninstall' );
 add_action( 'init', 'fo_init' );
 
 function fo_init(){
@@ -69,6 +71,16 @@ function fo_allow_upload_types($existing_mimes = array()){
 	return $existing_mimes;
 }
 
+function fo_uninstall(){
+	global $wp_roles; 
+
+	// Remove all capabilities added by this plugin.
+	foreach ($wp_roles as $role) {
+		if($role->has_cap('manage_fonts'))
+			 $role->remove_cap( 'manage_fonts' ); 
+	}
+}
+
 function fo_install() {
 	global $wpdb;
 	global $fo_db_version;
@@ -102,6 +114,11 @@ function fo_install() {
 
 	// Set the db version to current.
 	add_option( 'fo_db_version', $fo_db_version );
+
+	// Set roles
+	 $role = get_role( 'administrator' );
+	 if(!$role->has_cap('manage_fonts'))
+	 	  $role->add_cap( 'manage_fonts' );
 }
 
 function fo_add_action_plugin( $actions, $plugin_file ) {
@@ -114,7 +131,7 @@ function fo_add_action_plugin( $actions, $plugin_file ) {
 
 		$settings = array('settings' => '<a href="options-general.php?page=font-setting-admin">' . __('Font Settings', 'fo') . '</a>');
     	$actions = array_merge($settings, $actions);
-    	
+
 	}
 		
 	return $actions;

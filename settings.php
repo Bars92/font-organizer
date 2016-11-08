@@ -93,7 +93,7 @@ class FoSettingsPage
      */
     public function __construct()
     {
-        include FO_ABSPATH . 'classes/class-ElementsTable.php'; 
+        require_once FO_ABSPATH . 'classes/class-ElementsTable.php'; 
 
         add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
         add_action( 'admin_init', array( $this, 'page_init' ) );
@@ -116,7 +116,6 @@ class FoSettingsPage
                                 'li_font'   =>  '<li> Font',
                                 'a_font'    =>  '<a> Font',
                                 );
-
 
         // An upload is made. Upload the file and proccess it.
         if (isset($_POST['submit_upload_font'])){  
@@ -173,7 +172,7 @@ class FoSettingsPage
         $hook = add_options_page(
             'Settings Admin', 
             'Font Settings', 
-            'manage_options', 
+            'manage_fonts', // We handle this by role.
             'font-setting-admin', 
             array( $this, 'create_font_settings_page' )
         );
@@ -444,7 +443,6 @@ class FoSettingsPage
                             <div class="inside">
 
                                 <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'fo'); ?></span>
-                                <em><?php _e('Example: #myelementid, .myelementclass, .myelementclass .foo, etc.', 'fo'); ?></em>
                                 <form action="" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
                                     <table class="form-table">
                                         <tr>
@@ -455,6 +453,7 @@ class FoSettingsPage
                                             <th scope="row"><?php _e('Custom Element', 'fo'); ?></th>
                                             <td>
                                                 <textarea id="custom_elements" name="custom_elements" style="width: 100%" rows="2"></textarea>
+                                                <em><?php _e('Custom elements can be seperated by commas to allow multiple elements. Example: #myelementid, .myelementclass, .myelementclass .foo, etc.', 'fo'); ?></em>
                                             </td>
                                         </tr>
                                         <tr>
@@ -802,6 +801,13 @@ class FoSettingsPage
             'font-setting-admin', // Page
             'setting_general' // Section           
         );   
+        add_settings_field(
+            'permissions', // ID
+            'Access Settings Role', // Title 
+            array( $this, 'permissions_callback' ), // Callback
+            'font-setting-admin', // Page
+            'setting_general' // Section           
+        );   
         add_settings_section(
             'setting_elements', // ID
             '', // Title
@@ -844,6 +850,19 @@ class FoSettingsPage
 
         if( !isset( $input['include_font_link'] ) )
             $new_input['include_font_link'] =  0 ;
+
+        if( isset( $input['permissions'] ) ){
+            $new_input['permissions'] = sanitize_text_field( $input['permissions'] );
+            if(isset($this->general_options['permissions']) && $this->general_options['permissions'] != $new_input['permissions'] && $new_input['permissions'] != FO_DEFAULT_ROLE){
+            	$prev_role = get_role($this->general_options['permissions']);
+            	$prev_role->remove_cap('manage_fonts');
+
+            	$new_role = get_role($new_input['permissions']);
+            	$new_role->add_cap('manage_fonts');
+            }
+        }else{
+        	$new_input['permissions'] = FO_DEFAULT_ROLE;
+        }
 
         return $new_input;
     }
@@ -925,6 +944,21 @@ class FoSettingsPage
             $checked, 
             __('Show font preview when listing the fonts (might be slow)', 'fo')
         );
+    }
+
+    /** 
+     * Get the settings option array and print one of its values
+     */
+    public function permissions_callback()
+    {
+        global $wp_roles;
+        $default = !isset($this->general_options['permissions']) ? FO_DEFAULT_ROLE : $this->general_options['permissions'];
+
+	    echo '<select id="permissions" name="fo_general_options[permissions]" class="input">';
+	    foreach ( $wp_roles->roles as $key=>$value ):
+	       echo '<option value="'.$key.'"'.selected($default,$key,false).'>'.$value['name'].'</option>';
+	    endforeach;
+	    echo '</select>';
     }
 
     /** 
