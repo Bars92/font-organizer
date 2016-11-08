@@ -41,9 +41,12 @@ function fo_init(){
 
 	if( is_admin() ){
 		add_filter('upload_mimes', 'fo_allow_upload_types');
+		add_filter( 'plugin_action_links', 'fo_add_action_plugin', 10, 5 );
+		
 		include FO_ABSPATH . 'helpers.php';
 
 		include FO_ABSPATH . 'settings.php'; 
+
 	    $settings_page = new FoSettingsPage();
 	}else{
 		if(file_exists($css_full_file_path)){
@@ -101,4 +104,19 @@ function fo_install() {
 	add_option( 'fo_db_version', $fo_db_version );
 }
 
+function fo_add_action_plugin( $actions, $plugin_file ) {
+	static $plugin;
+
+	if (!isset($plugin))
+		$plugin = plugin_basename(__FILE__);
+
+	if ($plugin == $plugin_file) {
+
+		$settings = array('settings' => '<a href="options-general.php?page=font-setting-admin">' . __('Font Settings', 'fo') . '</a>');
+    	$actions = array_merge($settings, $actions);
+    	
+	}
+		
+	return $actions;
+}
 ?>

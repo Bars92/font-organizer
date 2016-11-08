@@ -23,6 +23,10 @@ class FoSettingsPage
      */
     private $usable_fonts;
 
+    /**
+     * Holds all the usable fonts from the database.
+     * An Objects array that contains the information on each font.
+     */
     private $usable_fonts_db;
 
     /**
@@ -56,10 +60,10 @@ class FoSettingsPage
     /**
      * Holds the error, if any, recieved from uploading a font.
      */
-    private $upload_error;
+    private $recent_error;
 
     /**
-     * Holds the elements id and title to select a font for.
+     * Holds the known elements id and title to select a font for.
      */
     private $elements;
 
@@ -70,10 +74,27 @@ class FoSettingsPage
     private $include_font_link;
 
     /**
+     * Holds a list of all the custom elements from the database.
+     */
+    private $custom_elements;
+
+    /**
+     * The selected font to manage in last step.
+     */
+    private $selected_manage_font;
+
+    /**
+     * Should create a css file (override if exists) based on recent actions made.
+     */
+    private $should_create_css;
+
+    /**
      * Start up
      */
     public function __construct()
     {
+        include FO_ABSPATH . 'classes/class-ElementsTable.php'; 
+
         add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
         add_action( 'admin_init', array( $this, 'page_init' ) );
 
@@ -82,6 +103,7 @@ class FoSettingsPage
         $this->custom_fonts = array();
         $this->available_fonts = array();
         $this->google_fonts = array();
+        $this->should_create_css = false;
         $this->elements = array('body_font' =>  '<body> Font',
                                 'h1_font'   =>  '<h1> Font',
                                 'h2_font'   =>  '<h2> Font',
@@ -94,6 +116,7 @@ class FoSettingsPage
                                 'li_font'   =>  '<li> Font',
                                 'a_font'    =>  '<a> Font',
                                 );
+
 
         // An upload is made. Upload the file and proccess it.
         if (isset($_POST['submit_upload_font'])){  
@@ -115,6 +138,7 @@ class FoSettingsPage
         if (isset($_POST['delete_usable_font'])){  
             if($args = $this->validate_delete_usable()){
                 $this->delete_font($args);
+                $this->should_create_css = true;
             }else{
                 add_action( 'admin_notices', array($this, 'delete_font_failed_admin_notice') );
             }
@@ -123,6 +147,7 @@ class FoSettingsPage
         if(isset($_POST['submit_custom_elements'])){
             if($args = $this->validate_custom_elements()){
                 $this->add_custom_elements($args);
+                $this->should_create_css = true;
             }else{
                 add_action( 'admin_notices', array($this, 'add_custom_elements_failed_admin_notice') );
             }
@@ -161,7 +186,7 @@ class FoSettingsPage
         global $css_full_file_path;
         global $css_directory_path;
 
-        if(!isset($_GET['settings-updated']) || !$_GET['settings-updated']){
+        if((!isset($_GET['settings-updated']) || !$_GET['settings-updated']) && !$this->should_create_css){
             return;
         }
         
@@ -212,6 +237,11 @@ class FoSettingsPage
             $content .= sprintf("%s { font-family: '%s'%s; }\n", $strip_key, $value, $important ? '!important' : '');
         }
 
+        // Add custom elements css.
+        foreach ($this->custom_elements as $custom_element_db) {
+        	$content .= sprintf("%s { font-family: '%s'%s; }\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '');
+        }
+
         if($content){
 
             // Make sure directory exists.
@@ -237,6 +267,8 @@ class FoSettingsPage
         $this->general_options = get_option( 'fo_general_options' );
         $this->elements_options = get_option( 'fo_elements_options' );
         
+        $this->custom_elements_table = new ElementsTable();
+
         $this->include_font_link = !isset( $this->general_options['include_font_link'] ) || (isset( $this->general_options['include_font_link'] ) && $this->general_options['include_font_link']);
 
         if(isset($this->general_options['google_key']) && $this->general_options['google_key']){
@@ -261,6 +293,7 @@ class FoSettingsPage
 
         // Get all usable fonts and add them to a list.
         $this->load_usable_fonts();
+        $this->load_custom_elements();
     }
 
     /**
@@ -269,6 +302,16 @@ class FoSettingsPage
     public function create_font_settings_page(){
         
         $this->init();
+
+        if(isset($_GET['manage_font_id'])){
+        		foreach ($this->usable_fonts_db as $font_db) {
+        			 if(intval($_GET['manage_font_id']) == $font_db->id){
+	                	$this->selected_manage_font = $this->usable_fonts[$font_db->name];
+        				$this->custom_elements_table->prepare_items_by_font($this->custom_elements, $font_db->id);
+	                	break;
+	                }
+        		}
+        }
 
         // Load the google fonts if selected or if not specified. else load just whats usable.
         if($this->include_font_link)
@@ -279,29 +322,6 @@ class FoSettingsPage
         ?>
         <div class="wrap">
             <h1><?php _e('Font Settings', 'fo'); ?></h1>
-
-          <div class="steps sticky">
-          <ol >
-            <li class="level1">
-              <div><a href="#step1"><span>1.</span><?php _e('General Settings', 'fo'); ?></a></div>
-            </li>
-            <li class="level2">
-              <div><a href="#step2"><span>2.</span><?php _e('Add Fonts', 'fo'); ?></a></div>
-            </li>
-            <li class="level3">
-              <div><a href="#step3"><span>3.</span><?php _e('Custom Fonts', 'fo'); ?></a></div>
-            </li>
-            <li class="level4">
-              <div><a href="#step4"><span>4.</span><?php _e('Known Elements Settings', 'fo'); ?></a></div>
-            </li>
-            <li class="level5">
-              <div><a href="#step5"><span>5.</span><?php _e('Custom Elements Settings', 'fo'); ?></a></div>
-            </li>
-            <li class="level6">
-              <div><a href="#step6"><span>6.</span><?php _e('Manage Fonts', 'fo'); ?></a></div>
-            </li>
-          </ol>
-        </div>
 
                 <div id="poststuff">  
                     <div id="post-body" class="metabox-holder columns-2">
@@ -425,16 +445,16 @@ class FoSettingsPage
 
                                 <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'fo'); ?></span>
                                 <em><?php _e('Example: #myelementid, .myelementclass, .myelementclass .foo, etc.', 'fo'); ?></em>
-                                <form action="" id="add_usable_font_form" name="add_usable_font_form" method="post"> 
+                                <form action="" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><?php _e('Font', 'fo'); ?></th>
-                                            <td><?php $this->print_custom_elements_usable_fonts_list(); ?></td>
+                                            <td><?php $this->print_custom_elements_usable_fonts_list('font_id'); ?></td>
                                         </tr>   
-                                        <tr>        
+                                        <tr>
                                             <th scope="row"><?php _e('Custom Element', 'fo'); ?></th>
                                             <td>
-                                                <textarea id="custom_elements" name="custom_elements" width="100%" rows="2"></textarea>
+                                                <textarea id="custom_elements" name="custom_elements" style="width: 100%" rows="2"></textarea>
                                             </td>
                                         </tr>
                                         <tr>
@@ -461,40 +481,45 @@ class FoSettingsPage
                             </button>
                             <h2 class="hndle ui-sortable-handle"><span><?php _e('5. Manage Fonts', 'fo'); ?></span></h2>
                             <div class="inside">
-
-                                <table class="widefat">
-                                    <thead>
+                            	<form action="#step6" id="select_font_form" name="select_font_form" method="get"> 
+	                                <table class="form-table">
+	                                        <tr>
+	                                            <th scope="row"><?php _e('Font', 'fo'); ?></th>
+	                                            <td><?php $this->print_custom_elements_usable_fonts_list('manage_font_id', __('-- Select Font --', 'fo')); ?></td>
+	                                        </tr>   
+	                                </table>
+	                                <input type="hidden" name="page" value="<?php echo wp_unslash( $_REQUEST['page'] ); ?>">
+	                            </form>
+	                            <?php if($this->selected_manage_font): ?>
+	                           	<hr/>
+                                <table class="form-table">
                                     <tr>
-                                        <th class="row-title"><?php _e('Font Name', 'fo'); ?></th>
-                                        <th class="row-title"><?php _e('Font Source', 'fo'); ?></th>
-                                        <th class="row-title"><?php _e('Font URL', 'fo'); ?></th>
-                                        <th class="row-title"></th>
+                                        <th scope="row"><?php _e('Source', 'fo'); ?></th>
+                                        <td><span><?php fo_print_source($this->selected_manage_font->kind); ?></span></td>
                                     </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php 
-                                        $is_alternate = false;
-                                        foreach ($this->usable_fonts as $usable_font): ?>
-                                             <tr class="<?php echo $is_alternate ? 'alternate' : ''; ?>">
-                                                <td style="font-family: <?php echo $usable_font->family; ?>"><?php echo $usable_font->family; ?></td>
-                                                <td><?php strpos($usable_font->kind, 'webfonts') !== false ? _e('Google', 'fo') : _e(ucfirst($usable_font->kind), 'fo'); ?></td>
-                                                <td><?php echo $usable_font->files->regular; ?></td>
-                                                <td>
-                                                    <form action="" method="post" name="delete_usable_font">
-                                                        <input type="hidden" name="font_name" value="<?php echo $usable_font->family; ?>" />
-                                                      <?php 
-                                                        submit_button(__('Delete', 'fo'), $type = 'delete', $name = 'delete_usable_font', $wrap = false);
-                                                        wp_nonce_field( 'delete_usable_font', 'delete_usable_font_nonce' );
-                                                      ?>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                    <?php
-                                        $is_alternate = !$is_alternate;
-                                        endforeach;
-                                   ?>
-                                   </tbody>
+                                    <tr>
+                                        <th scope="row"><?php _e('Urls', 'fo'); ?></th>
+                                        <td>
+                                            <span>
+                                            <?php
+                                             $urls = explode('|', $this->selected_manage_font->files->regular); 
+                                             foreach($urls as $url)
+                                               echo $url, '<br>';
+                                            ?>
+                                            </span>
+                                        </td>
+                                    </tr>
                                 </table>
+                                <div class="wp-table-fo-container">
+                                 	<form id="custom_elements-filter" method="get" action="#step6">
+                                 		<input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
+                                 		<input type="hidden" name="manage_font_id" value="<?php echo $_GET['manage_font_id']; ?>">
+                               			<?php $this->custom_elements_table->display(); ?>
+                               		</form>
+                                </div>
+                                <?php
+                                endif;
+                                ?>
                             </div>
                         </div>
 
@@ -524,25 +549,25 @@ class FoSettingsPage
 
     private function validate_upload(){
         if(!isset( $_POST['add_custom_font_nonce'] ) || !wp_verify_nonce( $_POST['add_custom_font_nonce'], 'add_custom_font' )){
-            $this->upload_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'fo');
             return false;
         }
 
         $args['font_name'] = sanitize_text_field( $_POST['font_name'] );
         if(!$args['font_name']){
-            $this->upload_error = __('Font name is empty or invalid.', 'fo');
+            $this->recent_error = __('Font name is empty or invalid.', 'fo');
             return false;
         }
 
         if(!isset($_FILES['font_file'])){
-            $this->upload_error = __('Font file is not selected.', 'fo');
+            $this->recent_error = __('Font file is not selected.', 'fo');
             return false;
         }
 
         $args['font_file'] = $_FILES['font_file'];
         $args['font_file_name'] = sanitize_file_name( $args['font_file']['name'] );
         if(!$args['font_file_name']){
-            $this->upload_error = __('Font file is not valid.', 'fo');
+            $this->recent_error = __('Font file is not valid.', 'fo');
             return false;
         }
 
@@ -551,13 +576,13 @@ class FoSettingsPage
 
     private function validate_add_usable(){
         if(!isset( $_POST['add_usable_font_nonce'] ) || !wp_verify_nonce( $_POST['add_usable_font_nonce'], 'add_usable_font' )){
-            $this->upload_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'fo');
             return false;
         }
 
         $args['usable_font'] = sanitize_text_field( $_POST['usable_font'] );
         if(!$args['usable_font']){
-            $this->upload_error = __('Usable font is empty or invalid.', 'fo');
+            $this->recent_error = __('Usable font is empty or invalid.', 'fo');
             return false;
         }
 
@@ -566,30 +591,32 @@ class FoSettingsPage
 
     private function validate_custom_elements(){
         if(!isset( $_POST['add_custom_elements_nonce'] ) || !wp_verify_nonce( $_POST['add_custom_elements_nonce'], 'add_custom_elements' )){
-            $this->upload_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'fo');
             return false;
         }
 
         $args['custom_elements'] = sanitize_text_field( $_POST['custom_elements'] );
         if(!$args['custom_elements']){
-            $this->upload_error = __('Custom elements is empty or invalid.', 'fo');
+            $this->recent_error = __('Custom elements is empty or invalid.', 'fo');
             return false;
         }
 
         $args['important'] = $_POST['important'] ? 1 : 0;
+
+        $args['font_id'] = $_POST['font_id'];
 
         return $args;        
     }
 
     private function validate_delete_usable(){
         if(!isset( $_POST['delete_usable_font_nonce'] ) || !wp_verify_nonce( $_POST['delete_usable_font_nonce'], 'delete_usable_font' )){
-            $this->upload_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'fo');
             return false;
         }
 
         $args['font_name'] = sanitize_text_field( $_POST['font_name'] );
         if(!$args['font_name']){
-            $this->upload_error = __('Something went horribly worng. Ask the support!', 'fo');
+            $this->recent_error = __('Something went horribly worng. Ask the support!', 'fo');
             return false;
         }
 
@@ -609,7 +636,7 @@ class FoSettingsPage
              * @see _wp_handle_upload() in wp-admin/includes/file.php
              */
             add_action( 'admin_notices', array($this, 'upload_failed_admin_notice') );
-            $this->upload_error = $movefile['error'];
+            $this->recent_error = $movefile['error'];
         }
     }
 
@@ -620,7 +647,7 @@ class FoSettingsPage
 
     private function add_custom_elements($args = array()){
             add_action( 'admin_notices', array($this, 'add_custom_elements_successfull_admin_notice') );
-            $this->save_custom_elements_to_database($args['custom_elements'], $args['important']);
+            $this->save_custom_elements_to_database($args['font_id'], $args['custom_elements'], $args['important']);
     }
 
     private function delete_font($args = array()){
@@ -635,14 +662,14 @@ class FoSettingsPage
         $wpdb->delete( $table_name, array( 'name' => $name ) );
     }
 
-    private function save_custom_elements_to_database($custom_elements, $important){
+    private function save_custom_elements_to_database($id, $custom_elements, $important){
         global $wpdb;
         $table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;
 
         $wpdb->insert( 
         $table_name, 
         array( 
-            'font_id' => $name, 
+            'font_id' => $id, 
             'custom_elements' => $custom_elements, 
             'important' => $important ? 1 : 0,
         ));
@@ -659,6 +686,15 @@ class FoSettingsPage
             'url' => $url, 
             'custom' => $is_custom ? 1 : 0,
         ));
+    }
+
+
+    public function add_custom_elements_successfull_admin_notice() {
+        ?>
+        <div class="updated notice">
+            <p><?php _e( 'Custom elements added to your website!', 'fo' ); ?></p>
+        </div>
+        <?php
     }
 
     public function use_font_successfull_admin_notice() {
@@ -688,7 +724,7 @@ class FoSettingsPage
     public function upload_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error uploading the file: ', 'fo' ) . $this->upload_error; ?></p>
+            <p><?php _e( 'Error uploading the file: ', 'fo' ) . $this->recent_error; ?></p>
         </div>
         <?php
     }
@@ -696,7 +732,7 @@ class FoSettingsPage
     public function use_font_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error adding font to website fonts: ', 'fo' ) . $this->upload_error; ?></p>
+            <p><?php _e( 'Error adding font to website fonts: ', 'fo' ) . $this->recent_error; ?></p>
         </div>
         <?php
     }
@@ -704,7 +740,7 @@ class FoSettingsPage
     public function delete_font_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error deleting font: ', 'fo' ) . $this->upload_error; ?></p>
+            <p><?php _e( 'Error deleting font: ', 'fo' ) . $this->recent_error; ?></p>
         </div>
         <?php
     }
@@ -940,7 +976,7 @@ class FoSettingsPage
             </fieldset>',
             __('Important', 'fo'),
             $name, $name, $name,
-            $checked,
+            checked(true, $checked, false),
             __('Include !important to this element to always apply.', 'fo')
         );
     }
@@ -969,15 +1005,20 @@ class FoSettingsPage
     /** 
      * Get the settings option array and print one of its values
      */
-    private function print_custom_elements_usable_fonts_list()
+    private function print_custom_elements_usable_fonts_list($name, $default = '')
     {
-        echo '<select id="custom_elements_selector" name="custom_elements_selector">';
+        echo '<select id="'.$name.'" name="'.$name.'">';
         
+        if($default){
+        	 echo '<option value="">'.$default.'</option>\n';
+        }
+
         //fonts section
-        foreach($this->usable_fonts as $font)
+        foreach($this->usable_fonts_db as $font)
         {
-          $font_name = $font->family;
-          echo '<option value="'.$font_name.'" style="font-family: '.$font_name.';">'.$font_name.'</option>\n';
+          $font_name = $font->name;
+          $selected = isset($_GET[$name]) && $font->id == $_GET[$name];
+          echo '<option value="' . $font->id . '" style="font-family: '.$font_name.';" ' . selected($selected) . '>'.$font_name.'</option>\n';
         }
 
         echo '</select>';
@@ -1010,13 +1051,13 @@ class FoSettingsPage
             // Find the font from the lists.
             if($usable_font->custom){
                 $font_obj = (object) [ 'family' => $usable_font->name, 'files' => (object) ['regular' => $usable_font->url], 'kind' => 'custom', 'variants' => array('regular')];
-                $this->usable_fonts[] = $font_obj;
-                $this->custom_fonts[] = $font_obj;
+                $this->usable_fonts[$font_obj->family] = $font_obj;
+                $this->custom_fonts[$font_obj->family] = $font_obj;
             }else{
                 $i = 0;
                 foreach ($this->available_fonts as $available_font) {
                     if($available_font->family == $usable_font->name){
-                        $this->usable_fonts[] = $available_font;
+                        $this->usable_fonts[$available_font->family] = $available_font;
                         
                         // Remove the fond font from avaiable since it is already used.
                         unset($this->available_fonts[$i]);
@@ -1029,6 +1070,12 @@ class FoSettingsPage
                 }
             }
         }
+    }
+
+    private function load_custom_elements(){
+        global $wpdb;
+
+        $this->custom_elements = $wpdb->get_results('SELECT e.id, u.name, e.font_id, e.custom_elements, e.important FROM ' . $wpdb->prefix . FO_ELEMENTS_DATABASE . ' as e LEFT OUTER JOIN ' . $wpdb->prefix . FO_USABLE_FONTS_DATABASE . ' as u ON ' . ' e.font_id = u.id ORDER BY e.font_id DESC');
     }
 
     private function get_known_fonts_array()
