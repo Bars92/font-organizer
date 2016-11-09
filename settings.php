@@ -529,15 +529,14 @@ class FoSettingsPage
                         <div class="meta-box-sortables">
                             <div class="postbox">
                             <h2>
-                                <span><?php esc_attr_e('Header', 'fo'); ?></span>
+                                <span><?php esc_attr_e('Thank you', 'fo'); ?></span>
                             </h2>
 
                             <div class="inside">
-                                <p><?php esc_attr_e(
-                                        'Everything you see here, from the documentation to the code itself, was created by and for the community. WordPress is an Open Source project, which means there are hundreds of people all over the world working on it. (More than most commercial platforms.) It also means you are free to use it for anything from your cat’s home page to a Fortune 500 web site without paying anyone a license fee and a number of other important freedoms.',
-                                        'wp_admin_style'
+                                <p><?php _e(
+                                        'Thank you for using an <a href="http://hivewebstudios.com" target="_blank">HiveTeam</a> plugin! We 5 star you already, so why don\'t you <a href="http://xxxxx.xxx" target="_blank">5 star us too</a>?',
+                                        'fo'
                                     ); ?></p>
-                            </div>
                             </div>
                         </div>
                     </div>

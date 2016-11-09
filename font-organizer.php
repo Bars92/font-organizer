@@ -72,12 +72,12 @@ function fo_allow_upload_types($existing_mimes = array()){
 }
 
 function fo_uninstall(){
-	global $wp_roles; 
+	$roles = wp_roles();
 
 	// Remove all capabilities added by this plugin.
-	foreach ($wp_roles as $role) {
-		if($role->has_cap('manage_fonts'))
-			 $role->remove_cap( 'manage_fonts' ); 
+	foreach ($roles as $role_name => $role) {
+		if(array_key_exists('manage_fonts', $role['capabilities']) && $role['capabilities']['manage_fonts'])
+			 $roles->remove_cap( $role_name, 'manage_fonts' ); 
 	}
 }
 
