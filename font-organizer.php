@@ -121,9 +121,9 @@ function fo_install() {
 	add_option( 'fo_db_version', $fo_db_version );
 
 	// Set roles
-	 $role = get_role( 'administrator' );
-	 if(!$role->has_cap('manage_fonts'))
-	 	  $role->add_cap( 'manage_fonts' );
+	$role = get_role( 'administrator' );
+	if(!$role->has_cap('manage_fonts'))
+	 	$role->add_cap( 'manage_fonts' );
 }
 
 function fo_add_action_plugin( $actions, $plugin_file ) {

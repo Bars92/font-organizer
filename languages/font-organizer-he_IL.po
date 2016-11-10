@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Font Organizer\n"
-"POT-Creation-Date: 2016-11-10 19:40+0200\n"
-"PO-Revision-Date: 2016-11-10 19:44+0200\n"
+"POT-Creation-Date: 2016-11-10 21:33+0200\n"
+"PO-Revision-Date: 2016-11-10 21:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -28,7 +28,7 @@ msgstr "מזהה"
 msgid "Custom Elements"
 msgstr "אלמנט מותאם אישית"
 
-#: classes/class-ElementsTable.php:73 settings.php:988 settings.php:1005
+#: classes/class-ElementsTable.php:73 settings.php:996 settings.php:1013
 msgid "Important"
 msgstr "חשוב"
 
@@ -48,7 +48,7 @@ msgstr "מחק"
 msgid "No custom elements found."
 msgstr "לא נמצאו אלמנטים מותאמים אישית."
 
-#: font-organizer.php:137 settings.php:318
+#: font-organizer.php:137 settings.php:174 settings.php:324
 msgid "Font Settings"
 msgstr "הגדרות גופנים"
 
@@ -108,122 +108,122 @@ msgstr "גופן לתגית <li>"
 msgid "<a> Font"
 msgstr "גופן לתגית <a>"
 
-#: settings.php:280
-msgid "Google API key is not valid!"
-msgstr "המפתח של גוגל אינו חוקי!"
+#: settings.php:286
+msgid "Google API key is not valid: "
+msgstr "המפתח של גוגל אינה חוקי:"
 
-#: settings.php:283
+#: settings.php:289
 msgid "Google API key is not set! Cannot display google fonts."
 msgstr "המפתח של גוגל אינו מוגדר! אין אפשרות להציג גופנים של גוגל."
 
-#: settings.php:330
+#: settings.php:336
 msgid "Toggle panel: General Settings"
 msgstr "לוח דו-מצביים: הגדרות כלליות"
 
-#: settings.php:332
+#: settings.php:338
 msgid "General Settings"
 msgstr "הגדרות כלליות"
 
-#: settings.php:349
+#: settings.php:355
 msgid "Toggle panel: First Step: Add Fonts"
 msgstr "לוח דו-מצביים: שלב ראשון: הוספת גופנים"
 
-#: settings.php:351
+#: settings.php:357
 msgid "1. Add Fonts"
 msgstr "1. הוספת גופנים"
 
-#: settings.php:353
+#: settings.php:359
 msgid ""
 "Step 1: Select and add fonts to be used in your website. Select as many as "
 "you wish."
 msgstr "שלב 1:  בחר והוסף גופנים לאתר האינטרנט שלך. ניתן לבחר כמה שתרצה."
 
-#: settings.php:355
+#: settings.php:361
 msgid "You can select google or regular fonts."
 msgstr "באפשרותך לבחור בגופנים של גוגל או גופנים מוכרים."
 
-#: settings.php:359
+#: settings.php:365
 msgid "Available Fonts"
 msgstr "גופנים זמינים"
 
-#: settings.php:366
+#: settings.php:372
 msgid "Use This Font"
 msgstr "השתמש בגופן זה"
 
-#: settings.php:378
+#: settings.php:384
 msgid "Toggle panel: Custom Fonts"
 msgstr "לוח דו-מצביים: גופנים מיובאים"
 
-#: settings.php:380
+#: settings.php:386
 msgid "2. Custom Fonts"
 msgstr "2. גופנים מיובאים"
 
-#: settings.php:382
+#: settings.php:388
 msgid ""
 "Step 2: Upload custom fonts to be used in your website. Here too, you can "
 "upload as many as you wish."
 msgstr "שלב 2: כאן ניתן לעלות גופנים לאתר שלך. גם כאן, ניתן להעלות כמה שתרצה."
 
-#: settings.php:386
+#: settings.php:392
 msgid "Font Name"
 msgstr "שם גופן"
 
-#: settings.php:390
+#: settings.php:396
 msgid "Font File"
 msgstr "קובץ הגופן"
 
-#: settings.php:393
+#: settings.php:399
 msgid "Accepted Font Format : "
 msgstr "פורמט גופן נתמך:"
 
-#: settings.php:400
+#: settings.php:406
 msgid "Upload"
 msgstr "העלה"
 
-#: settings.php:412
+#: settings.php:418
 msgid "Toggle panel: Known Elements Settings"
 msgstr "לוח דו-מצביים: הגדרות אלמנטים ידועים"
 
-#: settings.php:414
+#: settings.php:420
 msgid "3. Known Elements Settings"
 msgstr "3. הגדרות אלמנטים הידועים"
 
-#: settings.php:417
+#: settings.php:423
 msgid ""
 "Step 3: For each element you can assign a font you have added in step 1 & 2."
 msgstr "שלב 3: עבור כל אלמנט ניתן להקצות גופן שהוספת בשלב 1 & 2."
 
-#: settings.php:418
+#: settings.php:424
 msgid "Note: "
 msgstr "הערה:"
 
-#: settings.php:418
+#: settings.php:424
 msgid "Custom fonts you uploaded are automatically used in your website."
-msgstr ""
+msgstr "גופנים מיובאים אוטומטית נוספים לאתר שלך."
 
-#: settings.php:435
+#: settings.php:441
 msgid "Toggle panel: Custom Elements Settings"
 msgstr "לוח דו-מצביים: הגדרות אלמנטים מותאמים אישית"
 
-#: settings.php:437
+#: settings.php:443
 msgid "4. Custom Elements Settings"
 msgstr "4. הגדרות אלמנטים מותאמים אישית"
 
-#: settings.php:440
+#: settings.php:446
 msgid ""
 "Step 4: Assign font that you have added to your website to custom elements."
 msgstr ""
 "שלב 4: כאן ניתן לשייך גופן שהוספת לאתר האינטרנט שלך לאלמנטים מותאמים אישית."
 
-#: settings.php:444 settings.php:481
+#: settings.php:450 settings.php:487
 msgid "Font"
 msgstr "גופן"
 
-#: settings.php:448
+#: settings.php:454
 msgid "Custom Element"
 msgstr "רכיב מותאם אישית"
 
-#: settings.php:451
+#: settings.php:457
 msgid ""
 "Custom elements can be seperated by commas to allow multiple elements. "
 "Example: #myelementid, .myelementclass, .myelementclass .foo, etc."
@@ -231,35 +231,35 @@ msgstr ""
 "רכיבים מותאמים אישית ניתן להפריד בפסיקים כדי לאפשר מספר אלמנטים. דוגמה: ."
 "myelementclass, #myelementid, .myelementclass .foo, וכו '."
 
-#: settings.php:462
+#: settings.php:468
 msgid "Apply Custom Elements"
 msgstr "החל על אלמנטים אלה"
 
-#: settings.php:474
+#: settings.php:480
 msgid "Toggle panel: Manage Fonts"
 msgstr "לוח דו-מצביים: ניהול גופנים"
 
-#: settings.php:476
+#: settings.php:482
 msgid "5. Manage Fonts"
 msgstr "5. ניהול גופנים"
 
-#: settings.php:482
+#: settings.php:488
 msgid "-- Select Font --"
 msgstr "-- בחירת גופן --"
 
-#: settings.php:491
+#: settings.php:497
 msgid "Source"
 msgstr "מקור"
 
-#: settings.php:495
+#: settings.php:501
 msgid "Urls"
 msgstr "כתובת"
 
-#: settings.php:527
+#: settings.php:533
 msgid "Thank you"
 msgstr "תודה לך!"
 
-#: settings.php:532
+#: settings.php:538
 msgid ""
 "Thank you for using an <a href=\"http://hivewebstudios.com\" target=\"_blank"
 "\">HiveTeam</a> plugin! We 5 star you already, so why don't you <a href="
@@ -269,83 +269,83 @@ msgstr ""
 "\"_blank\">HiveTeam</a>! אנחנו מדרגים אותך 5 כוכבים כבר, אז למה לא <a href="
 "\"http://xxxxx.xxx\" target=\"_blank\">תדרג אותנו 5 כוכבים</a>?"
 
-#: settings.php:545 settings.php:572 settings.php:587 settings.php:606
+#: settings.php:551 settings.php:578 settings.php:593 settings.php:612
 msgid "Session ended, please try again."
 msgstr "הסתיים הטיפול, אנא נסה שנית."
 
-#: settings.php:551
+#: settings.php:557
 msgid "Font name is empty or invalid."
 msgstr "שם גופן הוא ריק או לא חוקי."
 
-#: settings.php:556
+#: settings.php:562
 msgid "Font file is not selected."
 msgstr "לא נבחר קובץ הגופן."
 
-#: settings.php:563
+#: settings.php:569
 msgid "Font file is not valid."
 msgstr "קובץ הגופן אינו חוקי."
 
-#: settings.php:578
+#: settings.php:584
 msgid "Usable font is empty or invalid."
 msgstr "גופן לשימוש הוא ריק או לא חוקי."
 
-#: settings.php:593
+#: settings.php:599
 msgid "Custom elements is empty or invalid."
 msgstr "אלמנטים מותאמים אישית ריק או לא חוקי."
 
-#: settings.php:612
+#: settings.php:618
 msgid "Something went horribly wrong. Ask the support!"
 msgstr "משהו השתבש בצורה נוראית. תשאל את התמיכה!"
 
-#: settings.php:688
+#: settings.php:694
 msgid "Custom elements added to your website!"
 msgstr "אלמנטים מותאמים אישית התווספו לאתר שלך!"
 
-#: settings.php:696
+#: settings.php:702
 msgid "Font can now be used in your website!"
 msgstr "כעת ניתן להשתמש בגופן באתר האינטרנט שלך!"
 
-#: settings.php:704
+#: settings.php:710
 msgid "Font deleted from your website!"
 msgstr "גופן נמחק מהאתר שלך!"
 
-#: settings.php:712
+#: settings.php:718
 msgid "The file has been uploaded!"
 msgstr "הקובץ הועלה בהצלחה."
 
-#: settings.php:720
+#: settings.php:726
 msgid "Error uploading the file: "
 msgstr "שגיאה בהעלאת הקובץ:"
 
-#: settings.php:728
+#: settings.php:734
 msgid "Error adding font to website fonts: "
 msgstr "שגיאה בעת הוספת גופן לאתר:"
 
-#: settings.php:736
+#: settings.php:742
 msgid "Error deleting font: "
 msgstr "שגיאה במחיקת גופן:"
 
-#: settings.php:744
+#: settings.php:750
 msgid "Failed to open or create the css file. Check for permissions."
 msgstr "לא ניתן לפתוח או ליצור את קובץ ה-css. בדוק אם יש הרשאות."
 
-#: settings.php:786
+#: settings.php:792
 msgid "Google API Key"
 msgstr "מפתח API של גוגל"
 
-#: settings.php:793
+#: settings.php:799
 msgid "Show Font Family Preview"
 msgstr "טען תצוגה מקדימה לגופנים"
 
-#: settings.php:800
+#: settings.php:806
 msgid "Access Settings Role"
 msgstr "רמת הרשאה להגדרות"
 
-#: settings.php:894
+#: settings.php:902
 msgid "This is the general settings for the site."
 msgstr "אלה הם הגדרות כלליות עבור התוסף."
 
-#: settings.php:913
+#: settings.php:921
 #, php-format
 msgid ""
 "To get all the fonts, Google requires the mandatory use of an API key, get "
@@ -354,19 +354,19 @@ msgstr ""
 "כדי לקבל את כל הגופנים, גוגל מחייב שימוש ב-API, ניתן לקבל אחד מ <a href=\"%s"
 "\" target=\"_blank\">כאן</a> בחינם ובמהירות."
 
-#: settings.php:937
+#: settings.php:945
 msgid "Include Font Family Preview"
 msgstr "הוסף גופן לדף זה לצפיה בתוצגה מוקדמת"
 
-#: settings.php:939
+#: settings.php:947
 msgid "Show font preview when listing the fonts (might be slow)"
 msgstr "הצג תצוגה מקדימה של הגופן ברשימה של גופנים (עשוי להיות איטי)."
 
-#: settings.php:991 settings.php:1008
+#: settings.php:999 settings.php:1016
 msgid "Include !important to this element to always apply."
 msgstr "הוסף  תגית important! על מנת שגופן זה תמיד יופיע."
 
-#: settings.php:1020
+#: settings.php:1028
 msgid "None"
 msgstr "ללא"
 
@@ -385,6 +385,9 @@ msgstr "תיאור"
 #. Author of the plugin/theme
 msgid "HiveTeam"
 msgstr "HiveTeam"
+
+#~ msgid "Google API key is not valid!"
+#~ msgstr "המפתח של גוגל אינו חוקי!"
 
 #~ msgid "Custom fonts you uploaded are automaticly used in your website."
 #~ msgstr "גופנים מיובאים אוטומטית נוספים לאתר האינטרנט שלך."

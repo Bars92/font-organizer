@@ -171,7 +171,7 @@ class FoSettingsPage
         // This page will be under "Settings"
         $hook = add_options_page(
             'Settings Admin', 
-            'Font Settings', 
+            __('Font Settings', 'font-organizer'), 
             'manage_fonts',
             'font-setting-admin', 
             array( $this, 'create_font_settings_page' )
@@ -246,7 +246,7 @@ class FoSettingsPage
 
             // Make sure directory exists.
             if(!is_dir($css_directory_path))
-                 mkdir($css_directory_path, 0777, true);
+                 mkdir($css_directory_path, 0755, true);
 
             $fhandler = fopen($css_full_file_path, "w");
             if(!$fhandler){
@@ -277,7 +277,7 @@ class FoSettingsPage
             if( wp_remote_retrieve_response_code( $response ) == 200){
            		$this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
            	}else{
-                add_settings_error('google_key', '', __('Google API key is not valid!', 'font-organizer'), 'error');
+                add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . wp_remote_retrieve_response_message($response), 'error');
             }
         }else{
             add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'font-organizer'), 'error');
@@ -795,13 +795,17 @@ class FoSettingsPage
             'font-setting-admin', // Page
             'setting_general' // Section           
         );   
-        add_settings_field(
-            'permissions', // ID
-            __('Access Settings Role', 'font-organizer'), // Title 
-            array( $this, 'permissions_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_general' // Section           
-        );   
+
+        // If user is admin, display the permissions option.
+    	if (current_user_can('manage_options')) {
+	        add_settings_field(
+	            'permissions', // ID
+	            __('Access Settings Role', 'font-organizer'), // Title 
+	            array( $this, 'permissions_callback' ), // Callback
+	            'font-setting-admin', // Page
+	            'setting_general' // Section           
+        	);   
+		}
         add_settings_section(
             'setting_elements', // ID
             '', // Title
@@ -846,16 +850,27 @@ class FoSettingsPage
             $new_input['include_font_link'] =  0 ;
 
         if( isset( $input['permissions'] ) ){
-            $new_input['permissions'] = sanitize_text_field( $input['permissions'] );
-            if(isset($this->general_options['permissions']) && $this->general_options['permissions'] != $new_input['permissions'] && $new_input['permissions'] != FO_DEFAULT_ROLE){
-            	$prev_role = get_role($this->general_options['permissions']);
-            	$prev_role->remove_cap('manage_fonts');
+        	$this->general_options = get_option( 'fo_general_options' );
+            $new_input['permissions'] = $input['permissions'];
 
-            	$new_role = get_role($new_input['permissions']);
-            	$new_role->add_cap('manage_fonts');
+            if(isset($this->general_options['permissions'])){
+
+	            // Remove previus capabilities.
+            	foreach ($this->general_options['permissions'] as $value) {
+            		if($value != FO_DEFAULT_ROLE){
+	            		$prev_role = get_role($value);
+	            		$prev_role->remove_cap('manage_fonts');
+	            	}
+            	}
+            }
+            
+            // Add the new capabilities to the new role.
+            foreach ($new_input['permissions'] as $value) {
+	           	$prev_role = get_role($value);
+	            $prev_role->add_cap('manage_fonts');
             }
         }else{
-        	$new_input['permissions'] = FO_DEFAULT_ROLE;
+        	$new_input['permissions'] = array();
         }
 
         return $new_input;
@@ -943,16 +958,16 @@ class FoSettingsPage
     /** 
      * Get the settings option array and print one of its values
      */
-    public function permissions_callback()
-    {
-        global $wp_roles;
-        $default = !isset($this->general_options['permissions']) ? FO_DEFAULT_ROLE : $this->general_options['permissions'];
+    public function permissions_callback(){
+        $wp_roles = new WP_Roles();
+		$roles = $wp_roles->get_names();
+        $checked_values = !isset($this->general_options['permissions']) ? array(FO_DEFAULT_ROLE) : $this->general_options['permissions'];
+		
+		foreach ($roles as $role_value => $role_name) {
+			$checked = $role_value == 'administrator' || in_array($role_value, $checked_values) ? 'checked' : '';
 
-	    echo '<select id="permissions" name="fo_general_options[permissions]" class="input">';
-	    foreach ( $wp_roles->roles as $key=>$value ):
-	       echo '<option value="'.$key.'"'.selected($default,$key,false).'>'.translate_user_role($value['name']).'</option>';
-	    endforeach;
-	    echo '</select>';
+			echo '<p><input type="checkbox"'.disabled("administrator", $role_value, false).' name="fo_general_options[permissions][]" value="' . $role_value . '" '.$checked.'>'.translate_user_role($role_name).'</input></p>';
+  		}
     }
 
     /** 
