@@ -1,0 +1,310 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Font Organizer\n"
+"POT-Creation-Date: 2016-11-09 15:53+0200\n"
+"PO-Revision-Date: 2016-11-09 15:53+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: font-organizer.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: classes/class-ElementsTable.php:71
+msgid "Id"
+msgstr ""
+
+#: classes/class-ElementsTable.php:72
+msgid "Custom Elements"
+msgstr ""
+
+#: classes/class-ElementsTable.php:73 settings.php:993 settings.php:1010
+msgid "Important"
+msgstr ""
+
+#: classes/class-ElementsTable.php:82
+msgid "Yes"
+msgstr ""
+
+#: classes/class-ElementsTable.php:82
+msgid "No"
+msgstr ""
+
+#: classes/class-ElementsTable.php:122
+msgid "Delete"
+msgstr ""
+
+#: classes/class-ElementsTable.php:191
+msgid "No custom elements found."
+msgstr ""
+
+#: font-organizer.php:137 settings.php:323
+msgid "Font Settings"
+msgstr ""
+
+#: helpers.php:77
+msgid "Google"
+msgstr ""
+
+#: settings.php:278
+msgid "Google API key is not valid!"
+msgstr ""
+
+#: settings.php:284
+msgid "Google API key is not set! Cannot display google fonts."
+msgstr ""
+
+#: settings.php:335
+msgid "Toggle panel: General Settings"
+msgstr ""
+
+#: settings.php:337
+msgid "General Settings"
+msgstr ""
+
+#: settings.php:354
+msgid "Toggle panel: First Step: Add Fonts"
+msgstr ""
+
+#: settings.php:356
+msgid "1. Add Fonts"
+msgstr ""
+
+#: settings.php:358
+msgid ""
+"Step 1: Select and add fonts to be used in your website. Select as many as "
+"you wish."
+msgstr ""
+
+#: settings.php:360
+msgid "You can select google or regular fonts."
+msgstr ""
+
+#: settings.php:364
+msgid "Available Fonts"
+msgstr ""
+
+#: settings.php:371
+msgid "Use This Font"
+msgstr ""
+
+#: settings.php:383
+msgid "Toggle panel: Custom Fonts"
+msgstr ""
+
+#: settings.php:385
+msgid "2. Custom Fonts"
+msgstr ""
+
+#: settings.php:387
+msgid ""
+"Step 2: Upload custom fonts to be used in your website. Here too, you can "
+"upload as many as you wish."
+msgstr ""
+
+#: settings.php:391
+msgid "Font Name"
+msgstr ""
+
+#: settings.php:395
+msgid "Font File"
+msgstr ""
+
+#: settings.php:398
+msgid "Accepted Font Format : "
+msgstr ""
+
+#: settings.php:405
+msgid "Upload"
+msgstr ""
+
+#: settings.php:417
+msgid "Toggle panel: Known Elements Settings"
+msgstr ""
+
+#: settings.php:419
+msgid "3. Known Elements Settings"
+msgstr ""
+
+#: settings.php:422
+msgid ""
+"Step 3: For each element you can assign a font you have added in step 1 & 2."
+msgstr ""
+
+#: settings.php:423
+msgid "Note: "
+msgstr ""
+
+#: settings.php:423
+msgid "Custom fonts you uploaded are automaticly used in your website."
+msgstr ""
+
+#: settings.php:440
+msgid "Toggle panel: Custom Elements Settings"
+msgstr ""
+
+#: settings.php:442
+msgid "4. Custom Elements Settings"
+msgstr ""
+
+#: settings.php:445
+msgid ""
+"Step 4: Assign font that you have added to your website to custom elements."
+msgstr ""
+
+#: settings.php:449 settings.php:486
+msgid "Font"
+msgstr ""
+
+#: settings.php:453
+msgid "Custom Element"
+msgstr ""
+
+#: settings.php:456
+msgid ""
+"Custom elements can be seperated by commas to allow multiple elements. "
+"Example: #myelementid, .myelementclass, .myelementclass .foo, etc."
+msgstr ""
+
+#: settings.php:467
+msgid "Apply Custom Elements"
+msgstr ""
+
+#: settings.php:479
+msgid "Toggle panel: Manage Fonts"
+msgstr ""
+
+#: settings.php:481
+msgid "5. Manage Fonts"
+msgstr ""
+
+#: settings.php:487
+msgid "-- Select Font --"
+msgstr ""
+
+#: settings.php:496
+msgid "Source"
+msgstr ""
+
+#: settings.php:500
+msgid "Urls"
+msgstr ""
+
+#: settings.php:532
+msgid "Thank you"
+msgstr ""
+
+#: settings.php:537
+msgid ""
+"Thank you for using an <a href=\"http://hivewebstudios.com\" target=\"_blank"
+"\">HiveTeam</a> plugin! We 5 star you already, so why don't you <a href="
+"\"http://xxxxx.xxx\" target=\"_blank\">5 star us too</a>?"
+msgstr ""
+
+#: settings.php:550 settings.php:577 settings.php:592 settings.php:611
+msgid "Session ended, please try again."
+msgstr ""
+
+#: settings.php:556
+msgid "Font name is empty or invalid."
+msgstr ""
+
+#: settings.php:561
+msgid "Font file is not selected."
+msgstr ""
+
+#: settings.php:568
+msgid "Font file is not valid."
+msgstr ""
+
+#: settings.php:583
+msgid "Usable font is empty or invalid."
+msgstr ""
+
+#: settings.php:598
+msgid "Custom elements is empty or invalid."
+msgstr ""
+
+#: settings.php:617
+msgid "Something went horribly worng. Ask the support!"
+msgstr ""
+
+#: settings.php:693
+msgid "Custom elements added to your website!"
+msgstr ""
+
+#: settings.php:701
+msgid "Font can now be used in your website!"
+msgstr ""
+
+#: settings.php:709
+msgid "Font deleted from your website!"
+msgstr ""
+
+#: settings.php:717
+msgid "The file has been uploaded!"
+msgstr ""
+
+#: settings.php:725
+msgid "Error uploading the file: "
+msgstr ""
+
+#: settings.php:733
+msgid "Error adding font to website fonts: "
+msgstr ""
+
+#: settings.php:741
+msgid "Error deleting font: "
+msgstr ""
+
+#: settings.php:749
+msgid "Failed to open or create the css file. Check for permissions."
+msgstr ""
+
+#: settings.php:918
+#, php-format
+msgid ""
+"To get all the fonts, Google requires the mandatory use of an API key, get "
+"one from <a href=\"%s\" target=\"_blank\">HERE</a>"
+msgstr ""
+
+#: settings.php:942
+msgid "Include Font Family Preview"
+msgstr ""
+
+#: settings.php:944
+msgid "Show font preview when listing the fonts (might be slow)"
+msgstr ""
+
+#: settings.php:996 settings.php:1013
+msgid "Include !important to this element to always apply."
+msgstr ""
+
+#: settings.php:1025
+msgid "None"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Font Organizer"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://wordpress.org/plugins/font-organizer/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "afsaf."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Hive"
+msgstr ""

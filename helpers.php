@@ -74,12 +74,12 @@
     function fo_print_source($kind){
         switch ($kind) {
             case 'webfonts#webfont':
-                _e('Google', 'fo');
+                _e('Google', 'font-organizer');
                 return;
             case 'standard':
             case 'custom':
             default:
-                _e(ucfirst($kind), 'fo');
+                _e(ucfirst($kind), 'font-organizer');
                 break;
         }
     }

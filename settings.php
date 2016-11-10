@@ -104,17 +104,17 @@ class FoSettingsPage
         $this->available_fonts = array();
         $this->google_fonts = array();
         $this->should_create_css = false;
-        $this->elements = array('body_font' =>  '<body> Font',
-                                'h1_font'   =>  '<h1> Font',
-                                'h2_font'   =>  '<h2> Font',
-                                'h3_font'   =>  '<h3> Font',
-                                'h4_font'   =>  '<h4> Font',
-                                'h5_font'   =>  '<h5> Font',
-                                'h6_font'   =>  '<h6> Font',
-                                'p_font'    =>  '<p> Font',
-                                'q_font'    =>  '<q> Font',
-                                'li_font'   =>  '<li> Font',
-                                'a_font'    =>  '<a> Font',
+        $this->elements = array('body_font' =>  __('<body> Font', 'font-organizer'),
+                                'h1_font'   =>  __('<h1> Font', 'font-organizer'),
+                                'h2_font'   =>  __('<h2> Font', 'font-organizer'),
+                                'h3_font'   =>  __('<h3> Font', 'font-organizer'),
+                                'h4_font'   =>  __('<h4> Font', 'font-organizer'),
+                                'h5_font'   =>  __('<h5> Font', 'font-organizer'),
+                                'h6_font'   =>  __('<h6> Font', 'font-organizer'),
+                                'p_font'    =>  __('<p> Font', 'font-organizer'),
+                                'q_font'    =>  __('<q> Font', 'font-organizer'),
+                                'li_font'   =>  __('<li> Font', 'font-organizer'),
+                                'a_font'    =>  __('<a> Font', 'font-organizer'),
                                 );
 
         // An upload is made. Upload the file and proccess it.
@@ -275,13 +275,13 @@ class FoSettingsPage
             set_time_limit(0);
             $response = wp_remote_get("https://www.googleapis.com/webfonts/v1/webfonts?sort=alpha&key=" . $this->general_options['google_key']);
             if( wp_remote_retrieve_response_code( $response ) != 200){
-                    add_settings_error('google_key', '', __('Google API key is not valid!', 'fo'), 'error');
+                    add_settings_error('google_key', '', __('Google API key is not valid!', 'font-organizer'), 'error');
                     settings_errors( 'google_key' );
             }
 
             $this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
         }else{
-            add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'fo'), 'error');
+            add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'font-organizer'), 'error');
             settings_errors( 'google_key' );
         }
 
@@ -320,7 +320,7 @@ class FoSettingsPage
         
         ?>
         <div class="wrap">
-            <h1><?php _e('Font Settings', 'fo'); ?></h1>
+            <h1><?php _e('Font Settings', 'font-organizer'); ?></h1>
 
                 <div id="poststuff">  
                     <div id="post-body" class="metabox-holder columns-2">
@@ -332,9 +332,9 @@ class FoSettingsPage
                         <div class="postbox">
                             <a name="step1"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: General Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                                <span class="screen-reader-text"><?php _e('Toggle panel: General Settings', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('General Settings', 'fo'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('General Settings', 'font-organizer'); ?></span></h2>
                             <div class="inside">
                                 <form method="post" action="options.php">
                                 <?php
@@ -351,24 +351,24 @@ class FoSettingsPage
                         <div class="postbox">
                             <a name="step2"></a>
                          <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: First Step: Add Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                                <span class="screen-reader-text"><?php _e('Toggle panel: First Step: Add Fonts', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('1. Add Fonts', 'fo'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('1. Add Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
-                                <span><?php _e('Step 1: Select and add fonts to be used in your website. Select as many as you wish.', 'fo'); ?></span>
+                                <span><?php _e('Step 1: Select and add fonts to be used in your website. Select as many as you wish.', 'font-organizer'); ?></span>
                                 <br />
-                                <span><?php _e('You can select google or regular fonts.', 'fo'); ?></span>
+                                <span><?php _e('You can select google or regular fonts.', 'font-organizer'); ?></span>
                                 <form action="" id="add_usable_font_form" name="add_usable_font_form" method="post"> 
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><?php _e('Available Fonts', 'fo'); ?></th>
+                                            <th scope="row"><?php _e('Available Fonts', 'font-organizer'); ?></th>
                                             <td><?php  $this->print_available_fonts_list('usable_font'); ?></td>
                                         </tr>   
                                         <tr>        
                                             <th scope="row"></th>
                                             <td>
                                              <?php wp_nonce_field( 'add_usable_font', 'add_usable_font_nonce' ); ?>
-                                            <input type="submit" name="submit_usable_font" id="submit_usable_font" class="button-primary" value="<?php _e('Use This Font', 'fo'); ?>" />
+                                            <input type="submit" name="submit_usable_font" id="submit_usable_font" class="button-primary" value="<?php _e('Use This Font', 'font-organizer'); ?>" />
                                             </td>
                                         </tr>
                                     </table>
@@ -380,29 +380,29 @@ class FoSettingsPage
                         <div class="postbox">
                             <a name="step3"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Fonts', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('2. Custom Fonts', 'fo'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('2. Custom Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
-                                <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'fo'); ?></span>
+                                <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'font-organizer'); ?></span>
                                 <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><?php _e('Font Name', 'fo'); ?></th>
+                                            <th scope="row"><?php _e('Font Name', 'font-organizer'); ?></th>
                                             <td><input type="text" id="font_name" name="font_name" value="" maxlength="20" class="required" /></td>
                                         </tr>   
                                         <tr>    
-                                            <th scope="row"><?php _e('Font File', 'fo'); ?></th>
+                                            <th scope="row"><?php _e('Font File', 'font-organizer'); ?></th>
                                             <td>
                                             <input type="file" id="font_file" name="font_file" value="" class="required" accept="<?php echo join(',',$this->supported_font_files); ?>" /><br/>
-                                            <em><?php echo __('Accepted Font Format : ', 'fo') . join(', ',$this->supported_font_files); ?></em><br/>
+                                            <em><?php echo __('Accepted Font Format : ', 'font-organizer') . '<span style="direction: ltr">' . join(', ',$this->supported_font_files) . '</span>'; ?></em><br/>
                                             </td>
                                         </tr>
                                         <tr>        
                                             <th scope="row"></th>
                                             <td>
                                              <?php wp_nonce_field( 'add_custom_font', 'add_custom_font_nonce' ); ?>
-                                            <input type="submit" name="submit_upload_font" id="submit_upload_font" class="button-primary" value="<?php _e('Upload', 'fo'); ?>" />
+                                            <input type="submit" name="submit_upload_font" id="submit_upload_font" class="button-primary" value="<?php _e('Upload', 'font-organizer'); ?>" />
                                             </td>
                                         </tr>
                                     </table>
@@ -414,13 +414,13 @@ class FoSettingsPage
                         <div class="postbox">
                             <a name="step4"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Known Elements Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                                <span class="screen-reader-text"><?php _e('Toggle panel: Known Elements Settings', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('3. Known Elements Settings', 'fo'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('3. Known Elements Settings', 'font-organizer'); ?></span></h2>
                             <div class="inside">
 
-                                <span><?php _e('Step 3: For each element you can assign a font you have added in step 1 & 2.', 'fo'); ?></span>
-                                <p><strong><?php _e('Note: ', 'fo'); ?></strong><?php _e('Custom fonts you uploaded are automaticly used in your website.', 'fo'); ?></p>
+                                <span><?php _e('Step 3: For each element you can assign a font you have added in step 1 & 2.', 'font-organizer'); ?></span>
+                                <p><strong><?php _e('Note: ', 'font-organizer'); ?></strong><?php _e('Custom fonts you uploaded are automaticly used in your website.', 'font-organizer'); ?></p>
 
                                 <form method="post" action="options.php">
                                 <?php
@@ -437,23 +437,23 @@ class FoSettingsPage
                         <div class="postbox">
                             <a name="step5"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Elements Settings', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Elements Settings', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('4. Custom Elements Settings', 'fo'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('4. Custom Elements Settings', 'font-organizer'); ?></span></h2>
                             <div class="inside">
 
-                                <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'fo'); ?></span>
+                                <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'font-organizer'); ?></span>
                                 <form action="" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><?php _e('Font', 'fo'); ?></th>
+                                            <th scope="row"><?php _e('Font', 'font-organizer'); ?></th>
                                             <td><?php $this->print_custom_elements_usable_fonts_list('font_id'); ?></td>
                                         </tr>   
                                         <tr>
-                                            <th scope="row"><?php _e('Custom Element', 'fo'); ?></th>
+                                            <th scope="row"><?php _e('Custom Element', 'font-organizer'); ?></th>
                                             <td>
                                                 <textarea id="custom_elements" name="custom_elements" style="width: 100%" rows="2"></textarea>
-                                                <em><?php _e('Custom elements can be seperated by commas to allow multiple elements. Example: #myelementid, .myelementclass, .myelementclass .foo, etc.', 'fo'); ?></em>
+                                                <em><?php _e('Custom elements can be seperated by commas to allow multiple elements. Example: #myelementid, .myelementclass, .myelementclass .foo, etc.', 'font-organizer'); ?></em>
                                             </td>
                                         </tr>
                                         <tr>
@@ -464,7 +464,7 @@ class FoSettingsPage
                                             <th scope="row"></th>
                                             <td>
                                              <?php wp_nonce_field( 'add_custom_elements', 'add_custom_elements_nonce' ); ?>
-                                            <input type="submit" name="submit_custom_elements" id="submit_custom_elements" class="button-primary" value="<?php _e('Apply Custom Elements', 'fo'); ?>" />
+                                            <input type="submit" name="submit_custom_elements" id="submit_custom_elements" class="button-primary" value="<?php _e('Apply Custom Elements', 'font-organizer'); ?>" />
                                             </td>
                                         </tr>
                                     </table>
@@ -476,15 +476,15 @@ class FoSettingsPage
                         <div class="postbox">
                             <a name="step6"></a>
                             <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Manage Fonts', 'fo'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
+                                <span class="screen-reader-text"><?php _e('Toggle panel: Manage Fonts', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
                             </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('5. Manage Fonts', 'fo'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle"><span><?php _e('5. Manage Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
                             	<form action="#step6" id="select_font_form" name="select_font_form" method="get"> 
 	                                <table class="form-table">
 	                                        <tr>
-	                                            <th scope="row"><?php _e('Font', 'fo'); ?></th>
-	                                            <td><?php $this->print_custom_elements_usable_fonts_list('manage_font_id', __('-- Select Font --', 'fo')); ?></td>
+	                                            <th scope="row"><?php _e('Font', 'font-organizer'); ?></th>
+	                                            <td><?php $this->print_custom_elements_usable_fonts_list('manage_font_id', __('-- Select Font --', 'font-organizer')); ?></td>
 	                                        </tr>   
 	                                </table>
 	                                <input type="hidden" name="page" value="<?php echo wp_unslash( $_REQUEST['page'] ); ?>">
@@ -493,11 +493,11 @@ class FoSettingsPage
 	                           	<hr/>
                                 <table class="form-table">
                                     <tr>
-                                        <th scope="row"><?php _e('Source', 'fo'); ?></th>
+                                        <th scope="row"><?php _e('Source', 'font-organizer'); ?></th>
                                         <td><span><?php fo_print_source($this->selected_manage_font->kind); ?></span></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><?php _e('Urls', 'fo'); ?></th>
+                                        <th scope="row"><?php _e('Urls', 'font-organizer'); ?></th>
                                         <td>
                                             <span>
                                             <?php
@@ -529,13 +529,13 @@ class FoSettingsPage
                         <div class="meta-box-sortables">
                             <div class="postbox">
                             <h2>
-                                <span><?php esc_attr_e('Thank you', 'fo'); ?></span>
+                                <span><?php esc_attr_e('Thank you', 'font-organizer'); ?></span>
                             </h2>
 
                             <div class="inside">
                                 <p><?php _e(
                                         'Thank you for using an <a href="http://hivewebstudios.com" target="_blank">HiveTeam</a> plugin! We 5 star you already, so why don\'t you <a href="http://xxxxx.xxx" target="_blank">5 star us too</a>?',
-                                        'fo'
+                                        'font-organizer'
                                     ); ?></p>
                             </div>
                         </div>
@@ -547,25 +547,25 @@ class FoSettingsPage
 
     private function validate_upload(){
         if(!isset( $_POST['add_custom_font_nonce'] ) || !wp_verify_nonce( $_POST['add_custom_font_nonce'], 'add_custom_font' )){
-            $this->recent_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'font-organizer');
             return false;
         }
 
         $args['font_name'] = sanitize_text_field( $_POST['font_name'] );
         if(!$args['font_name']){
-            $this->recent_error = __('Font name is empty or invalid.', 'fo');
+            $this->recent_error = __('Font name is empty or invalid.', 'font-organizer');
             return false;
         }
 
         if(!isset($_FILES['font_file'])){
-            $this->recent_error = __('Font file is not selected.', 'fo');
+            $this->recent_error = __('Font file is not selected.', 'font-organizer');
             return false;
         }
 
         $args['font_file'] = $_FILES['font_file'];
         $args['font_file_name'] = sanitize_file_name( $args['font_file']['name'] );
         if(!$args['font_file_name']){
-            $this->recent_error = __('Font file is not valid.', 'fo');
+            $this->recent_error = __('Font file is not valid.', 'font-organizer');
             return false;
         }
 
@@ -574,13 +574,13 @@ class FoSettingsPage
 
     private function validate_add_usable(){
         if(!isset( $_POST['add_usable_font_nonce'] ) || !wp_verify_nonce( $_POST['add_usable_font_nonce'], 'add_usable_font' )){
-            $this->recent_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'font-organizer');
             return false;
         }
 
         $args['usable_font'] = sanitize_text_field( $_POST['usable_font'] );
         if(!$args['usable_font']){
-            $this->recent_error = __('Usable font is empty or invalid.', 'fo');
+            $this->recent_error = __('Usable font is empty or invalid.', 'font-organizer');
             return false;
         }
 
@@ -589,13 +589,13 @@ class FoSettingsPage
 
     private function validate_custom_elements(){
         if(!isset( $_POST['add_custom_elements_nonce'] ) || !wp_verify_nonce( $_POST['add_custom_elements_nonce'], 'add_custom_elements' )){
-            $this->recent_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'font-organizer');
             return false;
         }
 
         $args['custom_elements'] = sanitize_text_field( $_POST['custom_elements'] );
         if(!$args['custom_elements']){
-            $this->recent_error = __('Custom elements is empty or invalid.', 'fo');
+            $this->recent_error = __('Custom elements is empty or invalid.', 'font-organizer');
             return false;
         }
 
@@ -608,13 +608,13 @@ class FoSettingsPage
 
     private function validate_delete_usable(){
         if(!isset( $_POST['delete_usable_font_nonce'] ) || !wp_verify_nonce( $_POST['delete_usable_font_nonce'], 'delete_usable_font' )){
-            $this->recent_error = __('Session ended, please try again.', 'fo');
+            $this->recent_error = __('Session ended, please try again.', 'font-organizer');
             return false;
         }
 
         $args['font_name'] = sanitize_text_field( $_POST['font_name'] );
         if(!$args['font_name']){
-            $this->recent_error = __('Something went horribly worng. Ask the support!', 'fo');
+            $this->recent_error = __('Something went horribly wrong. Ask the support!', 'font-organizer');
             return false;
         }
 
@@ -690,7 +690,7 @@ class FoSettingsPage
     public function add_custom_elements_successfull_admin_notice() {
         ?>
         <div class="updated notice">
-            <p><?php _e( 'Custom elements added to your website!', 'fo' ); ?></p>
+            <p><?php _e( 'Custom elements added to your website!', 'font-organizer' ); ?></p>
         </div>
         <?php
     }
@@ -698,7 +698,7 @@ class FoSettingsPage
     public function use_font_successfull_admin_notice() {
         ?>
         <div class="updated notice">
-            <p><?php _e( 'Font can now be used in your website!', 'fo' ); ?></p>
+            <p><?php _e( 'Font can now be used in your website!', 'font-organizer' ); ?></p>
         </div>
         <?php
     }
@@ -706,7 +706,7 @@ class FoSettingsPage
     public function delete_font_successfull_admin_notice() {
         ?>
         <div class="updated notice">
-            <p><?php _e( 'Font deleted from your website!', 'fo' ); ?></p>
+            <p><?php _e( 'Font deleted from your website!', 'font-organizer' ); ?></p>
         </div>
         <?php
     }
@@ -714,7 +714,7 @@ class FoSettingsPage
     public function upload_successfull_admin_notice() {
         ?>
         <div class="updated notice">
-            <p><?php _e( 'The file has been uploaded!', 'fo' ); ?></p>
+            <p><?php _e( 'The file has been uploaded!', 'font-organizer' ); ?></p>
         </div>
         <?php
     }
@@ -722,7 +722,7 @@ class FoSettingsPage
     public function upload_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error uploading the file: ', 'fo' ) . $this->recent_error; ?></p>
+            <p><?php _e( 'Error uploading the file: ', 'font-organizer' ) . $this->recent_error; ?></p>
         </div>
         <?php
     }
@@ -730,7 +730,7 @@ class FoSettingsPage
     public function use_font_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error adding font to website fonts: ', 'fo' ) . $this->recent_error; ?></p>
+            <p><?php _e( 'Error adding font to website fonts: ', 'font-organizer' ) . $this->recent_error; ?></p>
         </div>
         <?php
     }
@@ -738,7 +738,7 @@ class FoSettingsPage
     public function delete_font_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Error deleting font: ', 'fo' ) . $this->recent_error; ?></p>
+            <p><?php _e( 'Error deleting font: ', 'font-organizer' ) . $this->recent_error; ?></p>
         </div>
         <?php
     }
@@ -746,7 +746,7 @@ class FoSettingsPage
     public function generate_css_failed_admin_notice() {
         ?>
         <div class="error notice">
-            <p><?php _e( 'Failed to open or create the css file. Check for permissions.', 'fo' ); ?></p>
+            <p><?php _e( 'Failed to open or create the css file. Check for permissions.', 'font-organizer' ); ?></p>
         </div>
         <?php
     }
@@ -788,21 +788,21 @@ class FoSettingsPage
         );  
         add_settings_field(
             'google_key', // ID
-            'Google API Key', // Title 
+            __('Google API Key', 'font-organizer'), // Title 
             array( $this, 'google_key_callback' ), // Callback
             'font-setting-admin', // Page
             'setting_general' // Section           
         );   
         add_settings_field(
             'include_font_link', // ID
-            'Show Font Family Preview', // Title 
+            __('Show Font Family Preview', 'font-organizer'), // Title 
             array( $this, 'include_font_link_callback' ), // Callback
             'font-setting-admin', // Page
             'setting_general' // Section           
         );   
         add_settings_field(
             'permissions', // ID
-            'Access Settings Role', // Title 
+            __('Access Settings Role', 'font-organizer'), // Title 
             array( $this, 'permissions_callback' ), // Callback
             'font-setting-admin', // Page
             'setting_general' // Section           
@@ -896,7 +896,7 @@ class FoSettingsPage
      */
     public function print_general_section_info()
     {
-        print 'This is the general settings for the site.';
+        _e('This is the general settings for the site.', 'font-organizer');
     }
 
     /** 
@@ -915,7 +915,7 @@ class FoSettingsPage
 
         $url = 'https://developers.google.com/fonts/docs/developer_api#acquiring_and_using_an_api_key';
 
-        echo sprintf( __( 'To get all the fonts, Google requires the mandatory use of an API key, get one from <a href="%s" target="_blank">HERE</a>', 'res_map' ), esc_url( $url ) );
+        echo sprintf( __( 'To get all the fonts, Google requires the mandatory use of an API key, get one from <a href="%s" target="_blank">HERE</a>', 'font-organizer' ), esc_url( $url ) );
 
         echo '</span> <br />';
 
@@ -939,9 +939,9 @@ class FoSettingsPage
                     %s
                 </label>
             </fieldset>',
-            __('Include Font Family Preview', 'fo'),
+            __('Include Font Family Preview', 'font-organizer'),
             $checked, 
-            __('Show font preview when listing the fonts (might be slow)', 'fo')
+            __('Show font preview when listing the fonts (might be slow)', 'font-organizer')
         );
     }
 
@@ -955,7 +955,7 @@ class FoSettingsPage
 
 	    echo '<select id="permissions" name="fo_general_options[permissions]" class="input">';
 	    foreach ( $wp_roles->roles as $key=>$value ):
-	       echo '<option value="'.$key.'"'.selected($default,$key,false).'>'.$value['name'].'</option>';
+	       echo '<option value="'.$key.'"'.selected($default,$key,false).'>'.translate_user_role($value['name']).'</option>';
 	    endforeach;
 	    echo '</select>';
     }
@@ -990,10 +990,10 @@ class FoSettingsPage
                     %s
                 </label>
             </fieldset>',
-            __('Important', 'fo'),
+            __('Important', 'font-organizer'),
             $name, $name, $name,
             $checked,
-            __('Include !important to this element to always apply.', 'fo')
+            __('Include !important to this element to always apply.', 'font-organizer')
         );
     }
 
@@ -1007,10 +1007,10 @@ class FoSettingsPage
                     %s
                 </label>
             </fieldset>',
-            __('Important', 'fo'),
+            __('Important', 'font-organizer'),
             $name, $name, $name,
             checked(true, $checked, false),
-            __('Include !important to this element to always apply.', 'fo')
+            __('Include !important to this element to always apply.', 'font-organizer')
         );
     }
 
@@ -1022,7 +1022,7 @@ class FoSettingsPage
         $selected = isset( $this->elements_options[$name] ) ? esc_attr( $this->elements_options[$name]) : '';
         echo '<select id="'.$name.'" name="fo_elements_options['.$name.']">';
         
-        echo '<option value="" '. selected('', $selected, false) . '>' . __('None', 'fo') . '</option>'; 
+        echo '<option value="" '. selected('', $selected, false) . '>' . __('None', 'font-organizer') . '</option>'; 
 
         //fonts section
         foreach($this->usable_fonts as $font)

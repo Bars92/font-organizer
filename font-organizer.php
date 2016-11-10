@@ -7,7 +7,7 @@
 Plugin Name: Font Organizer
 Plugin URI: https://wordpress.org/plugins/font-organizer/
 Description: afsaf.
-Author: Hive
+Author: HiveTeam
 Version: 1.0.0
 Author URI: 
 */
@@ -37,6 +37,11 @@ add_action( 'plugins_loaded', 'fo_update_db_check' );
 register_activation_hook( __FILE__, 'fo_install' );
 register_deactivation_hook( __FILE__, 'fo_uninstall' );
 add_action( 'init', 'fo_init' );
+add_action('plugins_loaded', 'fo_load_textdomain');
+
+function fo_load_textdomain() {
+	load_plugin_textdomain( 'font-organizer', false, dirname( plugin_basename(__FILE__) ) . '/languages/' );
+}
 
 function fo_init(){
 	global $css_full_file_path;
@@ -129,7 +134,7 @@ function fo_add_action_plugin( $actions, $plugin_file ) {
 
 	if ($plugin == $plugin_file) {
 
-		$settings = array('settings' => '<a href="options-general.php?page=font-setting-admin">' . __('Font Settings', 'fo') . '</a>');
+		$settings = array('settings' => '<a href="options-general.php?page=font-setting-admin">' . __('Font Settings', 'font-organizer') . '</a>');
     	$actions = array_merge($settings, $actions);
 
 	}

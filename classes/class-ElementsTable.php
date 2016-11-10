@@ -68,9 +68,9 @@ class ElementsTable extends WP_List_Table {
 	function get_columns() {
 		$columns = array(
 		'cb'        => '<input type="checkbox" />',
-		'id'    => __( 'Id', 'fo' ),
-		'custom_elements'   => __( 'Custom Elements', 'fo' ),
-		'important'   => __( 'Important', 'fo' ),
+		'id'    => __( 'Id', 'font-organizer' ),
+		'custom_elements'   => __( 'Custom Elements', 'font-organizer' ),
+		'important'   => __( 'Important', 'font-organizer' ),
 		);
 
 		return $columns;
@@ -79,7 +79,7 @@ class ElementsTable extends WP_List_Table {
 	function column_important( $item ) {
 		//Return the title contents
 		return sprintf( '%1$s <span style="color:silver"></span>',
-			/*$1%s*/ $item->important ? __('Yes', 'fo') : __('No', 'fo') 
+			/*$1%s*/ $item->important ? __('Yes', 'font-organizer') : __('No', 'font-organizer') 
 		);
 	}
 
@@ -119,7 +119,7 @@ class ElementsTable extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 		$actions = array(
-		'bulk-delete' => __('Delete', 'fo'),
+		'bulk-delete' => __('Delete', 'font-organizer'),
 		);
 
 		return $actions;
@@ -188,7 +188,7 @@ class ElementsTable extends WP_List_Table {
 	}
 
 	public function no_items() {
-		_e( 'No custom elements found.', 'fo' );
+		_e( 'No custom elements found.', 'font-organizer' );
 	}
 
     private function delete_from_database($id){
