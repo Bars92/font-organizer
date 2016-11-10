@@ -172,13 +172,18 @@ class FoSettingsPage
         $hook = add_options_page(
             'Settings Admin', 
             'Font Settings', 
-            'manage_fonts', // We handle this by role.
+            'manage_fonts',
             'font-setting-admin', 
             array( $this, 'create_font_settings_page' )
         );
 
+        add_action( 'load-' . $hook, array( $this, 'init_page' ) );
         add_action( 'load-' . $hook, array( $this, 'register_scripts' ) );
         add_action( 'load-' . $hook, array( $this, 'create_css_file' ) );
+    }
+
+    public function init_page(){
+    	$this->init();
     }
 
     public function create_css_file(){
@@ -189,10 +194,6 @@ class FoSettingsPage
             return;
         }
         
-        // This is called when the class is rebuilt before the redirect, so we need to initialize
-        // some stuff again.
-        $this->init();
-
         $content = "/* This Awesome CSS file was created by Font Orgranizer from HiveTeam :) */\n\n";
         $custom_fonts_content = '';
         $google_fonts = array();
@@ -265,7 +266,6 @@ class FoSettingsPage
     public function init(){
         $this->general_options = get_option( 'fo_general_options' );
         $this->elements_options = get_option( 'fo_elements_options' );
-        
         $this->custom_elements_table = new ElementsTable();
 
         $this->include_font_link = !isset( $this->general_options['include_font_link'] ) || (isset( $this->general_options['include_font_link'] ) && $this->general_options['include_font_link']);
@@ -274,15 +274,13 @@ class FoSettingsPage
             // Add Google fonts.
             set_time_limit(0);
             $response = wp_remote_get("https://www.googleapis.com/webfonts/v1/webfonts?sort=alpha&key=" . $this->general_options['google_key']);
-            if( wp_remote_retrieve_response_code( $response ) != 200){
-                    add_settings_error('google_key', '', __('Google API key is not valid!', 'font-organizer'), 'error');
-                    settings_errors( 'google_key' );
+            if( wp_remote_retrieve_response_code( $response ) == 200){
+           		$this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
+           	}else{
+                add_settings_error('google_key', '', __('Google API key is not valid!', 'font-organizer'), 'error');
             }
-
-            $this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
         }else{
             add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'font-organizer'), 'error');
-            settings_errors( 'google_key' );
         }
 
         // Add known fonts.
@@ -299,9 +297,6 @@ class FoSettingsPage
      * Options page callback
      */
     public function create_font_settings_page(){
-        
-        $this->init();
-
         if(isset($_GET['manage_font_id'])){
         		foreach ($this->usable_fonts_db as $font_db) {
         			 if(intval($_GET['manage_font_id']) == $font_db->id){
@@ -420,7 +415,7 @@ class FoSettingsPage
                             <div class="inside">
 
                                 <span><?php _e('Step 3: For each element you can assign a font you have added in step 1 & 2.', 'font-organizer'); ?></span>
-                                <p><strong><?php _e('Note: ', 'font-organizer'); ?></strong><?php _e('Custom fonts you uploaded are automaticly used in your website.', 'font-organizer'); ?></p>
+                                <p><strong><?php _e('Note: ', 'font-organizer'); ?></strong><?php _e('Custom fonts you uploaded are automatically used in your website.', 'font-organizer'); ?></p>
 
                                 <form method="post" action="options.php">
                                 <?php

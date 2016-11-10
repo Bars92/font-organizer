@@ -25,6 +25,9 @@
     }
 
     function fo_print_links($fonts, $fonts_per_link = 150){
+        if(empty($fonts))
+            return;
+
         // Create list of names with no spaces.
         $font_names = array_map(function($font) { return str_replace(' ', '+', $font->family); }, $fonts);
 
@@ -77,7 +80,9 @@
                 _e('Google', 'font-organizer');
                 return;
             case 'standard':
+                _e('Standard', 'font-organizer');
             case 'custom':
+                _e('Custom', 'font-organizer');
             default:
                 _e(ucfirst($kind), 'font-organizer');
                 break;
