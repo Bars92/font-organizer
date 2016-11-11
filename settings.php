@@ -268,7 +268,7 @@ class FoSettingsPage
         $this->elements_options = get_option( 'fo_elements_options' );
         $this->custom_elements_table = new ElementsTable();
 
-        $this->include_font_link = !isset( $this->general_options['include_font_link'] ) || (isset( $this->general_options['include_font_link'] ) && $this->general_options['include_font_link']);
+        $this->include_font_link = isset( $this->general_options['include_font_link'] ) && $this->general_options['include_font_link']);
 
         if(isset($this->general_options['google_key']) && $this->general_options['google_key']){
             // Add Google fonts.
@@ -940,7 +940,7 @@ class FoSettingsPage
      */
     public function include_font_link_callback()
     {
-        $checked = !isset($this->general_options['include_font_link']) || (isset($this->general_options['include_font_link']) && $this->general_options['include_font_link']) ? 'checked="checked"' : '';
+        $checked = isset($this->general_options['include_font_link']) && $this->general_options['include_font_link'] ? 'checked="checked"' : '';
         printf(
             '<fieldset>
                 <legend class="screen-reader-text"><span>%s</span></legend>
