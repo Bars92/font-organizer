@@ -89,6 +89,11 @@ class FoSettingsPage
     private $should_create_css;
 
     /**
+     * Is the current user admin or not.
+     */
+    private $is_admin;
+
+    /**
      * Start up
      */
     public function __construct()
@@ -104,6 +109,7 @@ class FoSettingsPage
         $this->available_fonts = array();
         $this->google_fonts = array();
         $this->should_create_css = false;
+        $this->is_admin = current_user_can('manage_options');
         $this->elements = array('body_font' =>  __('<body> Font', 'font-organizer'),
                                 'h1_font'   =>  __('<h1> Font', 'font-organizer'),
                                 'h2_font'   =>  __('<h2> Font', 'font-organizer'),
@@ -779,7 +785,7 @@ class FoSettingsPage
         );   
 
         // If user is admin, display the permissions option.
-    	if (current_user_can('manage_options')) {
+    	if ($this->is_admin) {
 	        add_settings_field(
 	            'permissions', // ID
 	            __('Access Settings Role', 'font-organizer'), // Title 
@@ -831,6 +837,10 @@ class FoSettingsPage
 
         if( !isset( $input['include_font_link'] ) )
             $new_input['include_font_link'] =  0 ;
+
+        // Do not allow change in permissions if user is not admin.
+        if(!$this->is_admin)
+        	return $new_input;
 
         // Get the old permissions.
        	$this->general_options = get_option( 'fo_general_options' );
