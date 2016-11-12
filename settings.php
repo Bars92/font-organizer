@@ -806,6 +806,7 @@ class FoSettingsPage
 	            'setting_general' // Section           
         	);   
 		}
+
         add_settings_section(
             'setting_elements', // ID
             '', // Title
@@ -849,28 +850,27 @@ class FoSettingsPage
         if( !isset( $input['include_font_link'] ) )
             $new_input['include_font_link'] =  0 ;
 
-        if( isset( $input['permissions'] ) ){
-        	$this->general_options = get_option( 'fo_general_options' );
-            $new_input['permissions'] = $input['permissions'];
+        // Get the old permissions.
+       	$this->general_options = get_option( 'fo_general_options' );
+       	$old_permissions = isset($this->general_options['permissions']) ? $this->general_options['permissions'] : array();
+       	
+       	// Get the new permissions.
+       	$new_input['permissions'] = isset($input['permissions']) ? $input['permissions'] : array();
+       	if($new_input != $old_permissions){
 
-            if(isset($this->general_options['permissions'])){
-
-	            // Remove previus capabilities.
-            	foreach ($this->general_options['permissions'] as $value) {
-            		if($value != FO_DEFAULT_ROLE){
-	            		$prev_role = get_role($value);
-	            		$prev_role->remove_cap('manage_fonts');
-	            	}
-            	}
+	        // Remove previus capabilities.
+            foreach ($old_permissions as $value) {
+            	if($value != FO_DEFAULT_ROLE){
+	           		$prev_role = get_role($value);
+	           		$prev_role->remove_cap('manage_fonts');
+	           	}
             }
-            
-            // Add the new capabilities to the new role.
+
+            // Add the new capabilities to the new roles.
             foreach ($new_input['permissions'] as $value) {
 	           	$prev_role = get_role($value);
 	            $prev_role->add_cap('manage_fonts');
             }
-        }else{
-        	$new_input['permissions'] = array();
         }
 
         return $new_input;
@@ -1032,7 +1032,7 @@ class FoSettingsPage
         $selected = isset( $this->elements_options[$name] ) ? esc_attr( $this->elements_options[$name]) : '';
         echo '<select id="'.$name.'" name="fo_elements_options['.$name.']">';
         
-        echo '<option value="" '. selected('', $selected, false) . '>' . __('None', 'font-organizer') . '</option>'; 
+        echo '<option value="" '. selected('', $selected, false) . '>' . __('Default', 'font-organizer') . '</option>'; 
 
         //fonts section
         foreach($this->usable_fonts as $font)
