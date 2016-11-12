@@ -326,10 +326,7 @@ class FoSettingsPage
                         <!-- General Settings Section -->
                         <div class="postbox">
                             <a name="step1"></a>
-                            <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: General Settings', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('General Settings', 'font-organizer'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('General Settings', 'font-organizer'); ?></span></h2>
                             <div class="inside">
                                 <form method="post" action="options.php">
                                 <?php
@@ -345,10 +342,7 @@ class FoSettingsPage
                         <!-- Add Google & Regular Fonts To Website Section -->
                         <div class="postbox">
                             <a name="step2"></a>
-                         <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: First Step: Add Fonts', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('1. Add Fonts', 'font-organizer'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('1. Add Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
                                 <span><?php _e('Step 1: Select and add fonts to be used in your website. Select as many as you wish.', 'font-organizer'); ?></span>
                                 <br />
@@ -374,10 +368,7 @@ class FoSettingsPage
                         <!-- Add Custom Fonts To Website Section -->
                         <div class="postbox">
                             <a name="step3"></a>
-                            <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Fonts', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('2. Custom Fonts', 'font-organizer'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('2. Custom Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
                                 <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'font-organizer'); ?></span>
                                 <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
@@ -408,10 +399,7 @@ class FoSettingsPage
                         <!-- Assign Fonts To Known Elements Section -->
                         <div class="postbox">
                             <a name="step4"></a>
-                            <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Known Elements Settings', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('3. Known Elements Settings', 'font-organizer'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('3. Known Elements Settings', 'font-organizer'); ?></span></h2>
                             <div class="inside">
 
                                 <span><?php _e('Step 3: For each element you can assign a font you have added in step 1 & 2.', 'font-organizer'); ?></span>
@@ -431,10 +419,7 @@ class FoSettingsPage
                         <!-- Assign Fonts To Custom Elements Section -->
                         <div class="postbox">
                             <a name="step5"></a>
-                            <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Custom Elements Settings', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('4. Custom Elements Settings', 'font-organizer'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('4. Custom Elements Settings', 'font-organizer'); ?></span></h2>
                             <div class="inside">
 
                                 <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'font-organizer'); ?></span>
@@ -470,10 +455,7 @@ class FoSettingsPage
                         <!-- Manage Used fonts Section -->
                         <div class="postbox">
                             <a name="step6"></a>
-                            <button type="button" class="handlediv button-link" aria-expanded="false">
-                                <span class="screen-reader-text"><?php _e('Toggle panel: Manage Fonts', 'font-organizer'); ?></span><span class="toggle-indicator" aria-hidden="true"></span>
-                            </button>
-                            <h2 class="hndle ui-sortable-handle"><span><?php _e('5. Manage Fonts', 'font-organizer'); ?></span></h2>
+                            <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('5. Manage Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
                             	<form action="#step6" id="select_font_form" name="select_font_form" method="get"> 
 	                                <table class="form-table">
