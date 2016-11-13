@@ -186,7 +186,15 @@ class FoSettingsPage
         add_action( 'load-' . $hook, array( $this, 'init_page' ) );
         add_action( 'load-' . $hook, array( $this, 'register_scripts' ) );
         add_action( 'load-' . $hook, array( $this, 'create_css_file' ) );
+        add_filter( 'option_page_capability_fo_general_options', array($this, 'options_capability') );
+        add_filter( 'option_page_capability_fo_elements_options', array($this, 'options_capability') );
     }
+
+    // Allows to tell wordpress that the options named fo_general_options & fo_elements_options
+    // can be saved by manage_fonts capability and by any role with this capability.
+	public function options_capability( $cap ) {
+    	return 'manage_fonts';
+	}
 
     public function init_page(){
     	$this->init();
@@ -837,6 +845,8 @@ class FoSettingsPage
 
         if( !isset( $input['include_font_link'] ) )
             $new_input['include_font_link'] =  0 ;
+        else
+        	$new_input['include_font_link'] = $input['include_font_link'];
 
         // Do not allow change in permissions if user is not admin.
         if(!$this->is_admin)
