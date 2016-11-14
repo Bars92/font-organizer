@@ -39,11 +39,9 @@
         }
     }
 
-    function fo_upload_file($file, $upload_dir_callback, $should_override = false){
+    function fo_upload_file($uploadedfile, $upload_dir_callback, $should_override = false){
         if ( ! function_exists( 'wp_handle_upload' ) ) 
             require_once( ABSPATH . 'wp-admin/includes/file.php' );
-
-        $uploadedfile = $args['font_file'];
 
         $upload_overrides = array( 'test_form' => false );
         if($should_override){
@@ -78,11 +76,13 @@
         switch ($kind) {
             case 'webfonts#webfont':
                 _e('Google', 'font-organizer');
-                return;
+                break;
             case 'standard':
                 _e('Standard', 'font-organizer');
+                break;
             case 'custom':
                 _e('Custom', 'font-organizer');
+                break;
             default:
                 _e(ucfirst($kind), 'font-organizer');
                 break;
