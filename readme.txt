@@ -1,116 +1,66 @@
-=== Plugin Name ===
-Contributors: (this should be a list of wordpress.org userid's)
-Donate link: 
-Tags: font, google fonts, upload font
+=== Font Organizer ===
+Contributors: hivewebstudios,basaar,yardensade
+Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
+Tested up to: 4.6.1
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Font Organizer is the complete solution for font implementation including uploading custom fonts and using google fonts in WordPress websites.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+Font Organizer is the complete solution for font implementation including uploading custom fonts and using google fonts in WordPress websites.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+The plugin is intended for both developers and regular users in order to easily add native, google and custom fonts then assign
+them to different elements in your website effortlessly.
 
-A few notes about the sections above:
-
-*   "Contributors" is a comma separated list of wordpress.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
-
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
-
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebStudios website") and find out more from us.
 
 == Installation ==
+Just download & install the plugin from your wordpress site. Or
 
-This section describes how to install the plugin and get it working.
+1. Download the plugin from here.
 
-e.g.
+2. Upload the plugin files to the `/wp-content/plugins/font-organizer` directory.
 
-1. Upload the plugin files to the `/wp-content/plugins/plugin-name` directory, or install the plugin through the WordPress plugins screen directly.
-1. Activate the plugin through the 'Plugins' screen in WordPress
-1. Use the Settings->Plugin Name screen to configure the plugin
-1. (Make your instructions match the desired user flow for activating and installing your plugin. Include any steps that might be needed for explanatory purposes)
+3. Activate the plugin through the 'Plugins' screen in your WordPress site.
 
+4. Use the Settings->Font Settings screen to configure the plugin and follow the steps.
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+Q: What is API key, and why do I need it?
 
-An answer to that question.
+A: API key is a special key made by google in order to let users view their full list of fonts and use them in the plugin.
+Without it the entire function of google fonts will not work.
 
-= What about foo bar? =
+Q: How do I create API key for the plugin?
 
-Answer to foo bar dilemma.
+A: Inside the plugin click on "HERE" at Settings->Font Settings->General Settings->Google API Key.
+Open the Credentials page link. Select "Create a project".
+Give the project a name, any name that makes sense to you is ok, then press OK.
+Click on "Create credentials" > "API key".
+There you go, google generated a brand new API key for you.
+Copy the entire key and paste it on the designated place in the plugin settings.
+
+Q: What the option "Show Font Family Preview" means?
+
+A: When selecting fonts in section 1, you will see a lot of different fonts, ticking this option will let you to actually
+see example of the font you are about to use.
+Due to the need of loading each font example from google, this option will slow down the performance of the plugin page.
+
+Q: What the option "Access Settings Role" means?
+
+A: We wanted to give you the option to decide which roles in your wordpress website are allowed to use the plugin, so you may or may not allow other users with access to the website the ability to use the plugin.
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets 
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png` 
-(or jpg, jpeg, gif).
-2. This is the second screen shot
 
 == Changelog ==
 
-= 1.0 =
-* A change since the previous version.
-* Another change.
-
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
+= 1.0.0 =
+* Plugin publish initial release.
 
 == Upgrade Notice ==
-
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
-
-== A brief Markdown Example ==
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`

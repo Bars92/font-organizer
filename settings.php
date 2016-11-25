@@ -208,7 +208,7 @@ class FoSettingsPage
             return;
         }
         
-        $content = "/* This Awesome CSS file was created by Font Orgranizer from HiveTeam :) */\n\n";
+        $content = "/* This Awesome CSS file was created by Font Orgranizer from Hive :) */\n\n";
         $custom_fonts_content = '';
         $google_fonts = array();
         foreach ($this->usable_fonts as $key => $usable_font) {
@@ -525,16 +525,23 @@ class FoSettingsPage
 
                             <div class="inside">
                                 <p><?php _e(
-                                        'Thank you for using an <a href="http://hivewebstudios.com" target="_blank">HiveTeam</a> plugin! We 5 star you already, so why don\'t you <a href="http://xxxxx.xxx" target="_blank">5 star us too</a>?',
-                                        'font-organizer'
-                                    ); ?></p>
+                                        'Thank you for using an <a href="http://hivewebstudios.com" target="_blank">Hive</a> plugin! We 5 star you already, so why don\'t you <a href="https://wordpress.org/support/plugin/font-organizer/reviews/?rate=5#new-post" target="_blank">5 star us too</a>?', 'font-organizer'); ?>
+                                    <br />
+                                    <p><?php _e('Anyway, if you need anything, this may help:', 'font-organizer'); ?></p> 
+                                    <ul style="list-style-type:disc;margin: 0 20px;">
+                                        <li><a href="http://hivewebstudios.com/font-organizer#faqs" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
+                                        <li><a href="https://wordpress.org/support/plugin/font-organizer" target="_blank"><?php _e('Support forums', 'font-organizer'); ?></a></li>
+                                        <li><a href="http://hivewebstudios.com/font-organizer" target="_blank"><?php _e('Contact us', 'font-organizer'); ?></a></li>
+                                        <li><a href="https://www.facebook.com/hivewp" target="_blank"><?php _e('Hive Facebook page', 'font-organizer'); ?></a></li>
+                                    </ul>
+                                </p>
                             </div>
                         </div>
                     </div>
             </form>
         </div>
         <?php
-    }
+    } 
 
     private function validate_upload(){
         if(!isset( $_POST['add_custom_font_nonce'] ) || !wp_verify_nonce( $_POST['add_custom_font_nonce'], 'add_custom_font' )){

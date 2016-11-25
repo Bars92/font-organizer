@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Font Organizer\n"
-"POT-Creation-Date: 2016-11-12 19:34+0200\n"
+"POT-Creation-Date: 2016-11-25 23:09+0200\n"
 "PO-Revision-Date: 2016-11-09 15:53+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Custom Elements"
 msgstr ""
 
-#: classes/class-ElementsTable.php:73 settings.php:985 settings.php:1002
+#: classes/class-ElementsTable.php:73 settings.php:1013 settings.php:1030
 msgid "Important"
 msgstr ""
 
@@ -47,293 +47,314 @@ msgstr ""
 msgid "No custom elements found."
 msgstr ""
 
-#: font-organizer.php:137 settings.php:174 settings.php:318
+#: font-organizer.php:138 settings.php:180 settings.php:332
 msgid "Font Settings"
 msgstr ""
 
-#: helpers.php:80
+#: helpers.php:78
 msgid "Google"
 msgstr ""
 
-#: helpers.php:83
+#: helpers.php:81
 msgid "Standard"
 msgstr ""
 
-#: helpers.php:85
+#: helpers.php:84
 msgid "Custom"
 msgstr ""
 
-#: settings.php:107
+#: settings.php:113
 msgid "<body> Font"
 msgstr ""
 
-#: settings.php:108
+#: settings.php:114
 msgid "<h1> Font"
 msgstr ""
 
-#: settings.php:109
+#: settings.php:115
 msgid "<h2> Font"
 msgstr ""
 
-#: settings.php:110
+#: settings.php:116
 msgid "<h3> Font"
 msgstr ""
 
-#: settings.php:111
+#: settings.php:117
 msgid "<h4> Font"
 msgstr ""
 
-#: settings.php:112
+#: settings.php:118
 msgid "<h5> Font"
 msgstr ""
 
-#: settings.php:113
+#: settings.php:119
 msgid "<h6> Font"
 msgstr ""
 
-#: settings.php:114
+#: settings.php:120
 msgid "<p> Font"
 msgstr ""
 
-#: settings.php:115
+#: settings.php:121
 msgid "<q> Font"
 msgstr ""
 
-#: settings.php:116
+#: settings.php:122
 msgid "<li> Font"
 msgstr ""
 
-#: settings.php:117
+#: settings.php:123
 msgid "<a> Font"
 msgstr ""
 
-#: settings.php:280
+#: settings.php:294
 msgid "Google API key is not valid: "
 msgstr ""
 
-#: settings.php:283
+#: settings.php:297
 msgid "Google API key is not set! Cannot display google fonts."
 msgstr ""
 
-#: settings.php:329
+#: settings.php:343
 msgid "General Settings"
 msgstr ""
 
-#: settings.php:345
+#: settings.php:359
 msgid "1. Add Fonts"
 msgstr ""
 
-#: settings.php:347
+#: settings.php:361
 msgid ""
 "Step 1: Select and add fonts to be used in your website. Select as many as "
 "you wish."
 msgstr ""
 
-#: settings.php:349
+#: settings.php:363
 msgid "You can select google or regular fonts."
 msgstr ""
 
-#: settings.php:353
+#: settings.php:367
 msgid "Available Fonts"
 msgstr ""
 
-#: settings.php:360
+#: settings.php:374
 msgid "Use This Font"
 msgstr ""
 
-#: settings.php:371
+#: settings.php:385
 msgid "2. Custom Fonts"
 msgstr ""
 
-#: settings.php:373
+#: settings.php:387
 msgid ""
 "Step 2: Upload custom fonts to be used in your website. Here too, you can "
 "upload as many as you wish."
 msgstr ""
 
-#: settings.php:377
+#: settings.php:391
 msgid "Font Name"
 msgstr ""
 
-#: settings.php:381
+#: settings.php:395
 msgid "Font File"
 msgstr ""
 
-#: settings.php:384
+#: settings.php:398
 msgid "Accepted Font Format : "
 msgstr ""
 
-#: settings.php:391
+#: settings.php:405
 msgid "Upload"
 msgstr ""
 
-#: settings.php:402
+#: settings.php:416
 msgid "3. Known Elements Settings"
 msgstr ""
 
-#: settings.php:405
+#: settings.php:419
 msgid ""
 "Step 3: For each element you can assign a font you have added in step 1 & 2."
 msgstr ""
 
-#: settings.php:406
+#: settings.php:420
 msgid "Note: "
 msgstr ""
 
-#: settings.php:406
+#: settings.php:420
 msgid "Custom fonts you uploaded are automatically used in your website."
 msgstr ""
 
-#: settings.php:422
+#: settings.php:436
 msgid "4. Custom Elements Settings"
 msgstr ""
 
-#: settings.php:425
+#: settings.php:439
 msgid ""
 "Step 4: Assign font that you have added to your website to custom elements."
 msgstr ""
 
-#: settings.php:429 settings.php:463
+#: settings.php:443 settings.php:477
 msgid "Font"
 msgstr ""
 
-#: settings.php:433
+#: settings.php:447
 msgid "Custom Element"
 msgstr ""
 
-#: settings.php:436
+#: settings.php:450
 msgid ""
 "Custom elements can be seperated by commas to allow multiple elements. "
 "Example: #myelementid, .myelementclass, .myelementclass .foo, etc."
 msgstr ""
 
-#: settings.php:447
+#: settings.php:461
 msgid "Apply Custom Elements"
 msgstr ""
 
-#: settings.php:458
+#: settings.php:472
 msgid "5. Manage Fonts"
 msgstr ""
 
-#: settings.php:464
+#: settings.php:478
 msgid "-- Select Font --"
 msgstr ""
 
-#: settings.php:473
+#: settings.php:487
 msgid "Source"
 msgstr ""
 
-#: settings.php:477
+#: settings.php:491
 msgid "Urls"
 msgstr ""
 
-#: settings.php:509
+#: settings.php:523
 msgid "Thank you"
 msgstr ""
 
-#: settings.php:514
+#: settings.php:528
 msgid ""
 "Thank you for using an <a href=\"http://hivewebstudios.com\" target=\"_blank"
-"\">HiveTeam</a> plugin! We 5 star you already, so why don't you <a href="
-"\"http://xxxxx.xxx\" target=\"_blank\">5 star us too</a>?"
+"\">Hive</a> plugin! We 5 star you already, so why don't you <a href="
+"\"https://wordpress.org/support/plugin/font-organizer/reviews/?rate=5#new-"
+"post\" target=\"_blank\">5 star us too</a>?"
 msgstr ""
 
-#: settings.php:527 settings.php:554 settings.php:569 settings.php:588
-msgid "Session ended, please try again."
+#: settings.php:531
+msgid "Anyway, if you need anything, this may help:"
 msgstr ""
 
 #: settings.php:533
+msgid "FAQ"
+msgstr ""
+
+#: settings.php:534
+msgid "Support forums"
+msgstr ""
+
+#: settings.php:535
+msgid "Contact us"
+msgstr ""
+
+#: settings.php:536
+msgid "Hive Facebook page"
+msgstr ""
+
+#: settings.php:549 settings.php:576 settings.php:591 settings.php:610
+msgid "Session ended, please try again."
+msgstr ""
+
+#: settings.php:555
 msgid "Font name is empty or invalid."
 msgstr ""
 
-#: settings.php:538
+#: settings.php:560
 msgid "Font file is not selected."
 msgstr ""
 
-#: settings.php:545
+#: settings.php:567
 msgid "Font file is not valid."
 msgstr ""
 
-#: settings.php:560
+#: settings.php:582
 msgid "Usable font is empty or invalid."
 msgstr ""
 
-#: settings.php:575
+#: settings.php:597
 msgid "Custom elements is empty or invalid."
 msgstr ""
 
-#: settings.php:594
+#: settings.php:616
 msgid "Something went horribly wrong. Ask the support!"
 msgstr ""
 
-#: settings.php:670
+#: settings.php:692
 msgid "Custom elements added to your website!"
 msgstr ""
 
-#: settings.php:678
+#: settings.php:700
 msgid "Font can now be used in your website!"
 msgstr ""
 
-#: settings.php:686
+#: settings.php:708
 msgid "Font deleted from your website!"
 msgstr ""
 
-#: settings.php:694
+#: settings.php:716
 msgid "The file has been uploaded!"
 msgstr ""
 
-#: settings.php:702
+#: settings.php:724
 msgid "Error uploading the file: "
 msgstr ""
 
-#: settings.php:710
+#: settings.php:732
 msgid "Error adding font to website fonts: "
 msgstr ""
 
-#: settings.php:718
+#: settings.php:740
 msgid "Error deleting font: "
 msgstr ""
 
-#: settings.php:726
+#: settings.php:748
 msgid "Failed to open or create the css file. Check for permissions."
 msgstr ""
 
-#: settings.php:768
+#: settings.php:790
 msgid "Google API Key"
 msgstr ""
 
-#: settings.php:775
+#: settings.php:797
 msgid "Show Font Family Preview"
 msgstr ""
 
-#: settings.php:785
+#: settings.php:807
 msgid "Access Settings Role"
 msgstr ""
 
-#: settings.php:891
+#: settings.php:919
 msgid "This is the general settings for the site."
 msgstr ""
 
-#: settings.php:910
+#: settings.php:938
 #, php-format
 msgid ""
 "To get all the fonts, Google requires the mandatory use of an API key, get "
 "one from <a href=\"%s\" target=\"_blank\">HERE</a>"
 msgstr ""
 
-#: settings.php:934
+#: settings.php:962
 msgid "Include Font Family Preview"
 msgstr ""
 
-#: settings.php:936
+#: settings.php:964
 msgid "Show font preview when listing the fonts (might be slow)"
 msgstr ""
 
-#: settings.php:988 settings.php:1005
+#: settings.php:1016 settings.php:1033
 msgid "Include !important to this element to always apply."
 msgstr ""
 
-#: settings.php:1017
+#: settings.php:1045
 msgid "Default"
 msgstr ""
 
@@ -346,9 +367,15 @@ msgid "https://wordpress.org/plugins/font-organizer/"
 msgstr ""
 
 #. Description of the plugin/theme
-msgid "afsaf."
+msgid ""
+"Font Organizer is the complete solution for font implementation in "
+"WordPress websites."
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "HiveTeam"
+msgid "Hive"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://hivewebstudios.com"
 msgstr ""

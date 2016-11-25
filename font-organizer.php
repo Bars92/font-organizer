@@ -6,10 +6,11 @@
 /*
 Plugin Name: Font Organizer
 Plugin URI: https://wordpress.org/plugins/font-organizer/
-Description: afsaf.
-Author: HiveTeam
+Description: Font Organizer is the complete solution for font implementation in WordPress websites.
+Author: Hive
 Version: 1.0.0
-Author URI: 
+Author URI: https://hivewebstudios.com
+Text Domain: font-organizer
 */
 
 define( 'FO_ABSPATH', plugin_dir_path( __FILE__ ) );
@@ -77,13 +78,14 @@ function fo_allow_upload_types($existing_mimes = array()){
 }
 
 function fo_uninstall(){
-	$roles = wp_roles();
+	// This is disabled and may move to permanent unistall option.
+	//$roles = wp_roles();
 
 	// Remove all capabilities added by this plugin.
-	foreach ($roles as $role_name => $role) {
-		if(array_key_exists('manage_fonts', $role['capabilities']) && $role['capabilities']['manage_fonts'])
-			 $roles->remove_cap( $role_name, 'manage_fonts' ); 
-	}
+	//foreach ($roles as $role_name => $role) {
+	//	if(array_key_exists('manage_fonts', $role['capabilities']) && $role['capabilities']['manage_fonts'])
+	//		 $roles->remove_cap( $role_name, 'manage_fonts' ); 
+	//}
 }
 
 function fo_install() {
