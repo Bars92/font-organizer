@@ -2,6 +2,13 @@
 class FoSettingsPage
 {
     /**
+     * The seperator used when inserting more then 1 font format
+     * to the database. The urls are joined with the seperator to
+     * create a string a parsed back to urls when needed.
+     */
+    const CUSTOM_FONT_URL_SPERATOR = ';';
+
+    /**
      * Holds the option values for the general section.
      */
     private $general_options;
@@ -107,6 +114,7 @@ class FoSettingsPage
         $this->supported_font_files = array('.woff', '.woff2', '.ttf','.otf');
         $this->custom_fonts = array();
         $this->available_fonts = array();
+        $this->usable_fonts = array();
         $this->google_fonts = array();
         $this->should_create_css = false;
         $this->is_admin = current_user_can('manage_options');
@@ -167,6 +175,8 @@ class FoSettingsPage
         wp_enqueue_script( 'jquery-ui-autocomplete' );
         wp_enqueue_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
         wp_enqueue_style( 'fo-settings-css', plugins_url( 'assets/css/settings.css', __FILE__ ) );
+        wp_enqueue_style( 'fontawesome', plugins_url( 'assets/css/font-awesome.min.css', __FILE__ ) );
+        
     }
 
     /**
@@ -214,11 +224,20 @@ class FoSettingsPage
         foreach ($this->usable_fonts as $key => $usable_font) {
             switch ($usable_font->kind) {
                 case 'custom':
-                    $url = $usable_font->files->regular;
+                    $urls = $usable_font->files->regular;
+
+                    // Set all the urls content under the same src.
+                    $urls_content_arr = array();
+                    foreach ($urls as $url) {
+                        $urls_content_arr[] = "url('" . $url . "') format('" . fo_get_font_format($url) . "')";
+                    }
+
+                    $urls_content = implode(",\n", $urls_content_arr) . ';';
+
                     $custom_fonts_content .= "
 @font-face {
     font-family: '" . $usable_font->family . "';
-    src: url('" . $url . "') format('" . fo_get_font_format($url) . "');
+    src: " . $urls_content . "
     font-weight: normal;
     font-style: normal;
 }\n";
@@ -256,6 +275,7 @@ class FoSettingsPage
         	$content .= sprintf("%s { font-family: '%s'%s; }\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '');
         }
 
+        // If there is any css to write. Create the directory if needed and create the file.
         if($content){
 
             // Make sure directory exists.
@@ -328,6 +348,7 @@ class FoSettingsPage
             fo_print_links($this->usable_fonts, $this->fonts_per_link);
         
         ?>
+        <a href="#" class="go-top<?php echo is_rtl() ? ' rtl' : 'ltr'; ?>"></a>
         <div class="wrap">
             <h1><?php _e('Font Settings', 'font-organizer'); ?></h1>
 
@@ -385,17 +406,24 @@ class FoSettingsPage
                             <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('2. Custom Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
                                 <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'font-organizer'); ?></span>
+                                <br />
+                                <span><?php _e('Name the font you want to upload and upload all the files formats for this font. In order to support more browsers you can click the green plus to upload more font formats. We suggest .woff and .woff2.', 'font-organizer'); ?></span>
                                 <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><?php _e('Font Name', 'font-organizer'); ?></th>
                                             <td><input type="text" id="font_name" name="font_name" value="" maxlength="20" class="required" /></td>
                                         </tr>   
-                                        <tr>    
-                                            <th scope="row"><?php _e('Font File', 'font-organizer'); ?></th>
+                                        <tr class="font_file_wrapper">    
+                                            <th scope="row">
+                                                <?php _e('Font File', 'font-organizer'); ?>
+                                            </th>
+                                            <td id="font_file_parent" style="width:33%;">
+                                                <input type="file" class="required" name="font_file[]" value="" accept="<?php echo join(',',$this->supported_font_files); ?>" /><br/>
+                                                <em><?php echo __('Accepted Font Format : ', 'font-organizer') . '<span style="direction: ltr">' . join(', ',$this->supported_font_files) . '</span>'; ?></em><br/>
+                                            </td>
                                             <td>
-                                            <input type="file" id="font_file" name="font_file" value="" class="required" accept="<?php echo join(',',$this->supported_font_files); ?>" /><br/>
-                                            <em><?php echo __('Accepted Font Format : ', 'font-organizer') . '<span style="direction: ltr">' . join(', ',$this->supported_font_files) . '</span>'; ?></em><br/>
+                                                 <a href="javascript:void(0);" class="add_button" title="<?php _e('Add Another Font File', 'font-organizer'); ?>"><i class="fa fa-plus fa-2x" aria-hidden="true"></i></a>
                                             </td>
                                         </tr>
                                         <tr>        
@@ -441,7 +469,7 @@ class FoSettingsPage
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><?php _e('Font', 'font-organizer'); ?></th>
-                                            <td><?php $this->print_custom_elements_usable_fonts_list('font_id'); ?></td>
+                                            <td><?php $this->print_custom_elements_usable_fonts_list('font_id', __('-- Select Font --', 'font-organizer')); ?></td>
                                         </tr>   
                                         <tr>
                                             <th scope="row"><?php _e('Custom Element', 'font-organizer'); ?></th>
@@ -489,11 +517,10 @@ class FoSettingsPage
                                     </tr>
                                     <tr>
                                         <th scope="row"><?php _e('Urls', 'font-organizer'); ?></th>
-                                        <td>
+                                        <td style="direction:ltr;text-align:left;line-height:20px;">
                                             <span>
                                             <?php
-                                             $urls = explode('|', $this->selected_manage_font->files->regular); 
-                                             foreach($urls as $url)
+                                             foreach($this->selected_manage_font->files->regular as $url)
                                                echo $url, '<br>';
                                             ?>
                                             </span>
@@ -560,13 +587,15 @@ class FoSettingsPage
             return false;
         }
 
-        $args['font_file'] = $_FILES['font_file'];
-        $args['font_file_name'] = sanitize_file_name( $args['font_file']['name'] );
-        if(!$args['font_file_name']){
-            $this->recent_error = __('Font file is not valid.', 'font-organizer');
-            return false;
+        $args['font_file'] = fo_rearray_files($_FILES['font_file']);
+        foreach ($args['font_file'] as $file) {
+            $args['font_file_name'][] = sanitize_file_name( $file['name'] );
+            if(!$args['font_file_name']){
+                $this->recent_error = __('Font file is not valid.', 'font-organizer');
+                return false;
+            }
         }
-
+        
         return $args;
     }
 
@@ -620,20 +649,20 @@ class FoSettingsPage
     }
 
     private function upload_file($args = array()){
-
-        $movefile = fo_upload_file($args['font_file'], array($this, 'fo_upload_dir'));
-
-        if ( $movefile && ! isset( $movefile['error'] ) ) {
-            add_action( 'admin_notices', array($this, 'upload_successfull_admin_notice') );
-            $this->save_usable_font_to_database($args['font_name'], $movefile['url'], true);
-        } else {
-            /**
-             * Error generated by _wp_handle_upload()
-             * @see _wp_handle_upload() in wp-admin/includes/file.php
-             */
-            $this->recent_error = $movefile['error'];
-            add_action( 'admin_notices', array($this, 'upload_failed_admin_notice') );
+        $urls = array();
+        foreach ($args['font_file'] as $file) {
+            $movefile = fo_upload_file($file, array($this, 'fo_upload_dir'));
+            if(!$movefile || isset( $movefile['error'] )){
+                $this->recent_error = $movefile['error'];
+                add_action( 'admin_notices', array($this, 'upload_failed_admin_notice') );
+                return false;
+            }
+            
+            $urls[] = $movefile['url'];
         }
+
+        $this->save_usable_font_to_database($args['font_name'], implode(self::CUSTOM_FONT_URL_SPERATOR, $urls), true);
+        add_action( 'admin_notices', array($this, 'upload_successfull_admin_notice') );
     }
 
     private function use_font($args = array()){
@@ -1102,7 +1131,7 @@ class FoSettingsPage
 
             // Find the font from the lists.
             if($usable_font->custom){
-                $font_obj = (object) [ 'family' => $usable_font->name, 'files' => (object) ['regular' => $usable_font->url], 'kind' => 'custom', 'variants' => array('regular')];
+                $font_obj = (object) [ 'family' => $usable_font->name, 'files' => (object) ['regular' => explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url)], 'kind' => 'custom', 'variants' => array('regular')];
                 $this->usable_fonts[$font_obj->family] = $font_obj;
                 $this->custom_fonts[$font_obj->family] = $font_obj;
             }else{

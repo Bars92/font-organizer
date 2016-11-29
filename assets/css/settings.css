@@ -3,3 +3,50 @@
 .wp-list-table .column-id { width: 10%; }
 .wp-list-table .column-custom_elements { width: 73%; }
 .wp-list-table .column-important { width: 17%;}
+
+/* Back to top styles */
+.go-top, .go-top:focus {
+	position: fixed;
+    bottom: 2em;
+    text-decoration: none;
+    font-size: 12px;
+    padding: 1em;
+    display: none;
+    z-index: 999999;
+    opacity: 0.4;
+    transition: opacity .25s ease-in-out;
+    -moz-transition: opacity .25s ease-in-out;
+    -webkit-transition: opacity .25s ease-in-out;
+    box-shadow: none;
+    width: 32px;
+    height: 32px;
+	background-image: url(../images/back-top.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right top;
+    border-radius: 10px;
+}
+
+.go-top.rtl{
+	left: 2em;
+}
+
+.go-top.ltr{
+	right: 2em;
+}
+
+.go-top:hover {
+	opacity: 0.6;
+}
+
+/* Upload fonts section styles */
+.remove_button, .remove_button:hover, .remove_button:active, .remove_button:focus{
+	color: red;
+	text-decoration: none;
+	box-shadow: none;
+}
+.add_button, .add_button:hover, .add_button:active, .add_button:focus{
+	color: green;
+	text-decoration: none;
+	box-shadow: none;
+}

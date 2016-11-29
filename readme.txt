@@ -18,7 +18,10 @@ them to different elements in your website effortlessly.
 
 Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebStudios website") and find out more from us.
 
+Want to try us? Use [Addendio's](https://Addendio.com/ "Addendio's website") [Font Organizer live demo](https://addendio.com/try-plugin/?slug=font-organizer "live demo")!
+
 == Installation ==
+
 Just download & install the plugin from your wordpress site. Or
 
 1. Download the plugin from here.
@@ -57,6 +60,10 @@ A: We wanted to give you the option to decide which roles in your wordpress webs
 
 == Screenshots ==
 
+1.Choosing Google & uploading fonts in just 1 step.
+2.Assigning the fonts you have chosen to various elements in your website.
+3.Assigning the fonts you have chosen to your own elements in your website & managing all your fonts.
+4.General settings & role restictions.
 
 == Changelog ==
 
