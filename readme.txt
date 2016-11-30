@@ -60,10 +60,10 @@ A: We wanted to give you the option to decide which roles in your wordpress webs
 
 == Screenshots ==
 
-1.Choosing Google & uploading fonts in just 1 step.
-2.Assigning the fonts you have chosen to various elements in your website.
-3.Assigning the fonts you have chosen to your own elements in your website & managing all your fonts.
-4.General settings & role restictions.
+1. Choosing Google & uploading fonts in just 1 step.
+2. Assigning the fonts you have chosen to various elements in your website.
+3. Assigning the fonts you have chosen to your own elements in your website & managing all your fonts.
+4. General settings & role restictions.
 
 == Changelog ==
 
