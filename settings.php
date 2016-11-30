@@ -55,6 +55,12 @@ class FoSettingsPage
     private $google_fonts;
 
     /**
+     * Holds the early access google fonts static list. (No API for full list exists)
+     * An Objects array that contains the information on each font.
+     */
+    private $earlyaccess_fonts;
+
+    /**
      * Holds the number of google fonts to load per request
      */
     private $fonts_per_link;
@@ -244,6 +250,8 @@ class FoSettingsPage
                     break;
                 case 'webfonts#webfont': // Google font
                     $google_fonts[] = str_replace(' ', '+', $usable_font->family);
+                case 'earlyaccess':
+                    $content .= "@import url(".$usable_font->files->regular.");\n";
                 case 'regular':
                 default:
                     break;
@@ -319,6 +327,13 @@ class FoSettingsPage
 
         // Add known fonts.
         $this->known_fonts = $this->get_known_fonts_array();
+
+        // Add early access google fonts. (this list is static, no api to get full list)
+        $this->earlyaccess_fonts = $this->get_early_access_fonts_array();
+
+        // Merge (and sort) the early access google fonts list with the google fonts.
+        $this->google_fonts = array_merge($this->google_fonts, $this->earlyaccess_fonts);
+        fo_array_sort($this->google_fonts);
 
         $this->available_fonts = array_merge($this->available_fonts, $this->google_fonts, $this->known_fonts );
 
@@ -1157,6 +1172,14 @@ class FoSettingsPage
         global $wpdb;
 
         $this->custom_elements = $wpdb->get_results('SELECT e.id, u.name, e.font_id, e.custom_elements, e.important FROM ' . $wpdb->prefix . FO_ELEMENTS_DATABASE . ' as e LEFT OUTER JOIN ' . $wpdb->prefix . FO_USABLE_FONTS_DATABASE . ' as u ON ' . ' e.font_id = u.id ORDER BY e.font_id DESC');
+    }
+
+    private function get_early_access_fonts_array(){
+        return array(
+        (object) [ 'family' => 'Open Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) ['regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrew.css')]],
+        (object) [ 'family' => 'Open Sans Hebrew Condensed', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) ['regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css')]],
+        (object) [ 'family' => 'Noto Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) ['regular' => array('http://fonts.googleapis.com/earlyaccess/notosanshebrew.css')]],
+            );
     }
 
     private function get_known_fonts_array()

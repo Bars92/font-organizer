@@ -83,6 +83,9 @@
             case 'custom':
                 _e('Custom', 'font-organizer');
                 break;
+            case 'earlyaccess':
+                _e('Google (Early Access)', 'font-organizer');
+                break;
             default:
                 _e(ucfirst($kind), 'font-organizer');
                 break;
@@ -102,5 +105,18 @@
             }
         }
         return $file_ary;
+    }
+
+    function cmp_font($a, $b){
+        $al = strtolower($a->family);
+        $bl = strtolower($b->family);
+        if ($al == $bl) {
+            return 0;
+        }
+        return ($al > $bl) ? +1 : -1;
+    }
+
+    function fo_array_sort(&$array){
+        return usort($array, 'cmp_font');
     }
 ?>
