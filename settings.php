@@ -250,8 +250,13 @@ class FoSettingsPage
                     break;
                 case 'webfonts#webfont': // Google font
                     $google_fonts[] = str_replace(' ', '+', $usable_font->family);
+                    break;
                 case 'earlyaccess':
-                    $content .= "@import url(".$usable_font->files->regular.");\n";
+                    // Better safe then sorry.
+                    reset($usable_font->files->regular);
+
+                    $content .= "@import url(".current($usable_font->files->regular).");\n";
+                    break;
                 case 'regular':
                 default:
                     break;
@@ -535,8 +540,12 @@ class FoSettingsPage
                                         <td style="direction:ltr;text-align:left;line-height:20px;">
                                             <span>
                                             <?php
-                                             foreach($this->selected_manage_font->files->regular as $url)
-                                               echo $url, '<br>';
+                                            if(is_array($this->selected_manage_font->files->regular)){
+                                                foreach($this->selected_manage_font->files->regular as $url)
+                                                    echo $url, '<br>';
+                                            }else{
+                                                echo $this->selected_manage_font->files->regular;
+                                            }
                                             ?>
                                             </span>
                                         </td>
@@ -641,7 +650,7 @@ class FoSettingsPage
             return false;
         }
 
-        $args['important'] = $_POST['important'] ? 1 : 0;
+        $args['important'] = isset($_POST['important']) ? 1 : 0;
 
         $args['font_id'] = $_POST['font_id'];
 
