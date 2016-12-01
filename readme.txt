@@ -3,7 +3,7 @@ Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.0.1
 Tested up to: 4.6.1
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,13 @@ them to different elements in your website effortlessly.
 Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebStudios website") and find out more from us.
 
 Want to try us? Use [Addendio's](https://Addendio.com/ "Addendio's website") [Font Organizer live demo](https://addendio.com/try-plugin/?slug=font-organizer "live demo")!
+
+Key Features:
+* Upload font to your website and apply it on any element.
+* Multi upload allow you to upload more font formats to support more browsers.
+* Add any google fonts in one click and apply them on any element.
+* Apply fonts for known elements or custom elements of your choosing easily.
+* It's awesome like it's users.
 
 == Installation ==
 
@@ -66,6 +73,12 @@ A: We wanted to give you the option to decide which roles in your wordpress webs
 4. General settings & role restictions.
 
 == Changelog ==
+
+= 1.1.0 =
+* Added Multi-upload to upload more formats per font to support more browsers.
+* Added back to top button.
+* Added a few early access google fonts.
+* Fixed a few minor bugs.
 
 = 1.0.0 =
 * Plugin publish initial release.
