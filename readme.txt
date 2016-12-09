@@ -21,6 +21,7 @@ Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebS
 Want to try us? Use [Addendio's](https://Addendio.com/ "Addendio's website") [Font Organizer live demo](https://addendio.com/try-plugin/?slug=font-organizer "live demo")!
 
 Key Features:
+
 * Upload font to your website and apply it on any element.
 * Multi upload allow you to upload more font formats to support more browsers.
 * Add any google fonts in one click and apply them on any element.
@@ -64,6 +65,11 @@ Due to the need of loading each font example from google, this option will slow 
 Q: What the option "Access Settings Role" means?
 
 A: We wanted to give you the option to decide which roles in your wordpress website are allowed to use the plugin, so you may or may not allow other users with access to the website the ability to use the plugin.
+
+Q: Why can't i see assigned fonts even when i saved?
+
+A: Sometimes some browsers save a cached version of the page when browsing it to display it faster.
+If you can't see a new font you have assigned make sure to clean the cache using Shift+F5 to clean the current page, or Ctrl+Shift+Delete to clean all.
 
 == Screenshots ==
 

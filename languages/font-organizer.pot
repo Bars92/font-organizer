@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Font Organizer\n"
-"POT-Creation-Date: 2016-12-01 22:45+0200\n"
+"POT-Creation-Date: 2016-12-09 16:36+0200\n"
 "PO-Revision-Date: 2016-11-09 15:53+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -197,6 +197,12 @@ msgstr ""
 
 #: settings.php:468
 msgid "Custom fonts you uploaded are automatically used in your website."
+msgstr ""
+
+#: settings.php:469
+msgid ""
+"In case of font not displaying in your website after saving, try clear the "
+"cache using Shift+F5 or Ctrl+Shift+Delete to clear all."
 msgstr ""
 
 #: settings.php:484

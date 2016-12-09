@@ -431,15 +431,15 @@ class FoSettingsPage
                                 <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><?php _e('Font Name', 'font-organizer'); ?></th>
-                                            <td><input type="text" id="font_name" name="font_name" value="" maxlength="20" class="required" /></td>
+                                            <th scope="row"><label for="font_name" class="required"><?php _e('Font Name', 'font-organizer'); ?></label></th>
+                                            <td><input type="text" id="font_name" name="font_name" value="" class="required" maxlength="20" /></td>
                                         </tr>   
                                         <tr class="font_file_wrapper">    
                                             <th scope="row">
                                                 <?php _e('Font File', 'font-organizer'); ?>
                                             </th>
                                             <td id="font_file_parent" style="width:33%;">
-                                                <input type="file" class="required" name="font_file[]" value="" accept="<?php echo join(',',$this->supported_font_files); ?>" /><br/>
+                                                <input type="file" required name="font_file[]" value="" class="required" accept="<?php echo join(',',$this->supported_font_files); ?>"  /><br/>
                                                 <em><?php echo __('Accepted Font Format : ', 'font-organizer') . '<span style="direction: ltr">' . join(', ',$this->supported_font_files) . '</span>'; ?></em><br/>
                                             </td>
                                             <td>
@@ -465,8 +465,8 @@ class FoSettingsPage
                             <div class="inside">
 
                                 <span><?php _e('Step 3: For each element you can assign a font you have added in step 1 & 2.', 'font-organizer'); ?></span>
-                                <p><strong><?php _e('Note: ', 'font-organizer'); ?></strong><?php _e('Custom fonts you uploaded are automatically used in your website.', 'font-organizer'); ?></p>
-
+                                <p><strong><?php _e('Note: ', 'font-organizer'); ?></strong> <?php _e('Custom fonts you uploaded are automatically used in your website.', 'font-organizer'); ?></p>
+                                <p><strong><?php _e('In case of font not displaying in your website after saving, try clear the cache using Shift+F5 or Ctrl+Shift+Delete to clear all.', 'font-organizer'); ?></strong>
                                 <form method="post" action="options.php">
                                 <?php
                                     // This prints out all hidden setting fields
