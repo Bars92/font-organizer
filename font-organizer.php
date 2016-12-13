@@ -20,17 +20,40 @@ define( 'FO_DEFAULT_ROLE', 'administrator' );
 
 global $fo_db_version;
 $fo_db_version = '1.1.0';
-global $css_full_file_path;
-global $css_full_url_path;
-global $css_directory_path;
-$css_full_file_path = wp_upload_dir()['basedir'] . '/font-organizer' . '/fo-fonts.css';
-$css_full_url_path = wp_upload_dir()['baseurl'] . '/font-organizer' . '/fo-fonts.css';
-$css_directory_path =  wp_upload_dir()['basedir'] . '/font-organizer';
+
+global $fo_css_directory_path;
+$fo_css_directory_path =  wp_upload_dir()['basedir'] . '/font-organizer';
+
+global $fo_css_base_url_path;
+$fo_css_base_url_path = wp_upload_dir()['baseurl'] . '/font-organizer';
+
+global $fo_declarations_css_file_name;
+$fo_declarations_css_file_name = 'fo-declarations.css';
+
+global $fo_elements_css_file_name;
+$fo_elements_css_file_name = 'fo-elements.css';
 
 function fo_update_db_check() {
     global $fo_db_version;
     if ( get_site_option( 'fo_db_version' ) != $fo_db_version ) {
         fo_install();
+
+        // As of 1.2 we split the css file to declartions and elements.
+        // Create the files and delete the old fo-fonts.css.
+        global $fo_css_directory_path;
+
+ 		require_once FO_ABSPATH . 'helpers.php';
+
+		require_once FO_ABSPATH . 'settings.php'; 
+
+	    $settings_page = new FoSettingsPage();
+	    $settings_page->init();
+	    $settings_page->create_css_file(true);
+
+	    // Delete the old file.
+	    if(file_exists($fo_css_directory_path . '/fo-fonts.css'))
+	    	unlink($fo_css_directory_path . '/fo-fonts.css');
+
     }
 }
 
@@ -45,27 +68,58 @@ function fo_load_textdomain() {
 }
 
 function fo_init(){
-	global $css_full_file_path;
-
 	if( is_admin() ){
-		add_filter('upload_mimes', 'fo_allow_upload_types');
-		add_filter( 'plugin_action_links', 'fo_add_action_plugin', 10, 5 );
-		
-		include FO_ABSPATH . 'helpers.php';
+		require_once FO_ABSPATH . 'helpers.php';
+		require_once FO_ABSPATH . 'settings.php'; 
 
-		include FO_ABSPATH . 'settings.php'; 
+		// Add the declarations to the editor, so in preview you can see
+		// the selected font family.
+	    add_editor_style( '../../uploads/font-organizer/fo-declarations.css' );
+
+		add_filter( 'upload_mimes', 'fo_allow_upload_types' );
+		add_filter( 'plugin_action_links', 'fo_add_action_plugin', 10, 5 );
+		add_filter( 'tiny_mce_before_init', 'fo_add_tinymce_fonts' );
+		add_filter( 'mce_buttons_2', 'fo_mce_buttons' );
+		add_action( 'admin_enqueue_scripts', 'fo_enqueue_declarations_fonts_css' );
 
 	    $settings_page = new FoSettingsPage();
 	}else{
-		if(file_exists($css_full_file_path)){
-			add_action( 'wp_enqueue_scripts', 'fo_enqueue_fonts_css' );
-		}
+		add_action( 'wp_enqueue_scripts', 'fo_enqueue_all_fonts_css' );
 	}
 }
 
-function fo_enqueue_fonts_css(){
-	global $css_full_url_path;
-	wp_enqueue_style('fo-fonts', $css_full_url_path);
+function fo_enqueue_all_fonts_css(){
+	fo_enqueue_fonts_css();
+}
+
+function fo_enqueue_declarations_fonts_css(){
+	fo_enqueue_fonts_css(true);
+}
+
+// Enable font size & font family selects in the editor
+function fo_mce_buttons( $buttons ) {
+	array_unshift( $buttons, 'fontselect' ); // Add Font Select
+	array_unshift( $buttons, 'fontsizeselect' ); // Add Font Size Select
+	return $buttons;
+}
+
+function fo_add_tinymce_fonts($initArray){
+	$usable_fonts = FontsDatabaseHelper::get_usable_fonts();
+	$font_formats = array();
+	foreach ($usable_fonts as $font) {
+		$font_formats[] = $font->name . '=' . $font->name;
+	}
+
+	// Set the font families from the usable fonts list.
+	$initArray['font_formats'] = implode(';', $font_formats);
+
+	// Apply the filter to allow quick change in the font sizes list in tinymce editor.
+	// The input is a string of the default standart font sizes spereated by spaces (' ').
+	$sizes = apply_filters('fo_tinyme_font_sizes', "8px 10px 12px 14px 16px 20px 24px 28px 32px 36px 48px 60px");
+
+	// Set font sizes.
+	$initArray['fontsize_formats'] = $sizes;
+	return $initArray;
 }
 
 function fo_allow_upload_types($existing_mimes = array()){
@@ -120,7 +174,7 @@ function fo_install() {
 	dbDelta( $sql );
 
 	// Set the db version to current.
-	add_option( 'fo_db_version', $fo_db_version );
+	update_option( 'fo_db_version', $fo_db_version );
 
 	// Set roles
 	$role = get_role( 'administrator' );

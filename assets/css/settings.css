@@ -50,3 +50,10 @@
 	text-decoration: none;
 	box-shadow: none;
 }
+
+label.required:after { 
+    color: #d00;
+    content: "*";
+    margin: 0 5px;
+    font-size: 17px;
+}
