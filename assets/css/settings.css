@@ -6,11 +6,10 @@
 
 /* Back to top styles */
 .go-top, .go-top:focus {
-	position: fixed;
+    position: fixed;
     bottom: 2em;
     text-decoration: none;
     font-size: 12px;
-    padding: 1em;
     display: none;
     z-index: 999999;
     opacity: 0.4;
@@ -18,9 +17,9 @@
     -moz-transition: opacity .25s ease-in-out;
     -webkit-transition: opacity .25s ease-in-out;
     box-shadow: none;
-    width: 32px;
-    height: 32px;
-	background-image: url(../images/back-top.png);
+    width: 48px;
+    height: 48px;
+    background-image: url(../images/back-top.png);
     background-repeat: no-repeat;
     background-size: contain;
     background-position: right top;

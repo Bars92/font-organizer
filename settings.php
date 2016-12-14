@@ -436,19 +436,20 @@ class FoSettingsPage
                                 <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><label for="font_name" class="required"><?php _e('Font Name', 'font-organizer'); ?></label></th>
-                                            <td><input type="text" id="font_name" name="font_name" value="" class="required" maxlength="20" /></td>
+                                            <th scope="row"><label for="font_name" class="required"><?php _e('Font Weight Name', 'font-organizer'); ?></label></th>
+                                            <td><input type="text" id="font_name" required oninvalid="this.setCustomValidity('<?php _e('Font weight name cannot be empty.', 'font-organizer'); ?>')" oninput="setCustomValidity('')" name="font_name" value="" class="required" maxlength="20" /></td>
                                         </tr>   
                                         <tr class="font_file_wrapper">    
                                             <th scope="row">
-                                                <?php _e('Font File', 'font-organizer'); ?>
+                                                <label for="font_file" class="required"><?php _e('Font Weight File', 'font-organizer'); ?></label>
                                             </th>
                                             <td id="font_file_parent" style="width:33%;">
-                                                <input type="file" required name="font_file[]" value="" class="required" accept="<?php echo join(',',$this->supported_font_files); ?>"  /><br/>
+                                                <input type="file" name="font_file[]" value="" class="required" accept="<?php echo join(',',$this->supported_font_files); ?>"  /><br/>
                                                 <em><?php echo __('Accepted Font Format : ', 'font-organizer') . '<span style="direction: ltr">' . join(', ',$this->supported_font_files) . '</span>'; ?></em><br/>
                                             </td>
                                             <td>
-                                                 <a href="javascript:void(0);" class="add_button" title="<?php _e('Add Another Font File', 'font-organizer'); ?>"><i class="fa fa-plus fa-2x" aria-hidden="true"></i></a>
+                                                 <a href="javascript:void(0);" class="add_button" title="<?php _e('Add Another Font Format File', 'font-organizer'); ?>"><i class="fa fa-plus fa-2x" aria-hidden="true"></i></a>
+                                                 <span style="font-size: 11px;font-style: italic;position: absolute;padding: 6px;"><?php _e('Add Another Font Format File', 'font-organizer'); ?></span>
                                             </td>
                                         </tr>
                                         <tr>        
@@ -493,13 +494,17 @@ class FoSettingsPage
                                 <form action="" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><?php _e('Font', 'font-organizer'); ?></th>
-                                            <td><?php $this->print_custom_elements_usable_fonts_list('font_id', __('-- Select Font --', 'font-organizer')); ?></td>
+                                            <th scope="row"><label for="custom_elements" class="required"><?php _e('Font', 'font-organizer'); ?></label></th>
+                                            <td><?php $this->print_custom_elements_usable_fonts_list('font_id', __('-- Select Font --', 'font-organizer'), __("You must select a font for the elements.", "font-organizer")); ?></td>
                                         </tr>   
                                         <tr>
-                                            <th scope="row"><?php _e('Custom Element', 'font-organizer'); ?></th>
+                                            <th scope="row">
+                                                <label for="custom_elements" class="required">
+                                                    <?php _e('Custom Element', 'font-organizer'); ?>
+                                                </label>
+                                            </th>
                                             <td>
-                                                <textarea id="custom_elements" name="custom_elements" style="width: 100%" rows="2"></textarea>
+                                                <textarea id="custom_elements" name="custom_elements" required oninvalid="this.setCustomValidity('<?php _e('Font custom elements cannot be empty.', 'font-organizer'); ?>')" oninput="setCustomValidity('')" style="width: 100%" rows="2"></textarea>
                                                 <em><?php _e('Custom elements can be seperated by commas to allow multiple elements. Example: #myelementid, .myelementclass, .myelementclass .foo, etc.', 'font-organizer'); ?></em>
                                             </td>
                                         </tr>
@@ -632,12 +637,19 @@ class FoSettingsPage
         }
 
         $args['font_file'] = fo_rearray_files($_FILES['font_file']);
+
+        $i = 0;
         foreach ($args['font_file'] as $file) {
-            $args['font_file_name'][] = sanitize_file_name( $file['name'] );
-            if(!$args['font_file_name']){
-                $this->recent_error = __('Font file is not valid.', 'font-organizer');
-                return false;
+            if(!$file['name']){
+                unset($args['font_file'][$i]);
             }
+
+            $i++;
+        }
+        
+        if(empty($args['font_file'])){
+            $this->recent_error = __('Font file(s) not selected.', 'font-organizer');
+            return false;
         }
         
         return $args;
@@ -1154,9 +1166,9 @@ class FoSettingsPage
     /** 
      * Get the settings option array and print one of its values
      */
-    private function print_custom_elements_usable_fonts_list($name, $default = '')
+    private function print_custom_elements_usable_fonts_list($name, $default = '', $validity = '')
     {
-        echo '<select id="'.$name.'" name="'.$name.'">';
+        echo '<select id="'.$name.'" name="'.$name.'" required oninvalid="this.setCustomValidity(\'' . $validity . '\')" oninput="setCustomValidity(\'\')">';
         
         if($default){
         	 echo '<option value="">'.$default.'</option>\n';
@@ -1196,7 +1208,7 @@ class FoSettingsPage
 
             // Find the font from the lists.
             if($usable_font->custom){
-                $font_obj = (object) [ 'family' => $usable_font->name, 'files' => (object) ['regular' => explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url)], 'kind' => 'custom', 'variants' => array('regular')];
+                $font_obj = (object) array( 'family' => $usable_font->name, 'files' => (object) array('regular' => explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url)), 'kind' => 'custom', 'variants' => array('regular'));
                 $this->usable_fonts[$font_obj->family] = $font_obj;
                 $this->custom_fonts[$font_obj->family] = $font_obj;
             }else{
@@ -1224,9 +1236,9 @@ class FoSettingsPage
 
     private function get_early_access_fonts_array(){
         return array(
-        (object) [ 'family' => 'Open Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) ['regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrew.css')]],
-        (object) [ 'family' => 'Open Sans Hebrew Condensed', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) ['regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css')]],
-        (object) [ 'family' => 'Noto Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) ['regular' => array('http://fonts.googleapis.com/earlyaccess/notosanshebrew.css')]],
+        (object) array( 'family' => 'Open Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrew.css'))),
+        (object) array( 'family' => 'Open Sans Hebrew Condensed', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css'))),
+        (object) array( 'family' => 'Noto Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/notosanshebrew.css'))),
             );
     }
 }
