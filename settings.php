@@ -291,7 +291,7 @@ class FoSettingsPage
 
         // Reset the content for the elements file.
         $content = self::DEFAULT_CSS_TITLE;
-        
+
         // Add the known elements css.
         foreach ($this->elements_options as $key => $value) {
             if(strpos($key, 'important') || !$value)
@@ -600,7 +600,7 @@ class FoSettingsPage
                                     <br />
                                     <p><?php _e('Anyway, if you need anything, this may help:', 'font-organizer'); ?></p> 
                                     <ul style="list-style-type:disc;margin: 0 20px;">
-                                        <li><a href="http://hivewebstudios.com/font-organizer#faqs" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
+                                        <li><a href="https://wordpress.org/plugins/font-organizer/faq/" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
                                         <li><a href="https://wordpress.org/support/plugin/font-organizer" target="_blank"><?php _e('Support forums', 'font-organizer'); ?></a></li>
                                         <li><a href="http://hivewebstudios.com/font-organizer" target="_blank"><?php _e('Contact us', 'font-organizer'); ?></a></li>
                                         <li><a href="https://www.facebook.com/hivewp" target="_blank"><?php _e('Hive Facebook page', 'font-organizer'); ?></a></li>
@@ -674,7 +674,7 @@ class FoSettingsPage
 
         $args['font_id'] = $_POST['font_id'];
 
-        return $args;        
+        return $args;
     }
 
     private function validate_delete_usable(){
@@ -1030,9 +1030,9 @@ class FoSettingsPage
         echo '<span class="highlight info">';
 
         $url = 'https://developers.google.com/fonts/docs/developer_api#acquiring_and_using_an_api_key';
-
+        $faq_url = 'https://wordpress.org/plugins/font-organizer/faq/';
         echo sprintf( __( 'To get all the fonts, Google requires the mandatory use of an API key, get one from <a href="%s" target="_blank">HERE</a>', 'font-organizer' ), esc_url( $url ) );
-
+        echo  sprintf( __( ' Need help? Click <a href="%s" target="_blank">here</a>', 'font-organizer' ), esc_url( $faq_url ) );
         echo '</span> <br />';
 
         printf(
