@@ -1,9 +1,9 @@
 === Font Organizer ===
 Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
-Requires at least: 3.0.1
+Requires at least: 3.8
 Tested up to: 4.7
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,9 @@ Key Features:
 * Multi upload allow you to upload more font formats to support more browsers.
 * Add any google fonts in one click and apply them on any element.
 * Apply fonts for known elements or custom elements of your choosing easily.
-* It's awesome like it's users.
+* Delete and remove fonts from your website in one click.
+* Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
+* It's awesome like its users.
 
 == Installation ==
 
@@ -71,8 +73,6 @@ Q: Why can't i see assigned fonts even when i saved?
 A: Sometimes some browsers save a cached version of the page when browsing it to display it faster.
 If you can't see a new font you have assigned make sure to clean the cache using Shift+F5 to clean the current page, or Ctrl+Shift+Delete to clean all.
 
-Test
-
 == Screenshots ==
 
 1. Choosing Google & uploading fonts in just 1 step.
@@ -81,6 +81,15 @@ Test
 4. General settings & role restictions.
 
 == Changelog ==
+
+= 1.2.0 =
+* Added fonts in your website and font sizes selection in the editor (tinyMCE & tinyMCE Advanced).
+* Added option to delete of fonts in your website in section 5.
+* Added validation in required fields.
+* Added link to FAQs in Google API key field.
+* Added support Wordpress 4.7 version.
+* Fixed PHP 7 requirment.
+* Fixed a few minor bugs.
 
 = 1.1.0 =
 * Added Multi-upload to upload more formats per font to support more browsers.

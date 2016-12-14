@@ -433,7 +433,7 @@ class FoSettingsPage
                                 <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'font-organizer'); ?></span>
                                 <br />
                                 <span><?php _e('Name the font you want to upload and upload all the files formats for this font. In order to support more browsers you can click the green plus to upload more font formats. We suggest .woff and .woff2.', 'font-organizer'); ?></span>
-                                <form action="" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
+                                <form action="#" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><label for="font_name" class="required"><?php _e('Font Weight Name', 'font-organizer'); ?></label></th>
@@ -491,7 +491,7 @@ class FoSettingsPage
                             <div class="inside">
 
                                 <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'font-organizer'); ?></span>
-                                <form action="" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
+                                <form action="#" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><label for="custom_elements" class="required"><?php _e('Font', 'font-organizer'); ?></label></th>
@@ -733,6 +733,7 @@ class FoSettingsPage
     }
 
     private function delete_font($args = array()){
+            global $fo_css_directory_path;
 
             // Delete all the known elements for this font and reset them back to default.
             $elements_options = get_option('fo_elements_options', array());
@@ -747,6 +748,24 @@ class FoSettingsPage
             // Delete all custom elements for this font.
             $table_name = FO_ELEMENTS_DATABASE;
             $this->delete_from_database($table_name, 'font_id', $args['font_id']);
+
+            global $wpdb;
+
+            $usable_fonts = $wpdb->get_results('SELECT * FROM ' . $wpdb->prefix . FO_USABLE_FONTS_DATABASE . ' ORDER BY id DESC');
+            foreach ($usable_fonts as $usable_font) {
+                if($usable_font->name == $args['font_name']){
+                    if(!$usable_font->custom)
+                        break;
+
+                   $urls = explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url);
+                   foreach ($urls as $url) {
+                        // Delete the old file.
+                        $file_name = basename($url);
+                        if(file_exists($fo_css_directory_path . '/' . $file_name))
+                            unlink($fo_css_directory_path . '/' . $file_name);
+                    }
+                }
+            }
 
             // Delete this font from the website.
             $table_name = FO_USABLE_FONTS_DATABASE;
