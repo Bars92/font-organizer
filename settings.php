@@ -116,9 +116,6 @@ class FoSettingsPage
         require_once FO_ABSPATH . 'classes/class-ElementsTable.php'; 
         require_once FO_ABSPATH . 'classes/class-FontsDatabaseHelper.php';
 
-        add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
-        add_action( 'admin_init', array( $this, 'page_init' ) );
-
         $this->fonts_per_link = 150;
         $this->supported_font_files = array('.woff', '.woff2', '.ttf','.otf');
         $this->custom_fonts = array();
@@ -161,6 +158,8 @@ class FoSettingsPage
             if($args = $this->validate_delete_usable()){
                 $this->delete_font($args);
                 $this->should_create_css = true;
+                wp_cache_delete ( 'alloptions', 'options' );
+
             }else{
                 add_action( 'admin_notices', array($this, 'delete_font_failed_admin_notice') );
             }
@@ -178,6 +177,9 @@ class FoSettingsPage
         if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['custom_element'])){
             $this->should_create_css = true;
         }
+
+        add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
+        add_action( 'admin_init', array( $this, 'page_init' ) );
     }
 
     /**
@@ -289,7 +291,7 @@ class FoSettingsPage
 
         // Reset the content for the elements file.
         $content = self::DEFAULT_CSS_TITLE;
-
+        
         // Add the known elements css.
         foreach ($this->elements_options as $key => $value) {
             if(strpos($key, 'important') || !$value)
@@ -522,15 +524,30 @@ class FoSettingsPage
                             <a name="step6"></a>
                             <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('5. Manage Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
-                            	<form action="#step6" id="select_font_form" name="select_font_form" method="get"> 
 	                                <table class="form-table">
 	                                        <tr>
 	                                            <th scope="row"><?php _e('Font', 'font-organizer'); ?></th>
-	                                            <td><?php $this->print_custom_elements_usable_fonts_list('manage_font_id', __('-- Select Font --', 'font-organizer')); ?></td>
+                                                <td>
+                                                    <form action="#step6" id="select_font_form" name="select_font_form" method="get"> 
+	                                                   <?php $this->print_custom_elements_usable_fonts_list('manage_font_id', __('-- Select Font --', 'font-organizer')); ?>
+                                                        <input type="hidden" name="page" value="<?php echo wp_unslash( $_REQUEST['page'] ); ?>">
+                                                    </form>
+                                                </td>
+                                                 <?php if($this->selected_manage_font): ?>
+
+                                                <td style="text-align:left;">
+                                                    <form action="#step6" id="delete_usable_font_form" name="delete_usable_font_form" method="post"> 
+                                                        <?php wp_nonce_field( 'delete_usable_font', 'delete_usable_font_nonce' ); ?>
+                                                        <input type="hidden" name="page" value="<?php echo wp_unslash( $_REQUEST['page'] ); ?>">
+                                                        <input type="hidden" name="font_id" value="<?php echo $_GET['manage_font_id']; ?>">
+                                                        <input type="hidden" name="font_name" value="<?php echo $this->selected_manage_font->family; ?>">
+                                                        <input type="submit" name="delete_usable_font" id="delete_usable_font" class="button-secondary" value="<?php _e('Delete Font', 'font-organizer'); ?>" onclick="return confirm('<?php _e("Are you sure you want to delete this font from your website?", "font-organizer"); ?>')" />
+                                                    </form>
+                                                </td>
+
+                                            <?php endif; ?>
 	                                        </tr>   
 	                                </table>
-	                                <input type="hidden" name="page" value="<?php echo wp_unslash( $_REQUEST['page'] ); ?>">
-	                            </form>
 	                            <?php if($this->selected_manage_font): ?>
 	                           	<hr/>
                                 <table class="form-table">
@@ -666,8 +683,9 @@ class FoSettingsPage
             return false;
         }
 
+        $args['font_id'] = intval( $_POST['font_id'] );
         $args['font_name'] = sanitize_text_field( $_POST['font_name'] );
-        if(!$args['font_name']){
+        if(!$args['font_id'] || !$args['font_name']){
             $this->recent_error = __('Something went horribly wrong. Ask the support!', 'font-organizer');
             return false;
         }
@@ -703,15 +721,31 @@ class FoSettingsPage
     }
 
     private function delete_font($args = array()){
+
+            // Delete all the known elements for this font and reset them back to default.
+            $elements_options = get_option('fo_elements_options', array());
+            foreach ($this->elements as $element_id => $element_display_name) {
+                if(array_key_exists($element_id, $elements_options) && $elements_options[$element_id] == $args['font_name']){
+                    $elements_options[$element_id] = '';
+                }
+            }
+
+            update_option('fo_elements_options', $elements_options);
+
+            // Delete all custom elements for this font.
+            $table_name = FO_ELEMENTS_DATABASE;
+            $this->delete_from_database($table_name, 'font_id', $args['font_id']);
+
+            // Delete this font from the website.
+            $table_name = FO_USABLE_FONTS_DATABASE;
+            $this->delete_from_database($table_name, 'id', $args['font_id']);
+
             add_action( 'admin_notices', array($this, 'delete_font_successfull_admin_notice') );
-            $this->delete_from_database($args['font_name']);
     }
 
-    private function delete_from_database($name){
+    private function delete_from_database($table_name, $field_name, $field_value){
         global $wpdb;
-        $table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
-
-        $wpdb->delete( $table_name, array( 'name' => $name ) );
+        $wpdb->delete( $wpdb->prefix . $table_name, array( $field_name => $field_value ) );
     }
 
     private function save_custom_elements_to_database($id, $custom_elements, $important){
@@ -741,6 +775,13 @@ class FoSettingsPage
     }
 
 
+    public function add_custom_elements_failed_admin_notice() {
+      ?>
+        <div class="error notice">
+            <p><?php echo __( 'Error adding custom elements: ', 'font-organizer' ) . $this->recent_error; ?></p>
+        </div>
+        <?php
+    }
     public function add_custom_elements_successfull_admin_notice() {
         ?>
         <div class="updated notice">
@@ -1143,7 +1184,6 @@ class FoSettingsPage
         foreach($this->available_fonts as $font)
         {
           $font_name = $font->family;
-          $is_selected = $font_name === $selected ? ' selected' : '';
           echo '<option value="'.$font_name.'" style="font-family: '.$font_name.';">'.$font_name.'</option>\n';
         }
 

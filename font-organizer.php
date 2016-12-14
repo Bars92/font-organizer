@@ -68,8 +68,9 @@ function fo_load_textdomain() {
 }
 
 function fo_init(){
+	require_once FO_ABSPATH . 'helpers.php';
+
 	if( is_admin() ){
-		require_once FO_ABSPATH . 'helpers.php';
 		require_once FO_ABSPATH . 'settings.php'; 
 
 		// Add the declarations to the editor, so in preview you can see
@@ -113,7 +114,7 @@ function fo_add_tinymce_fonts($initArray){
 	// Set the font families from the usable fonts list.
 	$initArray['font_formats'] = implode(';', $font_formats);
 
-	// Apply the filter to allow quick change in the font sizes list in tinymce editor.
+	// Apply the filter to allow quick change in the font sizes list in tinymce editors.
 	// The input is a string of the default standart font sizes spereated by spaces (' ').
 	$sizes = apply_filters('fo_tinyme_font_sizes', "8px 10px 12px 14px 16px 20px 24px 28px 32px 36px 48px 60px");
 
