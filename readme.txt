@@ -58,8 +58,8 @@ Click on "Create credentials" > "API key".
 There you go, google generated a brand new API key for you.
 Copy the entire key and paste it on the designated place in the plugin settings.
 
-* In order to enable the API key go to API Manager dashboard or use the link: "https://console.developers.google.com/apis/dashboard"
-Press "ENABLE API", Then Choose "Web Fonts Developer API" under "Other popular APIs" section. * - This step is a must.
+In order to enable the API key go to API Manager dashboard or use the link: "https://console.developers.google.com/apis/dashboard"
+Press "ENABLE API", Then Choose "Web Fonts Developer API" under "Other popular APIs" section. - This step is a must.
 
 Congrats, your API key is now enabled.
 
@@ -107,6 +107,8 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 * Added support Wordpress 4.7 version.
 * Fixed PHP 7 requirment.
 * Fixed a few minor bugs.
+* Extended FAQ
+* Better usability and general guiding.
 
 = 1.1.0 =
 * Added Multi-upload to upload more formats per font to support more browsers.
