@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Font Organizer\n"
-"POT-Creation-Date: 2016-12-14 17:08+0200\n"
+"POT-Creation-Date: 2016-12-14 19:54+0200\n"
 "PO-Revision-Date: 2016-11-09 15:53+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Custom Elements"
 msgstr ""
 
-#: classes/class-ElementsTable.php:73 settings.php:1121 settings.php:1138
+#: classes/class-ElementsTable.php:73 settings.php:1140 settings.php:1157
 msgid "Important"
 msgstr ""
 
@@ -328,83 +328,83 @@ msgstr ""
 msgid "Something went horribly wrong. Ask the support!"
 msgstr ""
 
-#: settings.php:793
+#: settings.php:812
 msgid "Error adding custom elements: "
 msgstr ""
 
-#: settings.php:800
+#: settings.php:819
 msgid "Custom elements added to your website!"
 msgstr ""
 
-#: settings.php:808
+#: settings.php:827
 msgid "Font can now be used in your website!"
 msgstr ""
 
-#: settings.php:816
+#: settings.php:835
 msgid "Font deleted from your website!"
 msgstr ""
 
-#: settings.php:824
+#: settings.php:843
 msgid "The file has been uploaded!"
 msgstr ""
 
-#: settings.php:832
+#: settings.php:851
 msgid "Error uploading the file: "
 msgstr ""
 
-#: settings.php:840
+#: settings.php:859
 msgid "Error adding font to website fonts: "
 msgstr ""
 
-#: settings.php:848
+#: settings.php:867
 msgid "Error deleting font: "
 msgstr ""
 
-#: settings.php:856
+#: settings.php:875
 msgid "Failed to open or create the css file. Check for permissions."
 msgstr ""
 
-#: settings.php:898
+#: settings.php:917
 msgid "Google API Key"
 msgstr ""
 
-#: settings.php:905
+#: settings.php:924
 msgid "Show Font Family Preview"
 msgstr ""
 
-#: settings.php:915
+#: settings.php:934
 msgid "Access Settings Role"
 msgstr ""
 
-#: settings.php:1027
+#: settings.php:1046
 msgid "This is the general settings for the site."
 msgstr ""
 
-#: settings.php:1046
+#: settings.php:1065
 #, php-format
 msgid ""
 "To get all the fonts, Google requires the mandatory use of an API key, get "
 "one from <a href=\"%s\" target=\"_blank\">HERE</a>"
 msgstr ""
 
-#: settings.php:1047
+#: settings.php:1066
 #, php-format
 msgid " Need help? Click <a href=\"%s\" target=\"_blank\">here</a>"
 msgstr ""
 
-#: settings.php:1070
+#: settings.php:1089
 msgid "Include Font Family Preview"
 msgstr ""
 
-#: settings.php:1072
+#: settings.php:1091
 msgid "Show font preview when listing the fonts (might be slow)"
 msgstr ""
 
-#: settings.php:1124 settings.php:1141
+#: settings.php:1143 settings.php:1160
 msgid "Include !important to this element to always apply."
 msgstr ""
 
-#: settings.php:1153
+#: settings.php:1172
 msgid "Default"
 msgstr ""
 
