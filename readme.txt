@@ -2,7 +2,7 @@
 Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.0.1
-Tested up to: 4.6.1
+Tested up to: 4.7
 Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
