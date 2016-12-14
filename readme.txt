@@ -28,6 +28,8 @@ Key Features:
 * Apply fonts for known elements or custom elements of your choosing easily.
 * Delete and remove fonts from your website in one click.
 * Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
+* Our code is extremely clean, well written, and optimized for maximum performance of your website.
+* Full support for language translation, including RTL languages.
 * It's awesome like its users.
 
 == Installation ==
