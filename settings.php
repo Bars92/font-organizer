@@ -174,6 +174,10 @@ class FoSettingsPage
                 add_action( 'admin_notices', array($this, 'add_custom_elements_failed_admin_notice') );
             }
         }
+
+        if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['custom_element'])){
+            $this->should_create_css = true;
+        }
     }
 
     /**
