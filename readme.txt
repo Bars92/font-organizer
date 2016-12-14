@@ -71,6 +71,8 @@ Q: Why can't i see assigned fonts even when i saved?
 A: Sometimes some browsers save a cached version of the page when browsing it to display it faster.
 If you can't see a new font you have assigned make sure to clean the cache using Shift+F5 to clean the current page, or Ctrl+Shift+Delete to clean all.
 
+Test
+
 == Screenshots ==
 
 1. Choosing Google & uploading fonts in just 1 step.
