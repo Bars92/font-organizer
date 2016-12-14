@@ -28,7 +28,7 @@ Key Features:
 * Apply fonts for known elements or custom elements of your choosing easily.
 * Delete and remove fonts from your website in one click.
 * Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
-* Our code is extremely clean, well written, and optimized for maximum performance of your website.
+* Our code is extremely clean, well written, and optimized for maximum performance for your website.
 * Full support for language translation, including RTL languages.
 * It's awesome like its users.
 
@@ -108,8 +108,8 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 * Added link to FAQs in Google API key field.
 * Added support Wordpress 4.7 version.
 * Fixed PHP 7 requirment.
+* Added more FAQs.
 * Fixed a few minor bugs.
-* Extended FAQ
 * Better usability and general guiding.
 
 = 1.1.0 =
