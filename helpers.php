@@ -100,7 +100,7 @@
 
         $declartions_full_file_url = $fo_css_base_url_path . '/' . $fo_declarations_css_file_name;
         if(file_exists($fo_css_directory_path . '/' . $fo_declarations_css_file_name)){
-            wp_enqueue_style('fo-fonts', $declartions_full_file_url);
+            wp_enqueue_style('fo-fonts-declaration', $declartions_full_file_url);
         }
 
         if($only_declarations)
@@ -108,7 +108,7 @@
 
         $elements_full_file_url = $fo_css_base_url_path . '/' . $fo_elements_css_file_name;
         if(file_exists($fo_css_directory_path . '/' . $fo_elements_css_file_name)){
-            wp_enqueue_style('fo-fonts', $elements_full_file_url);
+            wp_enqueue_style('fo-fonts-elements', $elements_full_file_url);
         }
     }
 

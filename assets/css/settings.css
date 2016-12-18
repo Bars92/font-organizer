@@ -4,6 +4,45 @@
 .wp-list-table .column-custom_elements { width: 73%; }
 .wp-list-table .column-important { width: 17%;}
 
+
+/* Validate inputs */
+input.valid {
+    color: green;
+}
+input.error {
+    color: red;
+}
+.validate {
+  position: relative;
+}
+
+input.valid + span,
+input.error + span {
+  font-weight: bold;
+  font-size: 18px;
+  display: block;
+  position: absolute;
+  right: 2%;
+  top: 10%;
+}
+
+input.valid + span:after {
+  content: "\2713";
+  color: green;
+}
+
+input.error + span:after {
+  content: "\2715";
+  color: red;
+}
+
+label.required:after { 
+    color: #d00;
+    content: "*";
+    margin: 0 5px;
+    font-size: 17px;
+}
+
 /* Back to top styles */
 .go-top, .go-top:focus {
     position: fixed;
@@ -48,11 +87,4 @@
 	color: green;
 	text-decoration: none;
 	box-shadow: none;
-}
-
-label.required:after { 
-    color: #d00;
-    content: "*";
-    margin: 0 5px;
-    font-size: 17px;
 }

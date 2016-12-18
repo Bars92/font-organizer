@@ -342,10 +342,14 @@ class FoSettingsPage
         $this->earlyaccess_fonts = $this->get_early_access_fonts_array();
 
         // Merge (and sort) the early access google fonts list with the google fonts.
-        $this->google_fonts = array_merge($this->google_fonts, $this->earlyaccess_fonts);
-        fo_array_sort($this->google_fonts);
+        if(!empty($this->google_fonts)){
+            $this->google_fonts = array_merge($this->google_fonts, $this->earlyaccess_fonts);
+            fo_array_sort($this->google_fonts);
 
-        $this->available_fonts = array_merge($this->available_fonts, $this->google_fonts, $this->known_fonts);
+            $this->available_fonts = array_merge($this->available_fonts, $this->google_fonts, $this->known_fonts);
+        }else{
+            $this->available_fonts = array_merge($this->available_fonts, $this->earlyaccess_fonts, $this->known_fonts);
+        }
 
         // Get all usable fonts and add them to a list.
         $this->load_usable_fonts();
@@ -369,11 +373,9 @@ class FoSettingsPage
         // Load the google fonts if selected or if not specified. else load just whats usable.
         if($this->include_font_link)
             fo_print_links($this->google_fonts, $this->fonts_per_link);
-        else
-            fo_print_links($this->usable_fonts, $this->fonts_per_link);
         
         ?>
-        <a href="#" class="go-top<?php echo is_rtl() ? ' rtl' : 'ltr'; ?>"></a>
+        <a href="#" class="go-top <?php echo is_rtl() ? ' rtl' : 'ltr'; ?>"></a>
         <div class="wrap">
             <h1><?php _e('Font Settings', 'font-organizer'); ?></h1>
 
@@ -1066,9 +1068,11 @@ class FoSettingsPage
         echo  sprintf( __( ' Need help? Click <a href="%s" target="_blank">here</a>', 'font-organizer' ), esc_url( $faq_url ) );
         echo '</span> <br />';
 
+
+        $value = isset( $this->general_options['google_key'] ) ? esc_attr( $this->general_options['google_key']) : '';
         printf(
-            '<input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" />',
-            isset( $this->general_options['google_key'] ) ? esc_attr( $this->general_options['google_key']) : ''
+            '<div class="validate"><input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text %s" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" /><span></span></div>',$value , empty($this->google_fonts) ? 'error' : 'valid'
+            
         );
     }
 

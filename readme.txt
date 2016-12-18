@@ -3,7 +3,7 @@ Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.8
 Tested up to: 4.7
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,7 +18,7 @@ them to different elements in your website effortlessly.
 
 Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebStudios website") and find out more from us.
 
-Want to try us? Use [Addendio's](https://Addendio.com/ "Addendio's website") [Font Organizer live demo](https://addendio.com/try-plugin/?slug=font-organizer "live demo")!
+Want to try us? Use Addendio's [Font Organizer live demo](https://addendio.com/try-plugin/?slug=font-organizer "live demo")!
 
 Key Features:
 
@@ -100,6 +100,12 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 4. General settings & role restictions.
 
 == Changelog ==
+
+= 1.2.1 =
+* Fixed elements rules sometimes not loading.
+* Fixed back to top button not appearing.
+* Fixed warnings when not setting Google API key.
+* Added Google API key indicator.
 
 = 1.2.0 =
 * Added fonts in your website and font sizes selection in the editor (tinyMCE & tinyMCE Advanced).
