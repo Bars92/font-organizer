@@ -161,6 +161,14 @@
         return ($al > $bl) ? +1 : -1;
     }
 
+    function fo_get_all_http_url($url){
+        if ( is_ssl() ) 
+            $url = str_replace( 'http://', 'https://', $url ); 
+        else 
+            $url = str_replace('https://', 'http://', $url);
+        return $url;
+    }
+
     function fo_array_sort(&$array){
         return usort($array, 'cmp_font');
     }

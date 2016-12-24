@@ -18,6 +18,8 @@ define( 'FO_USABLE_FONTS_DATABASE', 'fo_usable_fonts' );
 define( 'FO_ELEMENTS_DATABASE', 'fo_elements' );
 define( 'FO_DEFAULT_ROLE', 'administrator' );
 
+require_once FO_ABSPATH . 'helpers.php';
+
 global $fo_db_version;
 $fo_db_version = '1.2.1';
 
@@ -26,6 +28,9 @@ $fo_css_directory_path =  wp_upload_dir()['basedir'] . '/font-organizer';
 
 global $fo_css_base_url_path;
 $fo_css_base_url_path = wp_upload_dir()['baseurl'] . '/font-organizer';
+
+// Fix ssl for base url.
+$fo_css_base_url_path = fo_get_all_http_url( $fo_css_base_url_path ); 
 
 global $fo_declarations_css_file_name;
 $fo_declarations_css_file_name = 'fo-declarations.css';
@@ -41,8 +46,6 @@ function fo_update_db_check() {
         // As of 1.2 we split the css file to declartions and elements.
         // Create the files and delete the old fo-fonts.css.
         global $fo_css_directory_path;
-
- 		require_once FO_ABSPATH . 'helpers.php';
 
 		require_once FO_ABSPATH . 'settings.php'; 
 
@@ -68,7 +71,6 @@ function fo_load_textdomain() {
 }
 
 function fo_init(){
-	require_once FO_ABSPATH . 'helpers.php';
 
 	if( is_admin() ){
 		require_once FO_ABSPATH . 'settings.php'; 

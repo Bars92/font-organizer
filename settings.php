@@ -7,6 +7,7 @@ class FoSettingsPage
      * create a string a parsed back to urls when needed.
      */
     const CUSTOM_FONT_URL_SPERATOR = ';';
+    const FACBOOK_APP_ID = "251836775235565";
 
     const DEFAULT_CSS_TITLE = "/* This Awesome CSS file was created by Font Orgranizer from Hive :) */\n\n";
 
@@ -141,6 +142,7 @@ class FoSettingsPage
         if (isset($_POST['submit_upload_font'])){  
             if($args = $this->validate_upload()){
                 $this->upload_file($args);
+                $this->should_create_css = true;
             }else{
                 add_action( 'admin_notices', array($this, 'upload_failed_admin_notice') );
             }
@@ -149,6 +151,7 @@ class FoSettingsPage
         if (isset($_POST['submit_usable_font'])){  
             if($args = $this->validate_add_usable()){
                 $this->use_font($args);
+                $this->should_create_css = true;
             }else{
                 add_action( 'admin_notices', array($this, 'use_font_failed_admin_notice') );
             }
@@ -246,6 +249,10 @@ class FoSettingsPage
                     // Set all the urls content under the same src.
                     $urls_content_arr = array();
                     foreach ($urls as $url) {
+                        // Fix everyone saved with http or https and let the browser decide.
+                        $url = str_replace('http://',  '//', $url); 
+                        $url = str_replace('https://', '//', $url);
+
                         $urls_content_arr[] = "url('" . $url . "') format('" . fo_get_font_format($url) . "')";
                     }
 
@@ -278,7 +285,7 @@ class FoSettingsPage
         if(!empty($google_fonts)){
             // We are assuming not to much google fonts. If it is, we need to split the request.
            // $content .= "<link href='http://fonts.googleapis.com/css?family=". implode("|", $google_fonts) . "' rel='stylesheet' type='text/css'>\n";
-            $content .= "@import url('http://fonts.googleapis.com/css?family=". implode("|", $google_fonts) . "');\n";
+            $content .= "@import url('//fonts.googleapis.com/css?family=". implode("|", $google_fonts) . "');\n";
         }
 
         // Add the custom fonts css that was created before.
@@ -325,11 +332,13 @@ class FoSettingsPage
         if(isset($this->general_options['google_key']) && $this->general_options['google_key']){
             // Add Google fonts.
             set_time_limit(0);
-            $response = wp_remote_get("https://www.googleapis.com/webfonts/v1/webfonts?sort=alpha&key=" . $this->general_options['google_key']);
+            $response = wp_remote_get("https://www.googleapis.com/webfonts/v1/webfonts?sort=alpha&key=" . $this->general_options['google_key'], array('timeout' => 60));
             if( wp_remote_retrieve_response_code( $response ) == 200){
            		$this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
            	}else{
-                add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . wp_remote_retrieve_response_message($response), 'error');
+                // Show the most detailed message in the error and display it to the user.
+                $error_message = json_decode(wp_remote_retrieve_body($response))->error->errors[0]->message;
+                add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . $error_message, 'error');
             }
         }else{
             add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'font-organizer'), 'error');
@@ -531,6 +540,9 @@ class FoSettingsPage
                             <a name="step6"></a>
                             <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('5. Manage Fonts', 'font-organizer'); ?></span></h2>
                             <div class="inside">
+                                    <span>
+                                        <?php _e('Step 5: Select a font to manage, delete and view the source and custom elements assigned to it.', 'font-organizer'); ?>    
+                                    </span>
 	                                <table class="form-table">
 	                                        <tr>
 	                                            <th scope="row"><?php _e('Font', 'font-organizer'); ?></th>
@@ -597,22 +609,30 @@ class FoSettingsPage
                     <div id="postbox-container-1" class="postbox-container">
                         <div class="meta-box-sortables">
                             <div class="postbox">
-                            <h2>
-                                <span><?php esc_attr_e('Thank you', 'font-organizer'); ?></span>
-                            </h2>
+                                <h2>
+                                    <span><?php esc_attr_e('Thank you', 'font-organizer'); ?></span>
+                                </h2>
 
-                            <div class="inside">
-                                <p><?php _e(
-                                        'Thank you for using an <a href="http://hivewebstudios.com" target="_blank">Hive</a> plugin! We 5 star you already, so why don\'t you <a href="https://wordpress.org/support/plugin/font-organizer/reviews/?rate=5#new-post" target="_blank">5 star us too</a>?', 'font-organizer'); ?>
-                                    <br />
-                                    <p><?php _e('Anyway, if you need anything, this may help:', 'font-organizer'); ?></p> 
-                                    <ul style="list-style-type:disc;margin: 0 20px;">
-                                        <li><a href="https://wordpress.org/plugins/font-organizer/faq/" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
-                                        <li><a href="https://wordpress.org/support/plugin/font-organizer" target="_blank"><?php _e('Support forums', 'font-organizer'); ?></a></li>
-                                        <li><a href="http://hivewebstudios.com/font-organizer" target="_blank"><?php _e('Contact us', 'font-organizer'); ?></a></li>
-                                        <li><a href="https://www.facebook.com/hivewp" target="_blank"><?php _e('Hive Facebook page', 'font-organizer'); ?></a></li>
-                                    </ul>
-                                </p>
+                                <div class="inside">
+                                    <p><?php _e(
+                                            'Thank you for using an <a href="http://hivewebstudios.com" target="_blank">Hive</a> plugin! We 5 star you already, so why don\'t you <a href="https://wordpress.org/support/plugin/font-organizer/reviews/?rate=5#new-post" target="_blank">5 star us too</a>?', 'font-organizer'); ?>
+                                        <br />
+                                        <p><?php _e('Anyway, if you need anything, this may help:', 'font-organizer'); ?></p> 
+                                        <ul style="list-style-type:disc;margin: 0 20px;">
+                                            <li><a href="https://wordpress.org/plugins/font-organizer/faq/" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
+                                            <li><a href="https://wordpress.org/support/plugin/font-organizer" target="_blank"><?php _e('Support forums', 'font-organizer'); ?></a></li>
+                                            <li><a href="http://hivewebstudios.com/font-organizer" target="_blank"><?php _e('Contact us', 'font-organizer'); ?></a></li>
+                                        </ul>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="postbox">
+                                <h2>
+                                    <span><?php esc_attr_e('Like Our Facebook Page', 'font-organizer'); ?></span>
+                                </h2>
+                                <div class="inside">
+                                    <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fhivewp%2F&tabs&width=340&height=214&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=<?php echo self::FACBOOK_APP_ID; ?>" width="100%" height="200" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -886,9 +906,11 @@ class FoSettingsPage
      * @return  array
      */
     public function fo_upload_dir( $dir ) {
+        $base_url =   $url = fo_get_all_http_url( $dir['baseurl'] );
+
         return array(
             'path'   => $dir['basedir'] . '/font-organizer',
-            'url'    => $dir['baseurl'] . '/font-organizer',
+            'url'    => $base_url . '/font-organizer',
             'subdir' => '/font-organizer',
         ) + $dir;
     }
