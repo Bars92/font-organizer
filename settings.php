@@ -177,7 +177,7 @@ class FoSettingsPage
             }
         }
 
-        if(isset($_GET['action']) && ($_GET['action'] == 'delete' || $_GET['bulk-delete']) && isset($_GET['custom_element'])){
+        if(isset($_GET['action']) && ($_GET['action'] == 'delete' || $_GET['action'] == 'bulk-delete') && isset($_GET['custom_element'])){
             $this->should_create_css = true;
         }
 
