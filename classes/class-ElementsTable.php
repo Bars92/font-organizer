@@ -55,10 +55,23 @@ class ElementsTable extends WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			/*$1%s*/ $this->_args['singular'],  //Let's simply repurpose the table's singular label ("movie")
-			/*$2%s*/ $item->id               //The value of the checkbox should be the record's id
+			/*$2%s*/ $item->id              //The value of the checkbox should be the record's id
 		);
 	}
 
+	/**
+	 * Render the custom_elements editable text
+	 *
+	 * @param array $item
+	 *
+	 * @return string
+	 */
+	function column_custom_elements( $item ) {
+		return sprintf(
+			'<input type="text" name="custom_elements" value="%1$s" style="background:transparent;box-shadow:none;border:0;width:100%%;direction:ltr;" />',
+			/*$2%s*/ $item->custom_elements
+		);
+	}
 
 	/**
 	 *  Associative array of columns
@@ -78,8 +91,10 @@ class ElementsTable extends WP_List_Table {
 
 	function column_important( $item ) {
 		//Return the title contents
-		return sprintf( '%1$s <span style="color:silver"></span>',
-			/*$1%s*/ $item->important ? __('Yes', 'font-organizer') : __('No', 'font-organizer') 
+		return sprintf( '<input type="checkbox" name="important" %1$s /> <span style="color:%2$s">%3$s</span>', 
+						checked($item->important, true, false),
+						$item->important ? 'darkgreen' : 'darkred',
+			/*$1%s*/ 	$item->important ? __('Yes', 'font-organizer') : __('No', 'font-organizer') 
 		);
 	}
 
@@ -87,8 +102,7 @@ class ElementsTable extends WP_List_Table {
 
 		//Build row actions
 		$actions = array(
-			//'edit'      => sprintf( '<a href="?page=%s&type=%s&id=%s">Edit</a>', $_REQUEST['page'], 'edit', $item->user_id ),
-			'delete'    => sprintf( '<a href="?page=%s&action=%s&manage_font_id=%s&custom_element=%s#step6">Delete</a>', $_REQUEST['page'], 'delete', $item->font_id, $item->id ),
+			'delete'    => sprintf( '<a href="?page=%s&action=%s&manage_font_id=%s&custom_element=%s#step6">%s</a>', $_REQUEST['page'], 'delete', $item->font_id, $item->id, __('Delete', 'font-organizer')), 
 		);
 
 		//Return the title contents

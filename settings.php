@@ -177,12 +177,13 @@ class FoSettingsPage
             }
         }
 
-        if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['custom_element'])){
+        if(isset($_GET['action']) && ($_GET['action'] == 'delete' || $_GET['bulk-delete']) && isset($_GET['custom_element'])){
             $this->should_create_css = true;
         }
 
         add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
         add_action( 'admin_init', array( $this, 'page_init' ) );
+        add_action( 'wp_ajax_edit_custom_elements', array( $this, 'edit_custom_elements_callback' ) );
     }
 
     /**
@@ -194,6 +195,116 @@ class FoSettingsPage
         wp_enqueue_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
         wp_enqueue_style( 'fo-settings-css', plugins_url( 'assets/css/settings.css', __FILE__ ) );
         wp_enqueue_style( 'fontawesome', plugins_url( 'assets/css/font-awesome.min.css', __FILE__ ) );
+    }
+
+    public function add_footer_styles(){ ?>
+        <script type="text/javascript" >
+            jQuery(document).ready(function() {
+                var textBefore = '';
+
+                // Exit focus from the text when clicking 'Enter' but don't submit the form.
+                jQuery('table.custom_elements').find('td input:text').on('keyup keypress', function(e) {
+                  var keyCode = e.keyCode || e.which;
+                  if (keyCode === 13) { 
+                    jQuery(this).blur();
+                    e.preventDefault();
+                    return false;
+                  }
+                });
+
+
+                jQuery('table.custom_elements').find('td input:checkbox').change(function () {
+
+                    // Change the No to Yes or Yes to No labels.
+                    var $field = jQuery(this);
+                    var value = $field.prop('checked') ? 1 : 0;
+                    var item = jQuery(this).siblings('span');
+                    if(value){
+                        item.css('color', 'darkgreen');
+                        item.text("<?php _e('Yes', 'font-organizer'); ?>");
+                    }else{
+                        item.css('color', 'darkred');
+                        item.text("<?php _e('No', 'font-organizer'); ?>");
+                    }
+
+                    // Send ajax request named 'edit_custom_elements' to change the column to value text
+                    // where id.
+                    var data = {
+                            'action': 'edit_custom_elements',
+                            'id': parseInt($field.closest('tr').find('.check-column input').val()),
+                            'column': $field.attr('name'),
+                            'text': value
+                    };
+                    jQuery.post(ajaxurl, data, function(response) {
+
+                            // Show message for success and error for 3 seconds.
+                            if(response == "true"){
+                                jQuery('.custom_elements_message.fo_success').show().delay(3000).fadeOut();
+                            }else{
+                                jQuery('.custom_elements_message.fo_warning').show().delay(3000).fadeOut();
+                                $field.prop('checked', !value);
+                            }
+                    });
+                });
+
+                jQuery('table.custom_elements').find('td input:text').on('focus', function () {
+                    var $field = jQuery(this);
+
+                    // Store the current value on focus and on change
+                    textBefore = $field.val();
+                }).blur(function() {
+                    var $field = jQuery(this);
+                    var text = $field.val();
+
+                    // Set back previous value if empty
+                    if (text.length <= 0) {
+                        $field.val(textBefore);
+                        return;
+                    }
+
+                    if (textBefore !== text) {
+
+                        // Send ajax request named 'edit_custom_elements' to change the column to value text
+                        // where id.
+                        var data = {
+                            'action': 'edit_custom_elements',
+                            'id': parseInt($field.closest('tr').find('.check-column input').val()),
+                            'column': $field.attr('name'),
+                            'text': text
+                        };
+                        jQuery.post(ajaxurl, data, function(response) {
+
+                            // Show message for success and error for 3 seconds.
+                            if(response == "true"){
+                                jQuery('.custom_elements_message.fo_success').show().delay(3000).fadeOut();
+                            }else{
+                                jQuery('.custom_elements_message.fo_warning').show().delay(3000).fadeOut();
+                                $field.val(textBefore);
+                            }
+                        });
+                    }
+                });
+            });
+        </script> <?php
+    }
+
+    public function edit_custom_elements_callback() {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;
+        $wpdb->update( 
+        $table_name, 
+        array( $_POST['column'] => $_POST['text'] ), // change the column selected with the new value.
+        array('id' => $_POST['id']) // where id
+        );
+
+        // Initialize what is a must for the elements file.
+        $this->load_custom_elements();
+        $this->elements_options = get_option( 'fo_elements_options' );
+
+        $this->create_elements_file();
+
+        wp_die('true'); // this is required to terminate immediately and return a proper response
     }
 
     /**
@@ -213,6 +324,7 @@ class FoSettingsPage
         add_action( 'load-' . $hook, array( $this, 'init_page' ) );
         add_action( 'load-' . $hook, array( $this, 'register_scripts' ) );
         add_action( 'load-' . $hook, array( $this, 'create_css_file' ) );
+        add_action( 'admin_footer', array( $this, 'add_footer_styles' ) );
         add_filter( 'option_page_capability_fo_general_options', array($this, 'options_capability') );
         add_filter( 'option_page_capability_fo_elements_options', array($this, 'options_capability') );
     }
@@ -228,15 +340,46 @@ class FoSettingsPage
     }
 
     public function create_css_file($force = false){
-        global $fo_css_directory_path;
-        global $fo_declarations_css_file_name;
-        global $fo_elements_css_file_name;
 
         if(((!isset($_GET['settings-updated']) || !$_GET['settings-updated']) && !$this->should_create_css) && !$force){
             return;
         }
         
-        /* ========= Start the declartions file ========= */
+        /* ========= Create the declartions file ========= */
+        $this->create_declration_file();
+
+        /* ========= Create the elements file ========= */
+        $this->create_elements_file();
+    }
+
+    private function create_elements_file(){
+        global $fo_css_directory_path;
+        global $fo_elements_css_file_name;
+
+        $content = self::DEFAULT_CSS_TITLE;
+
+        // Add the known elements css.
+        foreach ($this->elements_options as $key => $value) {
+            if(strpos($key, 'important') || !$value)
+                continue;
+
+            $strip_key = str_replace('_font', '', $key);
+            $important = $this->elements_options[$key . '_important'];
+            $content .= sprintf("%s { font-family: '%s'%s; }\n", $strip_key, $value, $important ? '!important' : '');
+        }
+
+        // Add custom elements css.
+        foreach ($this->custom_elements as $custom_element_db) {
+            $content .= sprintf("%s { font-family: '%s'%s; }\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '');
+        }
+
+        // If there is any css to write. Create the directory if needed and create the file.
+        fo_try_write_file($content, $fo_css_directory_path, $fo_elements_css_file_name, array($this, 'generate_css_failed_admin_notice'));
+    }
+
+    private function create_declration_file(){
+        global $fo_css_directory_path;
+        global $fo_declarations_css_file_name;
 
         $content = self::DEFAULT_CSS_TITLE;
         $custom_fonts_content = '';
@@ -293,29 +436,6 @@ class FoSettingsPage
 
         // If there is any declartions css to write.
         fo_try_write_file($content, $fo_css_directory_path, $fo_declarations_css_file_name, array($this, 'generate_css_failed_admin_notice'));
-
-        /* ========= Start the elements file ========= */
-
-        // Reset the content for the elements file.
-        $content = self::DEFAULT_CSS_TITLE;
-
-        // Add the known elements css.
-        foreach ($this->elements_options as $key => $value) {
-            if(strpos($key, 'important') || !$value)
-                continue;
-
-            $strip_key = str_replace('_font', '', $key);
-            $important = $this->elements_options[$key . '_important'];
-            $content .= sprintf("%s { font-family: '%s'%s; }\n", $strip_key, $value, $important ? '!important' : '');
-        }
-
-        // Add custom elements css.
-        foreach ($this->custom_elements as $custom_element_db) {
-        	$content .= sprintf("%s { font-family: '%s'%s; }\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '');
-        }
-
-        // If there is any css to write. Create the directory if needed and create the file.
-        fo_try_write_file($content, $fo_css_directory_path, $fo_elements_css_file_name, array($this, 'generate_css_failed_admin_notice'));
     }
 
     /**
@@ -543,6 +663,19 @@ class FoSettingsPage
                                     <span>
                                         <?php _e('Step 5: Select a font to manage, delete and view the source and custom elements assigned to it.', 'font-organizer'); ?>    
                                     </span>
+                                     <p>
+                                        <strong><?php _e('Note: ', 'font-organizer'); ?></strong> 
+                                        <?php _e('You can edit the values of every row to change the custom elements assigned or add and remove the important tag. Just change the text or check the box and the settings will automatically save.', 'font-organizer'); ?>
+                                    </p>
+                                    <div class="custom_elements_message fo_success" style="display: none;">
+                                        <i class="fa fa-info-circle"></i>
+                                        <?php _e('Changes saved!', 'font-organizer'); ?>
+                                    </div>
+                                    <div class="custom_elements_message fo_warning" style="display: none;">
+                                        <i class="fa fa-warning"></i>
+                                        <?php _e("Data is invalid", "font-organizer"); ?>
+                                        <span></span>
+                                    </div>
 	                                <table class="form-table">
 	                                        <tr>
 	                                            <th scope="row"><?php _e('Font', 'font-organizer'); ?></th>
@@ -619,9 +752,9 @@ class FoSettingsPage
                                         <br />
                                         <p><?php _e('Anyway, if you need anything, this may help:', 'font-organizer'); ?></p> 
                                         <ul style="list-style-type:disc;margin: 0 20px;">
-                                            <li><a href="https://wordpress.org/plugins/font-organizer/faq/" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
+                                            <li><a href="http://hivewebstudios.com/font-organizer/#faq" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
                                             <li><a href="https://wordpress.org/support/plugin/font-organizer" target="_blank"><?php _e('Support forums', 'font-organizer'); ?></a></li>
-                                            <li><a href="http://hivewebstudios.com/font-organizer" target="_blank"><?php _e('Contact us', 'font-organizer'); ?></a></li>
+                                            <li><a href="http://hivewebstudios.com/font-organizer/#contact" target="_blank"><?php _e('Contact us', 'font-organizer'); ?></a></li>
                                         </ul>
                                     </p>
                                 </div>
@@ -1093,8 +1226,7 @@ class FoSettingsPage
 
         $value = isset( $this->general_options['google_key'] ) ? esc_attr( $this->general_options['google_key']) : '';
         printf(
-            '<div class="validate"><input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text %s" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" /><span></span></div>',$value , empty($this->google_fonts) ? 'error' : 'valid'
-            
+            '<div class="validate"><input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text %s %s" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" /><span></span></div>', $value , empty($this->google_fonts) ? 'error' : 'valid', is_rtl() ? 'rtl' : 'ltr'
         );
     }
 

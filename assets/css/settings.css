@@ -22,8 +22,17 @@ input.error + span {
   font-size: 18px;
   display: block;
   position: absolute;
-  right: 2%;
   top: 10%;
+}
+
+input.valid.rtl + span,
+input.error.rtl + span {
+  left: 2%;
+}
+
+input.valid.ltr + span,
+input.error.ltr + span {
+  right: 2%;
 }
 
 input.valid + span:after {
@@ -87,4 +96,30 @@ label.required:after {
 	color: green;
 	text-decoration: none;
 	box-shadow: none;
+}
+
+/* Custom Elements Section */
+.fo_info, .fo_success, .fo_warning, .fo_error {
+  margin: 10px 0px;
+}
+.fo_info {
+    color: #00529B;
+    background-color: #BDE5F8;
+}
+.fo_success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+}
+.fo_warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+}
+.fo_error {
+    color: #D8000C;
+    background-color: #FFBABA;
+}
+.fo_info i, .fo_success i, .fo_warning i, .fo_error i {
+    margin:10px 22px;
+    font-size:2em;
+    vertical-align:middle;
 }
