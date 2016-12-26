@@ -1226,7 +1226,7 @@ class FoSettingsPage
         echo '<span class="highlight info">';
 
         $url = 'https://developers.google.com/fonts/docs/developer_api#acquiring_and_using_an_api_key';
-        $faq_url = 'https://wordpress.org/plugins/font-organizer/faq/';
+        $faq_url = 'http://hivewebstudios.com/font-organizer/#faq';
         echo sprintf( __( 'To get all the fonts, Google requires the mandatory use of an API key, get one from <a href="%s" target="_blank">HERE</a>', 'font-organizer' ), esc_url( $url ) );
         echo  sprintf( __( ' Need help? Click <a href="%s" target="_blank">here</a>', 'font-organizer' ), esc_url( $faq_url ) );
         echo '</span> <br />';

@@ -3,7 +3,7 @@ Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.8
 Tested up to: 4.7
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,12 +20,15 @@ Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebS
 
 Want to try us? Use Addendio's [Font Organizer live demo](https://addendio.com/try-plugin/?slug=font-organizer "live demo")!
 
+Have any problems? Check out our new [Office Font Organizer page](http://hivewebstudios.com/font-organizer/ "Font Organizer page")
+
 Key Features:
 
 * Upload font to your website and apply it on any element.
 * Multi upload allow you to upload more font formats to support more browsers.
 * Add any google fonts in one click and apply them on any element.
 * Apply fonts for known elements or custom elements of your choosing easily.
+* Edit and remove custom elements assigned quickly.
 * Delete and remove fonts from your website in one click.
 * Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
 * Our code is extremely clean, well written, and optimized for maximum performance for your website.
@@ -100,6 +103,15 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 4. General settings & role restictions.
 
 == Changelog ==
+
+= 1.3.0 =
+* Added quick editing in custom elements table on section 5.
+* Added better error message when Google API key not working.
+* Added facebook page like box in the settings.
+* Fixed HTTPS website could not load the css
+* Fixed timeout issues with google fonts request.
+* Fixed tinyMCE and tinyMCE advanced not working sometimes.
+* Fixed a few minor bugs.
 
 = 1.2.1 =
 * Fixed elements rules sometimes not loading.
