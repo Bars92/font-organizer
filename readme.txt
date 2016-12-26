@@ -20,7 +20,7 @@ Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebS
 
 Want to try us? Use Addendio's [Font Organizer live demo](https://addendio.com/try-plugin/?slug=font-organizer "live demo")!
 
-Have any problems? Check out our new [Office Font Organizer page](http://hivewebstudios.com/font-organizer/ "Font Organizer page")
+Have any problems? Check out our new [Official Font Organizer page](http://hivewebstudios.com/font-organizer/ "Font Organizer page").
 
 Key Features:
 
@@ -31,7 +31,7 @@ Key Features:
 * Edit and remove custom elements assigned quickly.
 * Delete and remove fonts from your website in one click.
 * Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
-* Our code is extremely clean, well written, and optimized for maximum performance for your website.
+* Our code is extremely clean, well written, commented, and optimized for maximum performance for your website.
 * Full support for language translation, including RTL languages.
 * It's awesome like its users.
 
@@ -108,9 +108,9 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 * Added quick editing in custom elements table on section 5.
 * Added better error message when Google API key not working.
 * Added facebook page like box in the settings.
-* Fixed HTTPS website could not load the css
+* Fixed HTTPS website could not load the css.
 * Fixed timeout issues with google fonts request.
-* Fixed tinyMCE and tinyMCE advanced not working sometimes.
+* Fixed tinyMCE and tinyMCE advanced font families preview not working sometimes.
 * Fixed a few minor bugs.
 
 = 1.2.1 =
