@@ -370,7 +370,10 @@ class FoSettingsPage
 
         // Add custom elements css.
         foreach ($this->custom_elements as $custom_element_db) {
-            $content .= sprintf("%s { font-family: '%s'%s; }\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '');
+            // if name is valid create a css for it.
+            if($custom_element_db->name){
+                $content .= sprintf("%s { font-family: '%s'%s; }\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '');
+            }
         }
 
         // If there is any css to write. Create the directory if needed and create the file.
@@ -457,8 +460,8 @@ class FoSettingsPage
            		$this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
            	}else{
                 // Show the most detailed message in the error and display it to the user.
-                $error_message = json_decode(wp_remote_retrieve_body($response))->error->errors[0]->message;
-                add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . $error_message, 'error');
+                $error = json_decode(wp_remote_retrieve_body($response))->error->errors[0];
+                add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . ' [' . $error->reason . '] ' . $error->message, 'error');
             }
         }else{
             add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'font-organizer'), 'error');
@@ -492,6 +495,11 @@ class FoSettingsPage
         if(isset($_GET['manage_font_id'])){
         		foreach ($this->usable_fonts_db as $font_db) {
         			 if(intval($_GET['manage_font_id']) == $font_db->id){
+
+                        // If name is made up/ deleted or unavailable for now just break for now.
+                        if(!array_key_exists($font_db->name, $this->usable_fonts))
+                            break;
+
 	                	$this->selected_manage_font = $this->usable_fonts[$font_db->name];
         				$this->custom_elements_table->prepare_items_by_font($this->custom_elements, $font_db->id);
 	                	break;
