@@ -33,8 +33,48 @@ jQuery(document).ready(function(){
         }
     });
 
+    var selectedFiles = [];
+    jQuery('body').on('change', '.add_font_file', function() {
+        var element = jQuery(this);
+        // Remove the old selected file extension from the array if exists.
+        var oldFileExtesion = getFileExtension(element[0].oldvalue);
+        var oldIndex = selectedFiles.indexOf(oldFileExtesion);
+        if(oldIndex != -1) {
+            selectedFiles.splice(oldIndex, 1);
+        }
+
+        // If the file extension is empty or already exists. Remove it with wrap.
+        var fileExtesion = getFileExtension(element[0].files[0].name);
+        if(fileExtesion == "" || selectedFiles.indexOf(fileExtesion) != -1){
+            // Reset a fake form to reset the input field.
+            element.wrap('<form>').closest('form').get(0).reset();
+            element.unwrap();
+
+            // Show an error message for trying to upload the same font format.
+            jQuery('.custom_font_message.fo_warning').show().delay(5000).fadeOut();
+            return;
+        }
+
+        // Add the selected file extension to the array.
+        selectedFiles.push(fileExtesion);
+    });
+
+    function getFileExtension(name)
+    {
+       var found = name.lastIndexOf('.') + 1;
+       return (found > 0 ? name.substr(found) : "");
+    }
+
     jQuery('#add_font_form').on('click','.remove_button', function(e){ //Once remove button is clicked
         e.preventDefault();
+
+        var element = jQuery(this).closest('.font_file_wrapper').find('.add_font_file');
+         var extesion = getFileExtension(element[0].files[0].name);
+        var index = selectedFiles.indexOf(extesion);
+        if(index != -1) {
+            selectedFiles.splice(index, 1);
+        }
+
         jQuery(this).closest('.font_file_wrapper').remove(); //Remove field html
         x--; //Decrement field counter
     });
