@@ -3,7 +3,7 @@ Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.8
 Tested up to: 4.7
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,10 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 4. General settings & role restictions.
 
 == Changelog ==
+
+= 1.3.1 =
+* Added a warning when trying to upload the same font file format in one upload.
+* Fixed PHP 5.3 not supported.
 
 = 1.3.0 =
 * Added quick editing in custom elements table on section 5.
