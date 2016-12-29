@@ -199,6 +199,7 @@ class FoSettingsPage
 
     public function add_footer_styles(){ ?>
         <script type="text/javascript" >
+
             jQuery(document).ready(function() {
                 var textBefore = '';
 
@@ -211,6 +212,38 @@ class FoSettingsPage
                     return false;
                   }
                 });
+
+                var selectedFiles = [];
+                jQuery('body').on('change', '.add_font_file', function() {
+                    var element = jQuery(this);
+                    // Remove the old selected file extension from the array if exists.
+                    var oldFileExtesion = getFileExtension(element[0].oldvalue);
+                    var oldIndex = selectedFiles.indexOf(oldFileExtesion);
+                    if(oldIndex != -1) {
+                        selectedFiles.splice(oldIndex, 1);
+                    }
+
+                    // If the file extension is empty or already exists. Remove it with wrap.
+                    var fileExtesion = getFileExtension(element[0].files[0].name);
+                    if(fileExtesion == "" || selectedFiles.indexOf(fileExtesion) != -1){
+                        // Reset a fake form to reset the input field.
+                        element.wrap('<form>').closest('form').get(0).reset();
+                        element.unwrap();
+
+                        // Show an error message for trying to upload the same font format.
+                        jQuery('.custom_font_message.fo_warning').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    // Add the selected file extension to the array.
+                    selectedFiles.push(fileExtesion);
+                });
+
+                function getFileExtension(name)
+                {
+                   var found = name.lastIndexOf('.') + 1;
+                   return (found > 0 ? name.substr(found) : "");
+                }
 
 
                 jQuery('table.custom_elements').find('td input:checkbox').change(function () {
@@ -572,6 +605,13 @@ class FoSettingsPage
                                 <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'font-organizer'); ?></span>
                                 <br />
                                 <span><?php _e('Name the font you want to upload and upload all the files formats for this font. In order to support more browsers you can click the green plus to upload more font formats. We suggest .woff and .woff2.', 'font-organizer'); ?></span>
+
+                                <div class="custom_font_message fo_warning" style="display: none;">
+                                        <i class="fa fa-warning"></i>
+                                        <?php _e("This font format is already selected. Reminder: you need to upload the font files for the same font weight.", "font-organizer"); ?>
+                                        <span></span>
+                                </div>
+
                                 <form action="#" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
                                     <table class="form-table">
                                         <tr>
@@ -583,7 +623,7 @@ class FoSettingsPage
                                                 <label for="font_file" class="required"><?php _e('Font Weight File', 'font-organizer'); ?></label>
                                             </th>
                                             <td id="font_file_parent" style="width:33%;">
-                                                <input type="file" name="font_file[]" value="" class="required" accept="<?php echo join(',',$this->supported_font_files); ?>"  /><br/>
+                                                <input type="file" name="font_file[]" value="" class="add_font_file required" onfocus="this.oldvalue = this.value;" accept="<?php echo join(',',$this->supported_font_files); ?>"  /><br/>
                                                 <em><?php echo __('Accepted Font Format : ', 'font-organizer') . '<span style="direction: ltr">' . join(', ',$this->supported_font_files) . '</span>'; ?></em><br/>
                                             </td>
                                             <td>

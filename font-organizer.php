@@ -23,11 +23,12 @@ require_once FO_ABSPATH . 'helpers.php';
 global $fo_db_version;
 $fo_db_version = '1.3.0';
 
+$upload_dir = wp_upload_dir(); // Must create a temp variable for PHP 5.3.
 global $fo_css_directory_path;
-$fo_css_directory_path =  wp_upload_dir()['basedir'] . '/font-organizer';
+$fo_css_directory_path =  $upload_dir['basedir'] . '/font-organizer';
 
 global $fo_css_base_url_path;
-$fo_css_base_url_path = wp_upload_dir()['baseurl'] . '/font-organizer';
+$fo_css_base_url_path = $upload_dir['baseurl'] . '/font-organizer';
 
 // Fix ssl for base url.
 $fo_css_base_url_path = fo_get_all_http_url( $fo_css_base_url_path ); 
