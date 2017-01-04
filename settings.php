@@ -192,7 +192,17 @@ class FoSettingsPage
     public function register_scripts() {
         wp_enqueue_script( 'jquery-ui-core' );
         wp_enqueue_script( 'jquery-ui-autocomplete' );
-        wp_enqueue_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
+        wp_register_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
+
+        $data = array(
+                    'usable_fonts' => $this->usable_fonts,
+                    'options_values' => $this->elements_options,
+                    'default_label' => __('Default', 'font-organizer'),
+            );
+        wp_localize_script( 'fo-settings-script', 'data', $data );
+
+        wp_enqueue_script( 'fo-settings-script' );
+
         wp_enqueue_style( 'fo-settings-css', plugins_url( 'assets/css/settings.css', __FILE__ ) );
         wp_enqueue_style( 'fontawesome', plugins_url( 'assets/css/font-awesome.min.css', __FILE__ ) );
     }
@@ -360,7 +370,7 @@ class FoSettingsPage
 
         // Add the known elements css.
         foreach ($this->elements_options as $key => $value) {
-            if(strpos($key, 'important') || !$value)
+            if(strpos($key, 'important') || strpos($key, 'weight') || !$value)
                 continue;
 
             $strip_key = str_replace('_font', '', $key);
@@ -1129,6 +1139,15 @@ class FoSettingsPage
             );   
 
             add_settings_field(
+                $id . '_weight', // ID
+                __('Font Weight', 'font-organizer'), // Title 
+                array( $this, 'fonts_weight_list_field_callback' ), // Callback
+                'font-setting-admin', // Page
+                'setting_elements', // Section 
+                $id . '_weight' // Parameter for Callback 
+            );   
+
+            add_settings_field(
                 $id . '_important', // ID
                 '', // Title 
                 array( $this, 'is_important_element_field_callback' ), // Callback
@@ -1204,6 +1223,10 @@ class FoSettingsPage
                 $new_input[$id . '_important'] =  0 ;
             else
                 $new_input[$id . '_important'] = intval($input[$id . '_important']);
+
+            if( isset( $input[$id . '_weight'] ) )
+                $new_input[$id . '_weight'] = sanitize_text_field($input[$id . '_weight']);
+
 
         }
 
@@ -1288,6 +1311,13 @@ class FoSettingsPage
         $this->print_usable_fonts_list($name);
     }
 
+    public function fonts_weight_list_field_callback($name){
+        $selected = isset( $this->elements_options[$name] ) ? esc_attr( $this->elements_options[$name]) : '';
+        echo '<select id="'.$name.'" name="fo_elements_options['.$name.']" class="known_element_fonts_weights">';
+        
+        echo '</select>';
+    }
+
     /** 
      * Prints the main fonts list.
      */
@@ -1340,7 +1370,7 @@ class FoSettingsPage
     private function print_usable_fonts_list($name)
     {
         $selected = isset( $this->elements_options[$name] ) ? esc_attr( $this->elements_options[$name]) : '';
-        echo '<select id="'.$name.'" name="fo_elements_options['.$name.']">';
+        echo '<select id="'.$name.'" name="fo_elements_options['.$name.']" class="known_element_fonts">';
         
         echo '<option value="" '. selected('', $selected, false) . '>' . __('Default', 'font-organizer') . '</option>'; 
 
