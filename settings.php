@@ -110,6 +110,12 @@ class FoSettingsPage
     private $is_admin;
 
     /**
+     * Is the google fonts list from a static resource or
+     * is it from google request.
+     */
+    private $is_google_static;
+
+    /**
      * Start up
      */
     public function __construct()
@@ -124,6 +130,7 @@ class FoSettingsPage
         $this->usable_fonts = array();
         $this->google_fonts = array();
         $this->should_create_css = false;
+        $this->is_google_static = false;
         $this->is_admin = current_user_can('manage_options');
         $this->elements = array('body_font' =>  __('<body> Font', 'font-organizer'),
                                 'h1_font'   =>  __('<h1> Font', 'font-organizer'),
@@ -454,17 +461,27 @@ class FoSettingsPage
 
         if(isset($this->general_options['google_key']) && $this->general_options['google_key']){
             // Add Google fonts.
-            set_time_limit(0);
             $response = wp_remote_get("https://www.googleapis.com/webfonts/v1/webfonts?sort=alpha&key=" . $this->general_options['google_key'], array('timeout' => 60));
             if( wp_remote_retrieve_response_code( $response ) == 200){
            		$this->google_fonts = json_decode(wp_remote_retrieve_body($response))->items;
            	}else{
                 // Show the most detailed message in the error and display it to the user.
-                $error = json_decode(wp_remote_retrieve_body($response))->error->errors[0];
+                if ( is_wp_error( $response ) ) {
+                    $error = wp_strip_all_tags( $response->get_error_message() );
+                }else{
+                    $error = json_decode(wp_remote_retrieve_body($response))->error->errors[0];
+                }
+
                 add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . ' [' . $error->reason . '] ' . $error->message, 'error');
             }
-        }else{
-            add_settings_error('google_key', '', __('Google API key is not set! Cannot display google fonts.', 'font-organizer'), 'error');
+        }
+
+        if(empty($this->google_fonts)){
+            // Get a static google fonts list.
+            require_once FO_ABSPATH . '/helpers/google-fonts.php';
+            
+            $this->google_fonts = json_decode(fo_get_all_google_fonts_static_response())->items;
+            $this->is_google_static = true;
         }
 
         // Add known fonts.
@@ -1234,15 +1251,18 @@ class FoSettingsPage
 
         $url = 'https://developers.google.com/fonts/docs/developer_api#acquiring_and_using_an_api_key';
         $faq_url = 'http://hivewebstudios.com/font-organizer/#faq';
-        echo sprintf( __( 'To get all the fonts, Google requires the mandatory use of an API key, get one from <a href="%s" target="_blank">HERE</a>', 'font-organizer' ), esc_url( $url ) );
+        echo sprintf( __( 'To get all the current fonts, Google requires the mandatory use of an API key, get one from <a href="%s" target="_blank">HERE</a>', 'font-organizer' ), esc_url( $url ) );
         echo  sprintf( __( ' Need help? Click <a href="%s" target="_blank">here</a>', 'font-organizer' ), esc_url( $faq_url ) );
         echo '</span> <br />';
 
-
         $value = isset( $this->general_options['google_key'] ) ? esc_attr( $this->general_options['google_key']) : '';
         printf(
-            '<div class="validate"><input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text %s %s" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" /><span></span></div>', $value , empty($this->google_fonts) ? 'error' : 'valid', is_rtl() ? 'rtl' : 'ltr'
+            '<div class="validate"><input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text %s %s" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" /><span></span></div>', $value , $this->is_google_static ? '' : 'valid', is_rtl() ? 'rtl' : 'ltr'
         );
+
+        if($this->is_google_static){
+            echo '<span style="color:#0073aa;font-weight: 500;">' . __('You are using a static google fonts list, if you want the current list you can specify an API key.') . '</span>';
+        }
     }
 
     /** 

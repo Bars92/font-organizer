@@ -18,7 +18,7 @@ define( 'FO_USABLE_FONTS_DATABASE', 'fo_usable_fonts' );
 define( 'FO_ELEMENTS_DATABASE', 'fo_elements' );
 define( 'FO_DEFAULT_ROLE', 'administrator' );
 
-require_once FO_ABSPATH . 'helpers.php';
+require_once FO_ABSPATH . 'helpers/helpers.php';
 
 global $fo_db_version;
 $fo_db_version = '1.3.1';
@@ -128,6 +128,7 @@ function fo_add_tinymce_fonts($initArray){
 
 function fo_allow_upload_types($existing_mimes = array()){
 	$existing_mimes['ttf'] = 'application/octet-stream';
+	$existing_mimes['eot'] = 'application/octet-stream';
 	$existing_mimes['woff'] = 'application/x-font-woff';
 	$existing_mimes['woff2'] = 'application/x-font-woff';
 	$existing_mimes['otf'] = 'application/x-font-woff';

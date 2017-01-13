@@ -24,12 +24,16 @@
         }
     }
 
+    function fo_websafe_font_names($font) { 
+        return str_replace(' ', '+', $font->family); 
+    }
+
     function fo_print_links($fonts, $fonts_per_link = 150){
         if(empty($fonts))
             return;
 
         // Create list of names with no spaces.
-        $font_names = array_map(function($font) { return str_replace(' ', '+', $font->family); }, $fonts);
+        $font_names = array_map('fo_websafe_font_names', $fonts);
 
         // Prepare to load the fonts in bulks to improve performance. Cannot include all.
         for ($i=0; $i < count($font_names); $i+=$fonts_per_link) { 
