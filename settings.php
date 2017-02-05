@@ -200,6 +200,9 @@ class FoSettingsPage
         wp_enqueue_script( 'jquery-ui-core' );
         wp_enqueue_script( 'jquery-ui-autocomplete' );
         wp_enqueue_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
+
+        wp_localize_script( 'fo-settings-script', 'available_fonts', $this->available_fonts );
+
         wp_enqueue_style( 'fo-settings-css', plugins_url( 'assets/css/settings.css', __FILE__ ) );
         wp_enqueue_style( 'fontawesome', plugins_url( 'assets/css/font-awesome.min.css', __FILE__ ) );
     }
@@ -402,10 +405,6 @@ class FoSettingsPage
                     // Set all the urls content under the same src.
                     $urls_content_arr = array();
                     foreach ($urls as $url) {
-                        // Fix everyone saved with http or https and let the browser decide.
-                        $url = str_replace('http://',  '//', $url); 
-                        $url = str_replace('https://', '//', $url);
-
                         $urls_content_arr[] = "url('" . $url . "') format('" . fo_get_font_format($url) . "')";
                     }
 
@@ -453,8 +452,9 @@ class FoSettingsPage
      * and all the usable fonts.
      */
     public function init(){
-        $this->general_options = get_option( 'fo_general_options' );
-        $this->elements_options = get_option( 'fo_elements_options' );
+        $this->general_options = get_option( 'fo_general_options' , array() );
+        $this->elements_options = get_option( 'fo_elements_options', array() );
+
         $this->custom_elements_table = new ElementsTable();
 
         $this->include_font_link = isset( $this->general_options['include_font_link'] ) && $this->general_options['include_font_link'];
@@ -567,7 +567,7 @@ class FoSettingsPage
                                     <table class="form-table">
                                         <tr>
                                             <th scope="row"><?php _e('Available Fonts', 'font-organizer'); ?></th>
-                                            <td><?php  $this->print_available_fonts_list('usable_font'); ?></td>
+                                            <td><?php  $this->print_available_fonts_list('usable_font',  __('-- Select Font --', 'font-organizer')); ?></td>
                                         </tr>   
                                         <tr>        
                                             <th scope="row"></th>
@@ -799,6 +799,23 @@ class FoSettingsPage
                                     <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fhivewp%2F&tabs&width=340&height=214&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=<?php echo self::FACBOOK_APP_ID; ?>" width="100%" height="200" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
                                 </div>
                             </div>
+                            <div class="postbox">
+                                <h2>
+                                    <span><?php esc_attr_e('Font Preview', 'font-organizer'); ?></span>
+                                </h2>
+
+                                <div class="inside">
+                                    <span><?php esc_attr_e('Select a font from the list to preview.', 'font-organizer'); ?></span>
+                                    <p>
+                                        <?php $this->print_available_fonts_list('font_preview_selection', __('-- Select Font --', 'font-organizer')); ?>
+                                        <input type="text" id="font_preview_text" value="<?php _e("This is a preview content.", 'font-organizer'); ?>" style="width: 100%;margin: 5px 0 0;" placeholder="<?php _e('Font preview free text', 'font-organizer'); ?>" /><br>
+                                    </p>
+                                    <div id="font_preview_demo">
+                                        <?php _e("This is a preview content.", 'font-organizer'); ?>
+                                    </div>
+                                    <span style="font-size: 11px;font-style:italic"><?php echo __('Note: ', 'font-organizer') . __('Some fonts may not support your language.', 'font-organizer'); ?></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
             </form>
@@ -982,6 +999,10 @@ class FoSettingsPage
     private function save_usable_font_to_database($name, $url = '', $is_custom = false){
         global $wpdb;
         $table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
+
+        // Save relative url in the database.
+        if($url)
+            $url = stristr($url, "/wp-content");
 
         $wpdb->insert( 
         $table_name, 
@@ -1369,7 +1390,7 @@ class FoSettingsPage
         {
           $font_name = $font->family;
           $is_selected = selected($font_name, $selected, false);
-          echo '<option value="'.$font_name.'" style="font-family: '.$font_name.';" '.$is_selected.'>'.$font_name.'</option>\n';
+          echo '<option value="'.$font_name.'" style="font-family: '.$font_name.';" '.$is_selected.'>'.$font_name.'</option>';
         }
 
         echo '</select>';
@@ -1383,7 +1404,7 @@ class FoSettingsPage
         echo '<select id="'.$name.'" name="'.$name.'" required oninvalid="this.setCustomValidity(\'' . $validity . '\')" oninput="setCustomValidity(\'\')">';
         
         if($default){
-        	 echo '<option value="">'.$default.'</option>\n';
+        	 echo '<option value="">'.$default.'</option>';
         }
 
         //fonts section
@@ -1391,7 +1412,7 @@ class FoSettingsPage
         {
           $font_name = $font->name;
           $selected = isset($_GET[$name]) && $font->id == $_GET[$name];
-          echo '<option value="' . $font->id . '" style="font-family: '.$font_name.';" ' . selected($selected) . '>'.$font_name.'</option>\n';
+          echo '<option value="' . $font->id . '" style="font-family: '.$font_name.';" ' . selected($selected) . '>'.$font_name.'</option>';
         }
 
         echo '</select>';
@@ -1400,15 +1421,18 @@ class FoSettingsPage
     /** 
      * Get the settings option array and print one of its values
      */
-    private function print_available_fonts_list($name)
+    private function print_available_fonts_list($name, $default = "")
     {
         echo '<select id="'.$name.'" name="'.$name.'">';
+        if($default){
+            echo '<option value="">'.$default.'</option>';
+        }
 
         //fonts section
         foreach($this->available_fonts as $font)
         {
           $font_name = $font->family;
-          echo '<option value="'.$font_name.'" style="font-family: '.$font_name.';">'.$font_name.'</option>\n';
+          echo '<option value="'.$font_name.'" style="font-family: '.$font_name.';">'.$font_name.'</option>';
         }
 
         echo '</select>';
@@ -1420,7 +1444,13 @@ class FoSettingsPage
 
             // Find the font from the lists.
             if($usable_font->custom){
-                $font_obj = (object) array( 'family' => $usable_font->name, 'files' => (object) array('regular' => explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url)), 'kind' => 'custom', 'variants' => array('regular'));
+                // Set the urls that will be used in the file.
+                $full_urls = array();
+                foreach (explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url) as $url) {
+                    $full_url[] = fo_get_full_url($url);
+                }
+
+                $font_obj = (object) array( 'family' => $usable_font->name, 'files' => (object) array('regular' => $full_url), 'kind' => 'custom', 'variants' => array('regular'));
                 $this->usable_fonts[$font_obj->family] = $font_obj;
                 $this->custom_fonts[$font_obj->family] = $font_obj;
             }else{

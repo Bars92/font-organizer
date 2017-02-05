@@ -123,3 +123,15 @@ label.required:after {
     font-size:2em;
     vertical-align:middle;
 }
+
+/* Fonts Preview */
+#font_preview_demo{
+  font-size: 14px;
+  color: black;
+  font-weight: normal;
+  line-height: 20px;
+  border: 1px solid black;
+  text-align: center;
+  padding: 15px;
+  margin-bottom: 15px;
+}

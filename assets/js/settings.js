@@ -79,3 +79,49 @@ jQuery(document).ready(function(){
         x--; //Decrement field counter
     });
 });
+
+jQuery(document).ready(function(){
+    // On font preview selection changed. a new font to preview is selected.
+    jQuery('#font_preview_selection').on('change', function(){
+        var font_family = jQuery(this).val();
+
+        // If default value is selected, hide the preview box and text.
+        if(!font_family){
+            jQuery('#font_preview_text').hide();
+            jQuery('#font_preview_demo').hide();
+            return;
+        }
+
+        // If not, first show the preview box and text.
+        jQuery('#font_preview_text').show();
+        jQuery('#font_preview_demo').show();
+
+        // Find the font and import it.
+        for( key in available_fonts){
+            font = available_fonts[key];
+            if(font && font.family == font_family)
+                if(font.files["regular"] != ""){
+                    if(font.kind == "earlyaccess")
+                        jQuery("head").append("<link href='" + font.files["regular"] + "' rel='stylesheet' type='text/css'>");
+                    else
+                        jQuery("head").append("<link href='https://fonts.googleapis.com/css?family=" + font.family.replace(' ', '+') + "' rel='stylesheet' type='text/css'>");
+
+                   break;
+                }
+
+        }
+
+        // Change the demo css to the selected font family.
+        jQuery("#font_preview_demo").css("font-family", font_family);
+    });
+    
+    // hide preview box and text by default.
+    jQuery('#font_preview_text').hide();
+    jQuery('#font_preview_demo').hide();
+    
+    // On any text changed change the preview in the demo to match the new value.
+    jQuery('#font_preview_text').bind("propertychange keyup input cut paste", function(event){
+        var value = jQuery(this).val();
+        jQuery('#font_preview_demo').text(value);
+    });
+});
