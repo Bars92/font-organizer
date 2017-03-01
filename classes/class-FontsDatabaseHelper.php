@@ -27,10 +27,20 @@ class FontsDatabaseHelper {
 		if(!self::$custom_elements){
  			global $wpdb;
 
-        	self::$custom_elements = $wpdb->get_results('SELECT e.id, u.name, e.font_id, e.custom_elements, e.important FROM ' . $wpdb->prefix . FO_ELEMENTS_DATABASE . ' as e LEFT OUTER JOIN ' . $wpdb->prefix . FO_USABLE_FONTS_DATABASE . ' as u ON ' . ' e.font_id = u.id ORDER BY e.font_id DESC');
+        	self::$custom_elements = $wpdb->get_results('SELECT e.id, u.name, e.font_id, e.font_weight, e.custom_elements, e.important FROM ' . $wpdb->prefix . FO_ELEMENTS_DATABASE . ' as e LEFT OUTER JOIN ' . $wpdb->prefix . FO_USABLE_FONTS_DATABASE . ' as u ON ' . ' e.font_id = u.id ORDER BY e.font_id DESC');
 		}
 
 		return self::$custom_elements;
+	}
+
+	public static function get_usable_font($name){
+ 		global $wpdb;
+
+ 		if(!$name)
+ 			return null;
+
+        return $wpdb->get_row('SELECT * FROM ' . $wpdb->prefix . FO_USABLE_FONTS_DATABASE . ' WHERE name = "' . $name . '" ORDER BY id DESC');
+		
 	}
 }
 ?>

@@ -41,8 +41,20 @@ $fo_elements_css_file_name = 'fo-elements.css';
 
 function fo_update_db_check() {
     global $fo_db_version;
+    	global $wpdb;
+
     if ( get_site_option( 'fo_db_version' ) != $fo_db_version ) {
+    	global $wpdb;
+
         fo_install();
+
+        // As of 2.0 we added font weights.
+		$row = $wpdb->get_results("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+		WHERE table_name = '" . $wpdb->prefix . FO_ELEMENTS_DATABASE . "' AND column_name = 'font_weight'"  );
+
+		if(empty($row)){
+		   $wpdb->query("ALTER TABLE " . $wpdb->prefix . FO_ELEMENTS_DATABASE . " ADD font_weight varchar(255)");
+		}
 
         // As of 1.2 we split the css file to declartions and elements.
         // Create the files and delete the old fo-fonts.css.
@@ -83,7 +95,7 @@ function fo_init(){
 		add_filter( 'upload_mimes', 'fo_allow_upload_types' );
 		add_filter( 'plugin_action_links', 'fo_add_action_plugin', 10, 5 );
 		add_filter( 'tiny_mce_before_init', 'fo_add_tinymce_fonts' );
-		add_filter( 'mce_buttons_2', 'fo_mce_buttons' );
+		add_filter( 'mce_buttons', 'fo_mce_buttons', 1000 );
 		add_action( 'admin_enqueue_scripts', 'fo_enqueue_declarations_fonts_css' );
 
 	    $settings_page = new FoSettingsPage();
@@ -123,6 +135,7 @@ function fo_add_tinymce_fonts($initArray){
 
 	// Set font sizes.
 	$initArray['fontsize_formats'] = $sizes;
+
 	return $initArray;
 }
 
@@ -162,6 +175,7 @@ function fo_install() {
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
 		name varchar(255) NOT NULL,
 		url text DEFAULT NULL,
+		font_weight varchar(255),
 		custom int(1) DEFAULT 0,
 		PRIMARY KEY  (id)
 	) $charset_collate;";

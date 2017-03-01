@@ -1,8 +1,9 @@
 
 /* Custom elements table styles */
-.wp-list-table .column-id { width: 10%; }
-.wp-list-table .column-custom_elements { width: 73%; }
-.wp-list-table .column-important { width: 17%;}
+.wp-list-table .column-id { width: 6%; }
+.wp-list-table .column-font_weight { width: 20%; }
+.wp-list-table .column-custom_elements { width: 62%; }
+.wp-list-table .column-important { width: 12%;}
 
 
 /* Validate inputs */

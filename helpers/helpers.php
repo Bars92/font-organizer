@@ -96,6 +96,49 @@
         }
     }
 
+    function fo_print_font_weight_option($weight, $selected = false){
+         switch($weight){
+                case "300":
+                    return "<option value=\"300\"" . selected($weight, $selected, false) . ">" . __('Light', 'font-organizer') . "</option>";
+                case "300italic":
+                    return "<option value=\"300italic\"" . selected($weight, $selected, false) . ">" . __('Light', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                case "regular":
+                    return "<option value=\"regular\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer'). "</option>";
+                case "italic":
+                    return "<option value=\"italic\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                case "600":
+                    return "<option value=\"600\"" . selected($weight, $selected, false) . ">" . __('Semi-Bold', 'font-organizer'). "</option>";
+                case "600italic":
+                    return "<option value=\"600italic\"" . selected($weight, $selected, false) . ">" . __('Semi-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                case "700":
+                    return "<option value=\"700\"" . selected($weight, $selected, false) . ">" . __('Bold', 'font-organizer'). "</option>";
+                case "700italic":
+                    return "<option value=\"700italic\"" . selected($weight, $selected, false) . ">" . __('Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                case "800":
+                    return "<option value=\"800\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer'). "</option>";
+                case "800italic":
+                    return "<option value=\"800italic\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+        }
+
+        return "";
+    }
+
+    function fo_get_weight_style_value($weight){
+        if(!$weight)
+            return array('weight' => '', 'style' => '');
+            
+        $italic_position = strpos($weight, 'italic');
+        $style = "";
+        if ($italic_position !== false) {
+            $style = 'italic';
+            $weight = substr($weight, 0, $italic_position);
+        }
+
+        $weight = $weight == "regular" ? "normal" : $weight;
+
+        return array('weight' => $weight, 'style' => $style);
+    }
+
     function fo_enqueue_fonts_css($only_declarations = false){
         global $fo_css_base_url_path;
         global $fo_css_directory_path;

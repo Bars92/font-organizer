@@ -84,6 +84,11 @@ class FoSettingsPage
     private $elements;
 
     /**
+     * Holds the all font weights options from 300 to 800.
+     */
+    private $font_weights;
+
+    /**
      * Holds the value if it should include font link (aka include google fonts for the settings page).
      * If set to false. loads only the usable fonts.
      */
@@ -145,6 +150,8 @@ class FoSettingsPage
                                 'a_font'    =>  __('<a> Font', 'font-organizer'),
                                 );
 
+         $this->font_weights = array('300','300italic','regular','italic','600','600italic','700','700italic','800','800italic');
+
         // An upload is made. Upload the file and proccess it.
         if (isset($_POST['submit_upload_font'])){  
             if($args = $this->validate_upload()){
@@ -201,7 +208,22 @@ class FoSettingsPage
         wp_enqueue_script( 'jquery-ui-autocomplete' );
         wp_enqueue_script( 'fo-settings-script', plugins_url( 'assets/js/settings.js', __FILE__ ) , array( 'jquery' ) );
 
-        wp_localize_script( 'fo-settings-script', 'available_fonts', $this->available_fonts );
+        $data = array(
+                    'usable_fonts' => $this->usable_fonts,
+                    'available_fonts' => $this->available_fonts,
+                    'options_values' => $this->elements_options,
+                    'labels' => array(
+                                    'default_label' => __('Not Stated', 'font-organizer'),
+                                    'light' => __('Light', 'font-organizer'),
+                                    'regular' => __('Normal', 'font-organizer'),
+                                    'semibold' => __('Semi-Bold', 'font-organizer'),
+                                    'bold' => __('Bold', 'font-organizer'),
+                                    'extrabold' => __('Extra-Bold', 'font-organizer'),
+                                    'italic' => __('Italic', 'font-organizer'),
+                                ),
+                );
+
+        wp_localize_script( 'fo-settings-script', 'data', $data );
 
         wp_enqueue_style( 'fo-settings-css', plugins_url( 'assets/css/settings.css', __FILE__ ) );
         wp_enqueue_style( 'fontawesome', plugins_url( 'assets/css/font-awesome.min.css', __FILE__ ) );
@@ -245,16 +267,47 @@ class FoSettingsPage
                             'column': $field.attr('name'),
                             'text': value
                     };
-                    jQuery.post(ajaxurl, data, function(response) {
 
-                            // Show message for success and error for 3 seconds.
-                            if(response == "true"){
-                                jQuery('.custom_elements_message.fo_success').show().delay(3000).fadeOut();
+                    jQuery.post(ajaxurl, data, function(response) {
+                            // Show message for success and error for 5 seconds.
+                            if(response){
+                                jQuery('.custom_elements_message.fo_success').show().delay(5000).fadeOut();
                             }else{
-                                jQuery('.custom_elements_message.fo_warning').show().delay(3000).fadeOut();
+                                jQuery('.custom_elements_message.fo_warning').show().delay(5000).fadeOut();
                                 $field.prop('checked', !value);
                             }
                     });
+                });
+
+                jQuery('table.custom_elements').find('td select').on('focus', function () {
+                    var $field = jQuery(this);
+
+                    // Store the current value on focus and on change
+                    textBefore = $field.val();
+                }).change(function() {
+                    var $field = jQuery(this);
+                    var text = $field.val();
+
+                    if (textBefore !== text) {
+
+                        // Send ajax request named 'edit_custom_elements' to change the column to value text
+                        // where id.
+                        var data = {
+                            'action': 'edit_custom_elements',
+                            'id': parseInt($field.closest('tr').find('.check-column input').val()),
+                            'column': $field.attr('name'),
+                            'text': text
+                        };
+
+                        jQuery.post(ajaxurl, data, function(response) {
+                            if(response){
+                                jQuery('.custom_elements_message.fo_success').show().delay(5000).fadeOut();
+                            }else{
+                                jQuery('.custom_elements_message.fo_warning').show().delay(5000).fadeOut();
+                                $field.val(textBefore);
+                            }
+                        });
+                    }
                 });
 
                 jQuery('table.custom_elements').find('td input:text').on('focus', function () {
@@ -282,13 +335,14 @@ class FoSettingsPage
                             'column': $field.attr('name'),
                             'text': text
                         };
+
                         jQuery.post(ajaxurl, data, function(response) {
 
                             // Show message for success and error for 3 seconds.
-                            if(response == "true"){
-                                jQuery('.custom_elements_message.fo_success').show().delay(3000).fadeOut();
+                            if(response){
+                                jQuery('.custom_elements_message.fo_success').show().delay(5000).fadeOut();
                             }else{
-                                jQuery('.custom_elements_message.fo_warning').show().delay(3000).fadeOut();
+                                jQuery('.custom_elements_message.fo_warning').show().delay(5000).fadeOut();
                                 $field.val(textBefore);
                             }
                         });
@@ -314,7 +368,7 @@ class FoSettingsPage
 
         $this->create_elements_file();
 
-        wp_die('true'); // this is required to terminate immediately and return a proper response
+        wp_die(true); // this is required to terminate immediately and return a proper response
     }
 
     /**
@@ -370,19 +424,23 @@ class FoSettingsPage
 
         // Add the known elements css.
         foreach ($this->elements_options as $key => $value) {
-            if(strpos($key, 'important') || !$value)
+            if(strpos($key, 'important') || strpos($key, 'weight') || !$value)
                 continue;
 
             $strip_key = str_replace('_font', '', $key);
             $important = $this->elements_options[$key . '_important'];
-            $content .= sprintf("%s { font-family: '%s'%s; }\n", $strip_key, $value, $important ? '!important' : '');
+            $weight = fo_get_weight_style_value($this->elements_options[$key . '_weight']);
+            $font_weight = $weight['weight'] ? sprintf("font-weight:%s;", $weight['weight']) : '';
+            $font_style = $weight['style'] ? sprintf("font-style:%s;", $weight['style']) : '';
+            $content .= sprintf("%s { font-family: '%s'%s; %s %s }\n", $strip_key, $value, $important ? '!important' : '', $font_weight, $font_style);
         }
 
         // Add custom elements css.
         foreach ($this->custom_elements as $custom_element_db) {
             // if name is valid create a css for it.
             if($custom_element_db->name){
-                $content .= sprintf("%s { font-family: '%s'%s; }\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '');
+                $font_weight = $custom_element_db->font_weight ? sprintf("font-weight:%s; ", $custom_element_db->font_weight) : '';
+                $content .= sprintf("%s { font-family: '%s'%s; %s}\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '', $font_weight);
             }
         }
 
@@ -397,11 +455,35 @@ class FoSettingsPage
         $content = self::DEFAULT_CSS_TITLE;
         $custom_fonts_content = '';
         $google_fonts = array();
-        foreach ($this->usable_fonts as $key => $usable_font) {
+        foreach ($this->usable_fonts_db as $usable_font_db) {
+            $weights = array();
+
+            // Get all the font weights from the known elements section
+            // and add them to include in the font file request.
+            foreach ($this->elements as $id => $title) {
+                if($this->elements_options[$id] == $usable_font_db->name){
+                    $weight = fo_get_weight_style_value($this->elements_options[$id . '_weight']);
+                    if(($weight['weight'] || $weight['style']) && !in_array($weight, $weights)){
+                        $weights[] = $weight;
+                    }
+                }
+            }
+
+            // Get all the font weights in custom elements assosiated with
+            // this font to include in font file request.
+            foreach ($this->custom_elements as $custom_element_db) {
+                if($custom_element_db->font_id === $usable_font_db->id){
+                    $weight = fo_get_weight_style_value($custom_element_db->font_weight);
+                    if(($weight['weight'] || $weight['style']) && !in_array($weight, $weights)){
+                        $weights[] = $weight;
+                    }
+                }
+            }
+            
+            $usable_font = $this->usable_fonts[$usable_font_db->name];
             switch ($usable_font->kind) {
                 case 'custom':
-                    $urls = $usable_font->files->regular;
-
+                foreach ($usable_font->files as $custom_weight => $urls) {
                     // Set all the urls content under the same src.
                     $urls_content_arr = array();
                     foreach ($urls as $url) {
@@ -409,17 +491,21 @@ class FoSettingsPage
                     }
 
                     $urls_content = implode(",\n", $urls_content_arr) . ';';
-
+                    $styles = fo_get_weight_style_value($custom_weight);
                     $custom_fonts_content .= "
 @font-face {
     font-family: '" . $usable_font->family . "';
-    src: " . $urls_content . "
-    font-weight: normal;
-    font-style: normal;
-}\n";
+    src: " . $urls_content . "\n";
+
+                    $custom_fonts_content .= $styles['weight'] ? "font-weight: " . $styles['weight'] . ";\n" : "";
+                    $custom_fonts_content .= $styles['style'] ? "font-style: " . $styles['style'] . ";\n" : "";
+                    $custom_fonts_content .= "}\n";
+                    }
+
                     break;
                 case 'webfonts#webfont': // Google font
-                    $google_fonts[] = str_replace(' ', '+', $usable_font->family);
+                    $name = str_replace(' ', '+', $usable_font->family);
+                    $google_fonts[$name] = $weights;
                     break;
                 case 'earlyaccess':
                     // Better safe then sorry.
@@ -437,7 +523,21 @@ class FoSettingsPage
         if(!empty($google_fonts)){
             // We are assuming not to much google fonts. If it is, we need to split the request.
            // $content .= "<link href='http://fonts.googleapis.com/css?family=". implode("|", $google_fonts) . "' rel='stylesheet' type='text/css'>\n";
-            $content .= "@import url('//fonts.googleapis.com/css?family=". implode("|", $google_fonts) . "');\n";
+            $google_requests = array();
+            foreach ($google_fonts as $font_name => $weights) {
+                if(!empty($weights)){
+                    $full_weights = array();
+                    foreach ($weights as $style) {
+                        $full_weights[] = $style['weight'] . $style['style'];
+                    }
+
+                    $google_requests[] = $font_name . ":" . implode(',', $full_weights);
+                }else{
+                    $google_requests[] = $font_name;
+                }
+            }
+
+            $content .= "@import url('//fonts.googleapis.com/css?family=". implode("|", $google_requests) . "');\n";
         }
 
         // Add the custom fonts css that was created before.
@@ -518,7 +618,7 @@ class FoSettingsPage
                             break;
 
 	                	$this->selected_manage_font = $this->usable_fonts[$font_db->name];
-        				$this->custom_elements_table->prepare_items_by_font($this->custom_elements, $font_db->id);
+        				$this->custom_elements_table->prepare_items_by_font($this->custom_elements, $font_db->id, $this->selected_manage_font);
 	                	break;
 	                }
         		}
@@ -596,12 +696,16 @@ class FoSettingsPage
                                         <span></span>
                                 </div>
 
-                                <form action="#" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data"> 
+                                <form action="#" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data">
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><label for="font_name" class="required"><?php _e('Font Weight Name', 'font-organizer'); ?></label></th>
+                                            <th scope="row"><label for="font_name" class="required"><?php _e('Font Name', 'font-organizer'); ?></label></th>
                                             <td><input type="text" id="font_name" required oninvalid="this.setCustomValidity('<?php _e('Font weight name cannot be empty.', 'font-organizer'); ?>')" oninput="setCustomValidity('')" name="font_name" value="" class="required" maxlength="20" /></td>
-                                        </tr>   
+                                        </tr>  
+                                        <tr>
+                                            <th scope="row"><label for="font_weight" class="required"><?php _e('Font Weight', 'font-organizer'); ?></label></th>
+                                            <td><?php $this->print_fonts_weights_list('font_weight'); ?></td>
+                                        </tr>  
                                         <tr class="font_file_wrapper">    
                                             <th scope="row">
                                                 <label for="font_file" class="required"><?php _e('Font Weight File', 'font-organizer'); ?></label>
@@ -615,7 +719,8 @@ class FoSettingsPage
                                                  <span style="font-size: 11px;font-style: italic;position: absolute;padding: 6px;"><?php _e('Add Another Font Format File', 'font-organizer'); ?></span>
                                             </td>
                                         </tr>
-                                        <tr>        
+                                        
+                                        <tr>
                                             <th scope="row"></th>
                                             <td>
                                              <?php wp_nonce_field( 'add_custom_font', 'add_custom_font_nonce' ); ?>
@@ -623,7 +728,7 @@ class FoSettingsPage
                                             </td>
                                         </tr>
                                     </table>
-                                </form>   
+                                </form>
                             </div>
                         </div>
    
@@ -657,9 +762,13 @@ class FoSettingsPage
                                 <form action="#" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
                                     <table class="form-table">
                                         <tr>
-                                            <th scope="row"><label for="custom_elements" class="required"><?php _e('Font', 'font-organizer'); ?></label></th>
+                                            <th scope="row"><label for="font_id" class="required"><?php _e('Font', 'font-organizer'); ?></label></th>
                                             <td><?php $this->print_custom_elements_usable_fonts_list('font_id', __('-- Select Font --', 'font-organizer'), __("You must select a font for the elements.", "font-organizer")); ?></td>
                                         </tr>   
+                                         <tr>
+                                            <th scope="row"><label for="font_weight" class="required"><?php _e('Font Weight', 'font-organizer'); ?></label></th>
+                                            <td><?php $this->fonts_weight_list_field('font_weight'); ?></td>
+                                        </tr>
                                         <tr>
                                             <th scope="row">
                                                 <label for="custom_elements" class="required">
@@ -835,6 +944,12 @@ class FoSettingsPage
             return false;
         }
 
+        $args['font_weight'] = sanitize_text_field( $_POST['font_weight'] );
+        if(!$args['font_weight']){
+            $this->recent_error = __('Font weight is empty or invalid.', 'font-organizer');
+            return false;
+        }
+
         if(!isset($_FILES['font_file'])){
             $this->recent_error = __('Font file is not selected.', 'font-organizer');
             return false;
@@ -890,6 +1005,8 @@ class FoSettingsPage
 
         $args['font_id'] = $_POST['font_id'];
 
+        $args['font_weight'] =  isset($_POST['font_weight']) ? $_POST['font_weight'] : false;
+
         return $args;
     }
 
@@ -911,6 +1028,7 @@ class FoSettingsPage
 
     private function upload_file($args = array()){
         $urls = array();
+
         foreach ($args['font_file'] as $file) {
             $movefile = fo_upload_file($file, array($this, 'fo_upload_dir'));
             if(!$movefile || isset( $movefile['error'] )){
@@ -919,10 +1037,19 @@ class FoSettingsPage
                 return false;
             }
             
-            $urls[] = $movefile['url'];
+            // Save relative url in the database.
+            $urls[] = stristr($movefile['url'], "/wp-content");
         }
 
-        $this->save_usable_font_to_database($args['font_name'], implode(self::CUSTOM_FONT_URL_SPERATOR, $urls), true);
+        // Find the font if does exist.
+        $usable_font = FontsDatabaseHelper::get_usable_font($args['font_name']);
+        $urls_str = $args['font_weight'] . self::CUSTOM_FONT_URL_SPERATOR . implode(self::CUSTOM_FONT_URL_SPERATOR, $urls);
+        if($usable_font){
+            $urls_str = $usable_font->url . self::CUSTOM_FONT_URL_SPERATOR . $urls_str;
+        }
+        
+        $this->save_usable_font_to_database($args['font_name'], $urls_str, true, $usable_font);
+
         add_action( 'admin_notices', array($this, 'upload_successfull_admin_notice') );
     }
 
@@ -933,7 +1060,7 @@ class FoSettingsPage
 
     private function add_custom_elements($args = array()){
             add_action( 'admin_notices', array($this, 'add_custom_elements_successfull_admin_notice') );
-            $this->save_custom_elements_to_database($args['font_id'], $args['custom_elements'], $args['important']);
+            $this->save_custom_elements_to_database($args['font_id'], $args['font_weight'], $args['custom_elements'], $args['important']);
     }
 
     private function delete_font($args = array()){
@@ -963,6 +1090,9 @@ class FoSettingsPage
 
                    $urls = explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url);
                    foreach ($urls as $url) {
+                        if(in_array($url, $this->font_weights))
+                            continue;
+
                         // Delete the old file.
                         $file_name = basename($url);
                         if(file_exists($fo_css_directory_path . '/' . $file_name))
@@ -983,7 +1113,7 @@ class FoSettingsPage
         $wpdb->delete( $wpdb->prefix . $table_name, array( $field_name => $field_value ) );
     }
 
-    private function save_custom_elements_to_database($id, $custom_elements, $important){
+    private function save_custom_elements_to_database($id, $font_weight, $custom_elements, $important){
         global $wpdb;
         $table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;
 
@@ -991,26 +1121,30 @@ class FoSettingsPage
         $table_name, 
         array( 
             'font_id' => $id, 
-            'custom_elements' => $custom_elements, 
+            'custom_elements' => $custom_elements,
+            'font_weight' => $font_weight,
             'important' => $important ? 1 : 0,
         ));
     }
 
-    private function save_usable_font_to_database($name, $url = '', $is_custom = false){
+    private function save_usable_font_to_database($name, $url = '',$is_custom = false, $update = false){
         global $wpdb;
         $table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
 
-        // Save relative url in the database.
-        if($url)
-            $url = stristr($url, "/wp-content");
-
-        $wpdb->insert( 
-        $table_name, 
-        array( 
-            'name' => $name, 
-            'url' => $url, 
-            'custom' => $is_custom ? 1 : 0,
-        ));
+        if($update){
+            $wpdb->update( 
+                    $table_name,
+                    array('url' => $url), 
+                    array('name' => $name));
+        }else{
+            $wpdb->insert( 
+            $table_name, 
+            array( 
+                'name' => $name, 
+                'url' => $url, 
+                'custom' => $is_custom ? 1 : 0,
+            ));
+        }
     }
 
 
@@ -1048,7 +1182,7 @@ class FoSettingsPage
     public function upload_successfull_admin_notice() {
         ?>
         <div class="updated notice">
-            <p><?php _e( 'The file has been uploaded!', 'font-organizer' ); ?></p>
+            <p><?php _e( 'The file(s) uploaded successfully!', 'font-organizer' ); ?></p>
         </div>
         <?php
     }
@@ -1166,6 +1300,15 @@ class FoSettingsPage
                 $id // Parameter for Callback 
             );   
 
+             add_settings_field(
+                $id . '_weight', // ID
+                __('Font Weight', 'font-organizer'), // Title 
+                array( $this, 'fonts_weight_list_field_callback' ), // Callback
+                'font-setting-admin', // Page
+                'setting_elements', // Section 
+                $id . '_weight' // Parameter for Callback 
+           ); 
+
             add_settings_field(
                 $id . '_important', // ID
                 '', // Title 
@@ -1242,6 +1385,9 @@ class FoSettingsPage
                 $new_input[$id . '_important'] =  0 ;
             else
                 $new_input[$id . '_important'] = intval($input[$id . '_important']);
+
+            if( isset( $input[$id . '_weight'] ) )
+                $new_input[$id . '_weight'] = sanitize_text_field($input[$id . '_weight']);
 
         }
 
@@ -1329,6 +1475,23 @@ class FoSettingsPage
         $this->print_usable_fonts_list($name);
     }
 
+    public function fonts_weight_list_field_callback($name){
+        echo '<select id="'.$name.'" name="fo_elements_options['.$name.']" class="known_element_fonts_weights" style="min-width: 125px;">';
+        echo '</select>';
+    }
+
+    public function fonts_weight_list_field($name){
+        echo '<select id="'.$name.'" name="'.$name.'" class="known_element_fonts_weights" style="min-width: 125px;">';
+        echo '</select>';
+    }
+
+    public function print_fonts_weights_list($name){
+         echo '<select id="'.$name.'" name="'.$name.'" class="known_element_fonts_weights" style="min-width: 125px;">';
+         foreach ($this->font_weights as $weight)
+            echo fo_print_font_weight_option($weight, 'regular');
+        echo '</select>';
+    }
+
     /** 
      * Prints the main fonts list.
      */
@@ -1381,7 +1544,7 @@ class FoSettingsPage
     private function print_usable_fonts_list($name)
     {
         $selected = isset( $this->elements_options[$name] ) ? esc_attr( $this->elements_options[$name]) : '';
-        echo '<select id="'.$name.'" name="fo_elements_options['.$name.']">';
+        echo '<select id="'.$name.'" name="fo_elements_options['.$name.']" class="known_element_fonts">';
         
         echo '<option value="" '. selected('', $selected, false) . '>' . __('Default', 'font-organizer') . '</option>'; 
 
@@ -1445,14 +1608,37 @@ class FoSettingsPage
             // Find the font from the lists.
             if($usable_font->custom){
                 // Set the urls that will be used in the file.
-                $full_urls = array();
+                $weight_files = array();
+                $variants = array('regular');
+
+                // Add to normal weight by default.
+                $current_weight = 'regular';
                 foreach (explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url) as $url) {
-                    $full_url[] = fo_get_full_url($url);
+                    if(!$url)
+                        continue;
+
+                    // If this is infact a font weight, change the current weight
+                    // and add all urls from now to this font weight.
+                    if(in_array($url, $this->font_weights)){
+                        $current_weight = $url;
+
+                        if(!in_array($url, $variants))
+                            $variants[] = $url;
+
+                        continue;
+                    }
+
+                    if(!array_key_exists($current_weight, $weight_files)){
+                        $weight_files[$current_weight] = array();
+                    }
+                    
+                    array_push($weight_files[$current_weight], fo_get_full_url($url));
                 }
 
-                $font_obj = (object) array( 'family' => $usable_font->name, 'files' => (object) array('regular' => $full_url), 'kind' => 'custom', 'variants' => array('regular'));
+                $font_obj = (object) array( 'family' => $usable_font->name, 'files' => (object) $weight_files, 'kind' => 'custom', 'variants' => $variants);
                 $this->usable_fonts[$font_obj->family] = $font_obj;
                 $this->custom_fonts[$font_obj->family] = $font_obj;
+
             }else{
                 $i = 0;
                 foreach ($this->available_fonts as $available_font) {

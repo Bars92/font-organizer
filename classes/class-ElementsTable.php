@@ -8,6 +8,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 class ElementsTable extends WP_List_Table {
 
 	private $custom_elements;
+	private $usable_font;
 
 	/** Class constructor */
 	public function __construct() {
@@ -36,6 +37,7 @@ class ElementsTable extends WP_List_Table {
 		switch ( $column_name ) {
 		case 'id':
 		case 'name':
+		case 'font_weight':
 		case 'custom_elements':
 		case 'important':
 			return $item->$column_name;
@@ -57,6 +59,20 @@ class ElementsTable extends WP_List_Table {
 			/*$1%s*/ $this->_args['singular'],  //Let's simply repurpose the table's singular label ("movie")
 			/*$2%s*/ $item->id              //The value of the checkbox should be the record's id
 		);
+	}
+
+	function column_font_weight( $item ) {
+		$html_output = '<select name="font_weight">';
+
+	    $html_output .= "<option value=\"\"" . selected('', $item->font_weight, false) . ">" . __('Not Stated', 'font-organizer'). "</option>";
+
+		foreach ($this->usable_font->files as $key => $value) {
+			$html_output .= fo_print_font_weight_option($key, $item->font_weight);
+		}
+
+		$html_output .= "</select>";
+
+		return $html_output;
 	}
 
 	/**
@@ -82,6 +98,7 @@ class ElementsTable extends WP_List_Table {
 		$columns = array(
 		'cb'        => '<input type="checkbox" />',
 		'id'    => __( 'Id', 'font-organizer' ),
+		'font_weight' => __( 'Font Weight', 'font-organizer'),
 		'custom_elements'   => __( 'Custom Elements', 'font-organizer' ),
 		'important'   => __( 'Important', 'font-organizer' ),
 		);
@@ -121,6 +138,7 @@ class ElementsTable extends WP_List_Table {
 		$sortable_columns = array(
 			'id' => array( 'id', true ),
 			'important' => array( 'important', false ),
+			'font_weight' => array( 'font_weight', false ),
 		);
 
 		return $sortable_columns;
@@ -142,9 +160,9 @@ class ElementsTable extends WP_List_Table {
 	/**
 	 * Handles data query and filter, sorting, and pagination.
 	 */
-	public function prepare_items_by_font($custom_elements, $font_id) {
+	public function prepare_items_by_font($custom_elements, $font_id, $usable_font) {
 		$this->custom_elements = $custom_elements;
-
+		$this->usable_font = $usable_font;
 		$columns = $this->get_columns();
 		$hidden = array();
 		$sortable = $this->get_sortable_columns();
