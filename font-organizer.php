@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Font_Organizer
- * @version 1.3.2
+ * @version 2.0.0
  */
 /*
 Plugin Name: Font Organizer
 Plugin URI: https://wordpress.org/plugins/font-organizer/
 Description: Font Organizer is the complete solution for font implementation in WordPress websites.
 Author: Hive
-Version: 1.3.2
+Version: 2.0.0
 Author URI: https://hivewebstudios.com
 Text Domain: font-organizer
 */
@@ -21,7 +21,7 @@ define( 'FO_DEFAULT_ROLE', 'administrator' );
 require_once FO_ABSPATH . 'helpers/helpers.php';
 
 global $fo_db_version;
-$fo_db_version = '1.3.2';
+$fo_db_version = '2.0.0';
 
 $upload_dir = wp_upload_dir(); // Must create a temp variable for PHP 5.3.
 global $fo_css_directory_path;

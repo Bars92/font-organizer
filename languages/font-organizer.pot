@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Font Organizer\n"
-"POT-Creation-Date: 2017-03-01 23:37+0200\n"
+"POT-Creation-Date: 2017-03-02 00:02+0200\n"
 "PO-Revision-Date: 2016-11-09 15:53+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,8 +27,8 @@ msgstr ""
 msgid "Id"
 msgstr ""
 
-#: classes/class-ElementsTable.php:101 settings.php:709 settings.php:772
-#: settings.php:1308
+#: classes/class-ElementsTable.php:101 settings.php:706 settings.php:769
+#: settings.php:1305
 msgid "Font Weight"
 msgstr ""
 
@@ -36,7 +36,7 @@ msgstr ""
 msgid "Custom Elements"
 msgstr ""
 
-#: classes/class-ElementsTable.php:103 settings.php:1520 settings.php:1537
+#: classes/class-ElementsTable.php:103 settings.php:1517 settings.php:1534
 msgid "Important"
 msgstr ""
 
@@ -56,7 +56,7 @@ msgstr ""
 msgid "No custom elements found."
 msgstr ""
 
-#: font-organizer.php:220 settings.php:385 settings.php:637
+#: font-organizer.php:212 settings.php:382 settings.php:634
 msgid "Font Settings"
 msgstr ""
 
@@ -145,191 +145,191 @@ msgstr ""
 msgid "<a> Font"
 msgstr ""
 
-#: settings.php:578
+#: settings.php:575
 msgid "Google API key is not valid: "
 msgstr ""
 
-#: settings.php:648
+#: settings.php:645
 msgid "General Settings"
 msgstr ""
 
-#: settings.php:664
+#: settings.php:661
 msgid "1. Add Fonts"
 msgstr ""
 
-#: settings.php:666
+#: settings.php:663
 msgid ""
 "Step 1: Select and add fonts to be used in your website. Select as many as "
 "you wish."
 msgstr ""
 
-#: settings.php:668
+#: settings.php:665
 msgid "You can select google or regular fonts."
 msgstr ""
 
-#: settings.php:672
+#: settings.php:669
 msgid "Available Fonts"
 msgstr ""
 
-#: settings.php:673 settings.php:769 settings.php:828 settings.php:922
+#: settings.php:670 settings.php:766 settings.php:825 settings.php:919
 msgid "-- Select Font --"
 msgstr ""
 
-#: settings.php:679
+#: settings.php:676
 msgid "Use This Font"
 msgstr ""
 
-#: settings.php:690
+#: settings.php:687
 msgid "2. Custom Fonts"
 msgstr ""
 
-#: settings.php:692
+#: settings.php:689
 msgid ""
 "Step 2: Upload custom fonts to be used in your website. Here too, you can "
 "upload as many as you wish."
 msgstr ""
 
-#: settings.php:694
+#: settings.php:691
 msgid ""
 "Name the font you want to upload and upload all the files formats for this "
 "font. In order to support more browsers you can click the green plus to "
 "upload more font formats. We suggest .woff and .woff2."
 msgstr ""
 
-#: settings.php:698
+#: settings.php:695
 msgid ""
 "This font format is already selected. Reminder: you need to upload the font "
 "files for the same font weight."
 msgstr ""
 
-#: settings.php:705
+#: settings.php:702
 msgid "Font Name"
 msgstr ""
 
-#: settings.php:706
+#: settings.php:703
 msgid "Font weight name cannot be empty."
 msgstr ""
 
-#: settings.php:714
+#: settings.php:711
 msgid "Font Weight File"
 msgstr ""
 
-#: settings.php:718
+#: settings.php:715
 msgid "Accepted Font Format : "
 msgstr ""
 
-#: settings.php:721 settings.php:722
+#: settings.php:718 settings.php:719
 msgid "Add Another Font Format File"
 msgstr ""
 
-#: settings.php:730
+#: settings.php:727
 msgid "Upload"
 msgstr ""
 
-#: settings.php:741
+#: settings.php:738
 msgid "3. Known Elements Settings"
 msgstr ""
 
-#: settings.php:744
+#: settings.php:741
 msgid ""
 "Step 3: For each element you can assign a font you have added in step 1 & 2."
 msgstr ""
 
-#: settings.php:745 settings.php:811 settings.php:928
+#: settings.php:742 settings.php:808 settings.php:925
 msgid "Note: "
 msgstr ""
 
-#: settings.php:745
+#: settings.php:742
 msgid "Custom fonts you uploaded are automatically used in your website."
 msgstr ""
 
-#: settings.php:746
+#: settings.php:743
 msgid ""
 "In case of font not displaying in your website after saving, try clear the "
 "cache using Shift+F5 or Ctrl+Shift+Delete to clear all."
 msgstr ""
 
-#: settings.php:761
+#: settings.php:758
 msgid "4. Custom Elements Settings"
 msgstr ""
 
-#: settings.php:764
+#: settings.php:761
 msgid ""
 "Step 4: Assign font that you have added to your website to custom elements."
 msgstr ""
 
-#: settings.php:768 settings.php:825
+#: settings.php:765 settings.php:822
 msgid "Font"
 msgstr ""
 
-#: settings.php:769
+#: settings.php:766
 msgid "You must select a font for the elements."
 msgstr ""
 
-#: settings.php:778
+#: settings.php:775
 msgid "Custom Element"
 msgstr ""
 
-#: settings.php:782
+#: settings.php:779
 msgid "Font custom elements cannot be empty."
 msgstr ""
 
-#: settings.php:783
+#: settings.php:780
 msgid ""
 "Custom elements can be seperated by commas to allow multiple elements. "
 "Example: #myelementid, .myelementclass, .myelementclass .foo, etc."
 msgstr ""
 
-#: settings.php:794
+#: settings.php:791
 msgid "Apply Custom Elements"
 msgstr ""
 
-#: settings.php:805
+#: settings.php:802
 msgid "5. Manage Fonts"
 msgstr ""
 
-#: settings.php:808
+#: settings.php:805
 msgid ""
 "Step 5: Select a font to manage, delete and view the source and custom "
 "elements assigned to it."
 msgstr ""
 
-#: settings.php:812
+#: settings.php:809
 msgid ""
 "You can edit the values of every row to change the custom elements assigned "
 "or add and remove the important tag. Just change the text or check the box "
 "and the settings will automatically save."
 msgstr ""
 
-#: settings.php:816
+#: settings.php:813
 msgid "Changes saved!"
 msgstr ""
 
-#: settings.php:820
+#: settings.php:817
 msgid "Data is invalid"
 msgstr ""
 
-#: settings.php:840
+#: settings.php:837
 msgid "Delete Font"
 msgstr ""
 
-#: settings.php:840
+#: settings.php:837
 msgid "Are you sure you want to delete this font from your website?"
 msgstr ""
 
-#: settings.php:851
+#: settings.php:848
 msgid "Source"
 msgstr ""
 
-#: settings.php:855
+#: settings.php:852
 msgid "Urls"
 msgstr ""
 
-#: settings.php:890
+#: settings.php:887
 msgid "Thank you"
 msgstr ""
 
-#: settings.php:895
+#: settings.php:892
 msgid ""
 "Thank you for using an <a href=\"http://hivewebstudios.com\" target=\"_blank"
 "\">Hive</a> plugin! We 5 star you already, so why don't you <a href="
@@ -337,161 +337,161 @@ msgid ""
 "post\" target=\"_blank\">5 star us too</a>?"
 msgstr ""
 
-#: settings.php:897
+#: settings.php:894
 msgid "Anyway, if you need anything, this may help:"
 msgstr ""
 
-#: settings.php:899
+#: settings.php:896
 msgid "FAQ"
 msgstr ""
 
-#: settings.php:900
+#: settings.php:897
 msgid "Support forums"
 msgstr ""
 
-#: settings.php:901
+#: settings.php:898
 msgid "Contact us"
 msgstr ""
 
-#: settings.php:908
+#: settings.php:905
 msgid "Like Our Facebook Page"
 msgstr ""
 
-#: settings.php:916
+#: settings.php:913
 msgid "Font Preview"
 msgstr ""
 
-#: settings.php:920
+#: settings.php:917
 msgid "Select a font from the list to preview."
 msgstr ""
 
-#: settings.php:923 settings.php:926
+#: settings.php:920 settings.php:923
 msgid "This is a preview content."
 msgstr ""
 
-#: settings.php:923
+#: settings.php:920
 msgid "Font preview free text"
 msgstr ""
 
-#: settings.php:928
+#: settings.php:925
 msgid "Some fonts may not support your language."
 msgstr ""
 
-#: settings.php:940 settings.php:982 settings.php:997 settings.php:1018
+#: settings.php:937 settings.php:979 settings.php:994 settings.php:1015
 msgid "Session ended, please try again."
 msgstr ""
 
-#: settings.php:946
+#: settings.php:943
 msgid "Font name is empty or invalid."
 msgstr ""
 
-#: settings.php:952
+#: settings.php:949
 msgid "Font weight is empty or invalid."
 msgstr ""
 
-#: settings.php:957
+#: settings.php:954
 msgid "Font file is not selected."
 msgstr ""
 
-#: settings.php:973
+#: settings.php:970
 msgid "Font file(s) not selected."
 msgstr ""
 
-#: settings.php:988
+#: settings.php:985
 msgid "Usable font is empty or invalid."
 msgstr ""
 
-#: settings.php:1003
+#: settings.php:1000
 msgid "Custom elements is empty or invalid."
 msgstr ""
 
-#: settings.php:1025
+#: settings.php:1022
 msgid "Something went horribly wrong. Ask the support!"
 msgstr ""
 
-#: settings.php:1157
+#: settings.php:1154
 msgid "Error adding custom elements: "
 msgstr ""
 
-#: settings.php:1164
+#: settings.php:1161
 msgid "Custom elements added to your website!"
 msgstr ""
 
-#: settings.php:1172
+#: settings.php:1169
 msgid "Font can now be used in your website!"
 msgstr ""
 
-#: settings.php:1180
+#: settings.php:1177
 msgid "Font deleted from your website!"
 msgstr ""
 
-#: settings.php:1188
+#: settings.php:1185
 msgid "The file(s) uploaded successfully!"
 msgstr ""
 
-#: settings.php:1196
+#: settings.php:1193
 msgid "Error uploading the file: "
 msgstr ""
 
-#: settings.php:1204
+#: settings.php:1201
 msgid "Error adding font to website fonts: "
 msgstr ""
 
-#: settings.php:1212
+#: settings.php:1209
 msgid "Error deleting font: "
 msgstr ""
 
-#: settings.php:1220
+#: settings.php:1217
 msgid "Failed to open or create the css file. Check for permissions."
 msgstr ""
 
-#: settings.php:1264
+#: settings.php:1261
 msgid "Google API Key"
 msgstr ""
 
-#: settings.php:1271
+#: settings.php:1268
 msgid "Show Font Family Preview"
 msgstr ""
 
-#: settings.php:1281
+#: settings.php:1278
 msgid "Access Settings Role"
 msgstr ""
 
-#: settings.php:1405
+#: settings.php:1402
 msgid "This is the general settings for the site."
 msgstr ""
 
-#: settings.php:1424
+#: settings.php:1421
 #, php-format
 msgid ""
 "To get all the current fonts, Google requires the mandatory use of an API "
 "key, get one from <a href=\"%s\" target=\"_blank\">HERE</a>"
 msgstr ""
 
-#: settings.php:1425
+#: settings.php:1422
 #, php-format
 msgid " Need help? Click <a href=\"%s\" target=\"_blank\">here</a>"
 msgstr ""
 
-#: settings.php:1434
+#: settings.php:1431
 msgid ""
 "You are using a static google fonts list, if you want the current list you "
 "can specify an API key."
 msgstr ""
 
-#: settings.php:1452
+#: settings.php:1449
 msgid "Include Font Family Preview"
 msgstr ""
 
-#: settings.php:1454
+#: settings.php:1451
 msgid "Show font preview when listing the fonts (might be slow)"
 msgstr ""
 
-#: settings.php:1523 settings.php:1540
+#: settings.php:1520 settings.php:1537
 msgid "Include !important to this element to always apply."
 msgstr ""
 
-#: settings.php:1552
+#: settings.php:1549
 msgid "Default"
 msgstr ""
 
