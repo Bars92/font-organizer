@@ -70,7 +70,9 @@
         $extension = pathinfo($url, PATHINFO_EXTENSION);
         switch ($extension) {
             case 'ttf':
-                return 'truetype';                
+                return 'truetype';            
+            case 'otf':
+                return 'opentype';
             default:
                 return $extension;
         }
