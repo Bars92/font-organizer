@@ -97,27 +97,30 @@
     }
 
     function fo_print_font_weight_option($weight, $selected = false){
+        $style = fo_get_weight_style_value($weight);
+        $font_style = $style['weight'] ? 'font-weight:' . $style['weight'] . ";" : '';
+        $font_style .= $style['style'] ? 'font-style:' . $style['style'] . ";" : '';
          switch($weight){
                 case "300":
-                    return "<option value=\"300\"" . selected($weight, $selected, false) . ">" . __('Light', 'font-organizer') . "</option>";
+                    return "<option style=\"".$font_style."\" value=\"300\"" . selected($weight, $selected, false) . ">" . __('Light', 'font-organizer') . "</option>";
                 case "300italic":
-                    return "<option value=\"300italic\"" . selected($weight, $selected, false) . ">" . __('Light', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"300italic\"" . selected($weight, $selected, false) . ">" . __('Light', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
                 case "regular":
-                    return "<option value=\"regular\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"regular\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer'). "</option>";
                 case "italic":
-                    return "<option value=\"italic\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"italic\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
                 case "600":
-                    return "<option value=\"600\"" . selected($weight, $selected, false) . ">" . __('Semi-Bold', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"600\"" . selected($weight, $selected, false) . ">" . __('Semi-Bold', 'font-organizer'). "</option>";
                 case "600italic":
-                    return "<option value=\"600italic\"" . selected($weight, $selected, false) . ">" . __('Semi-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"600italic\"" . selected($weight, $selected, false) . ">" . __('Semi-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
                 case "700":
-                    return "<option value=\"700\"" . selected($weight, $selected, false) . ">" . __('Bold', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"700\"" . selected($weight, $selected, false) . ">" . __('Bold', 'font-organizer'). "</option>";
                 case "700italic":
-                    return "<option value=\"700italic\"" . selected($weight, $selected, false) . ">" . __('Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"700italic\"" . selected($weight, $selected, false) . ">" . __('Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
                 case "800":
-                    return "<option value=\"800\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"800\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer'). "</option>";
                 case "800italic":
-                    return "<option value=\"800italic\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                    return "<option style=\"".$font_style."\" value=\"800italic\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
         }
 
         return "";

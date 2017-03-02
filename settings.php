@@ -511,7 +511,11 @@ class FoSettingsPage
                     // Better safe then sorry.
                     reset($usable_font->files->regular);
 
-                    $content .= "@import url(".current($usable_font->files->regular).");\n";
+                    $font_url = current($usable_font->files->regular);
+                     // Fix everyone saved with http or https and let the browser decide.
+                    $font_url = str_replace('http://',  '//', $font_url); 
+                    $font_url = str_replace('https://', '//', $font_url);
+                    $content .= "@import url(".$font_url.");\n";
                     break;
                 case 'regular':
                 default:
@@ -1645,10 +1649,8 @@ class FoSettingsPage
                     if($available_font->family == $usable_font->name){
                         $this->usable_fonts[$available_font->family] = $available_font;
                         
-                        // Remove the fond font from avaiable since it is already used.
-                        unset($this->available_fonts[$i]);
-
-                        $found = true;
+                        // Remove the found font from avaiable since it is already used.
+                        array_splice($this->available_fonts, $i, 1);
                         break;
                     }
 
@@ -1664,9 +1666,9 @@ class FoSettingsPage
 
     private function get_early_access_fonts_array(){
         return array(
-        (object) array( 'family' => 'Open Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrew.css'))),
-        (object) array( 'family' => 'Open Sans Hebrew Condensed', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css'))),
-        (object) array( 'family' => 'Noto Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array(), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/notosanshebrew.css'))),
+        (object) array( 'family' => 'Open Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array('regular'), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrew.css'))),
+        (object) array( 'family' => 'Open Sans Hebrew Condensed', 'kind' => 'earlyaccess', 'variants' => array('regular'), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css'))),
+        (object) array( 'family' => 'Noto Sans Hebrew', 'kind' => 'earlyaccess', 'variants' => array('regular'), 'files' => (object) array('regular' => array('http://fonts.googleapis.com/earlyaccess/notosanshebrew.css'))),
             );
     }
 }
