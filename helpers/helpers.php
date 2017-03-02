@@ -128,6 +128,33 @@
         return "";
     }
 
+    function fo_get_font_weight($weight){
+         switch($weight){
+                case "300":
+                    return __('Light', 'font-organizer');
+                case "300italic":
+                    return __('Light', 'font-organizer') . " " . __('Italic', 'font-organizer');
+                case "regular":
+                    return __('Normal', 'font-organizer');
+                case "italic":
+                    return __('Normal', 'font-organizer') . " " . __('Italic', 'font-organizer');
+                case "600":
+                    return __('Semi-Bold', 'font-organizer');
+                case "600italic":
+                    return __('Semi-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer');
+                case "700":
+                    return __('Bold', 'font-organizer');
+                case "700italic":
+                    return __('Bold', 'font-organizer') . " " . __('Italic', 'font-organizer');
+                case "800":
+                    return __('Extra-Bold', 'font-organizer');
+                case "800italic":
+                    return __('Extra-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer');
+        }
+
+        return "";
+    }
+
     function fo_get_weight_style_value($weight){
         if(!$weight)
             return array('weight' => '', 'style' => '');

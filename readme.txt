@@ -2,8 +2,8 @@
 Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.8
-Tested up to: 4.7.1
-Stable tag: 1.3.2
+Tested up to: 4.7.2
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,8 +11,8 @@ Font Organizer is the complete solution for font implementation including upload
 
 == Description ==
 
-**Note: WordPress 4.7.1 has an [open issue](https://core.trac.wordpress.org/ticket/39550 "Offical open bug link") that fail non-image uploads.
-To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until version 4.7.2.**
+**Note: WordPress 4.7.2 has an [open issue](https://core.trac.wordpress.org/ticket/39550 "Offical open bug link") that fail non-image uploads.
+To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until version 4.7.3.**
 
 Font Organizer is the complete solution for font implementation including uploading custom fonts and using google fonts in WordPress websites.
 
@@ -27,10 +27,11 @@ Have any problems? Check out our new [Official Font Organizer page](http://hivew
 
 Key Features:
 
-* Upload font to your website and apply it on any element.
+* Upload fonts to your website and apply it on any element.
 * Multi upload allow you to upload more font formats to support more browsers.
 * Add any google fonts in one click and apply them on any element.
 * Apply fonts for known elements or custom elements of your choosing easily.
+* Select font weight for every font you use with custom elements and known.
 * Edit and remove custom elements assigned quickly.
 * Delete and remove fonts from your website in one click.
 * Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
@@ -104,8 +105,18 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 2. Assigning the fonts you have chosen to various elements in your website.
 3. Assigning the fonts you have chosen to your own elements in your website & managing all your fonts.
 4. General settings & role restictions.
+5. Choosing added fonts in any post and page in one click.
 
 == Changelog ==
+
+= 2.0.0 =
+* Added font weight system to known elements, custom elements and custom fonts.
+* Added font preview for avaiable fonts in side menu.
+* Fixed otf fonts did not work in all supported browsers.
+* Fixed font family and style is not shown in editor.
+* Fixed early access fonts not loading in https.
+* Fixed multi upload error.
+* Fixed absolute urls cause erros when changing site url.
 
 = 1.3.2 =
 * Added static google fonts list when not using an API.

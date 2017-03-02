@@ -41,7 +41,6 @@ $fo_elements_css_file_name = 'fo-elements.css';
 
 function fo_update_db_check() {
     global $fo_db_version;
-    	global $wpdb;
 
     if ( get_site_option( 'fo_db_version' ) != $fo_db_version ) {
     	global $wpdb;

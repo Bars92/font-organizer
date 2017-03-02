@@ -692,8 +692,8 @@ class FoSettingsPage
                             <div class="inside">
                                 <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'font-organizer'); ?></span>
                                 <br />
-                                <span><?php _e('Name the font you want to upload and upload all the files formats for this font. In order to support more browsers you can click the green plus to upload more font formats. We suggest .woff and .woff2.', 'font-organizer'); ?></span>
-
+                                <span><?php _e('Name the font you want to upload and upload all the files formats for this font. In order to support more browsers you can click the green plus to upload more font formats. We suggest at least .woff and .woff2.', 'font-organizer'); ?></span>
+                                <p style="font-weight: 600;"><?php _e('You can now set font weight for this upload. If font name is set to an existing font name, the font weight will be added to the existing font and will be free to be used under said font name. You can always leave it Normal.', 'font-organizer'); ?></p>
                                 <div class="custom_font_message fo_warning" style="display: none;">
                                         <i class="fa fa-warning"></i>
                                         <?php _e("This font format is already selected. Reminder: you need to upload the font files for the same font weight.", "font-organizer"); ?>
@@ -857,11 +857,16 @@ class FoSettingsPage
                                         <td style="direction:ltr;text-align:left;line-height:20px;">
                                             <span>
                                             <?php
-                                            if(is_array($this->selected_manage_font->files->regular)){
-                                                foreach($this->selected_manage_font->files->regular as $url)
-                                                    echo $url, '<br>';
-                                            }else{
-                                                echo $this->selected_manage_font->files->regular;
+                                            foreach ($this->selected_manage_font->files as $weight => $urls) {
+                                                echo '<span style="font-weight:bold">' . fo_get_font_weight($weight) . '</span><br />';
+                                                if(is_array($urls)){
+                                                    foreach($urls as $url)
+                                                        echo $url, '<br>';
+                                                }else{
+                                                    echo $this->selected_manage_font->files->regular;
+                                                }
+
+                                                echo '<br />';
                                             }
                                             ?>
                                             </span>
