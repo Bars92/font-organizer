@@ -1618,10 +1618,9 @@ class FoSettingsPage
             if($usable_font->custom){
                 // Set the urls that will be used in the file.
                 $weight_files = array();
-                $variants = array('regular');
+                $variants = array('');
 
-                // Add to normal weight by default.
-                $current_weight = 'regular';
+                $current_weight = '';
                 foreach (explode(self::CUSTOM_FONT_URL_SPERATOR, $usable_font->url) as $url) {
                     if(!$url)
                         continue;
@@ -1637,10 +1636,19 @@ class FoSettingsPage
                         continue;
                     }
 
+                    // first time and now weight yet? must be font
+                    // from before 2.0. So add normal weight by default.
+                    if(!$current_weight){
+                        $current_weight = 'regular';
+                        $variants[] = 'regular';
+                    }
+
+                    // If the array does not contain the weight, add it.
                     if(!array_key_exists($current_weight, $weight_files)){
                         $weight_files[$current_weight] = array();
                     }
                     
+                    // Add the current url to the current weight array.
                     array_push($weight_files[$current_weight], fo_get_full_url($url));
                 }
 
