@@ -2,7 +2,7 @@
 class FoSettingsPage
 {
     /**
-     * The seperator used when inserting more then 1 font format
+     * The seperator used when inserting more then 1 font format or font weights
      * to the database. The urls are joined with the seperator to
      * create a string a parsed back to urls when needed.
      */
@@ -134,6 +134,9 @@ class FoSettingsPage
         $this->available_fonts = array();
         $this->usable_fonts = array();
         $this->google_fonts = array();
+        $this->general_options = array();
+        $this->elements_options = array();
+        $this->usable_fonts_db = array();
         $this->should_create_css = false;
         $this->is_google_static = false;
         $this->is_admin = current_user_can('manage_options');
