@@ -92,6 +92,7 @@ function fo_init(){
 	    add_editor_style( '../../uploads/font-organizer/fo-declarations.css' );
 
 		add_filter( 'upload_mimes', 'fo_allow_upload_types' );
+		add_filter( 'wp_check_filetype_and_ext', 'fo_disable_real_mime_check', 10, 4 );
 		add_filter( 'plugin_action_links', 'fo_add_action_plugin', 10, 5 );
 		add_filter( 'tiny_mce_before_init', 'fo_add_tinymce_fonts' );
 		add_filter( 'mce_buttons', 'fo_mce_buttons', 1000 );
@@ -101,6 +102,18 @@ function fo_init(){
 	}else{
 		add_action( 'wp_enqueue_scripts', 'fo_enqueue_all_fonts_css' );
 	}
+}
+
+// Fix WordPress not allowing non-image file types "for security reasons".
+// For more information see: https://core.trac.wordpress.org/ticket/40175.
+function fo_disable_real_mime_check( $data, $file, $filename, $mimes ) {
+	$wp_filetype = wp_check_filetype( $filename, $mimes );
+
+	$ext = $wp_filetype['ext'];
+	$type = $wp_filetype['type'];
+	$proper_filename = $data['proper_filename'];
+
+	return compact( 'ext', 'type', 'proper_filename' );
 }
 
 function fo_enqueue_all_fonts_css(){
