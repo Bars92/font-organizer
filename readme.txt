@@ -112,11 +112,14 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 = 2.0.0 =
 * Added font weight system to known elements, custom elements and custom fonts.
 * Added font preview for avaiable fonts in side menu.
-* Fixed otf fonts did not work in all supported browsers.
+* Fixed otf font format did not work in all supported browsers.
 * Fixed font family and style is not shown in editor.
+* Fixed upload sometimes displays a PHP warning.
+* Fixed Upload fails with "Sorry, for security reasons this type of file is not allowed.".
+* Fixed delete font permission error.
 * Fixed early access fonts not loading in https.
 * Fixed multi upload error.
-* Fixed absolute urls cause erros when changing site url.
+* Fixed absolute urls cause errors when changing site url.
 
 = 1.3.2 =
 * Added static google fonts list when not using an API.
