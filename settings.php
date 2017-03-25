@@ -432,18 +432,20 @@ class FoSettingsPage
 
             $strip_key = str_replace('_font', '', $key);
             $important = $this->elements_options[$key . '_important'];
+            $important_content =  $important ? '!important' : '';
             $weight = fo_get_weight_style_value($this->elements_options[$key . '_weight']);
-            $font_weight = $weight['weight'] ? sprintf("font-weight:%s;", $weight['weight']) : '';
+            $font_weight = $weight['weight'] ? sprintf("font-weight:%s%s;", $weight['weight'], $important_content) : '';
             $font_style = $weight['style'] ? sprintf("font-style:%s;", $weight['style']) : '';
-            $content .= sprintf("%s { font-family: '%s'%s; %s %s }\n", $strip_key, $value, $important ? '!important' : '', $font_weight, $font_style);
+            $content .= sprintf("%s { font-family: '%s'%s; %s %s }\n", $strip_key, $value, $important_content, $font_weight, $font_style);
         }
 
         // Add custom elements css.
         foreach ($this->custom_elements as $custom_element_db) {
             // if name is valid create a css for it.
             if($custom_element_db->name){
-                $font_weight = $custom_element_db->font_weight ? sprintf("font-weight:%s; ", $custom_element_db->font_weight) : '';
-                $content .= sprintf("%s { font-family: '%s'%s; %s}\n", $custom_element_db->custom_elements, $custom_element_db->name, $custom_element_db->important ? '!important' : '', $font_weight);
+                $important_content = $custom_element_db->important ? '!important' : '';
+                $font_weight = $custom_element_db->font_weight ? sprintf("font-weight:%s%s; ", $custom_element_db->font_weight, $important_content) : '';
+                $content .= sprintf("%s { font-family: '%s'%s; %s}\n", $custom_element_db->custom_elements, $custom_element_db->name, $important_content, $font_weight);
             }
         }
 

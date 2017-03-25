@@ -39,7 +39,7 @@
         for ($i=0; $i < count($font_names); $i+=$fonts_per_link) { 
             $calculated_length = count($font_names) - $i > $fonts_per_link ? $fonts_per_link : count($font_names) - $i;
             $font_names_to_load = array_slice($font_names, $i, $calculated_length);
-            echo "<link href='http://fonts.googleapis.com/css?family=". implode("|", $font_names_to_load) . "' rel='stylesheet' type='text/css'>";
+            echo "<link href='//fonts.googleapis.com/css?family=". implode("|", $font_names_to_load) . "' rel='stylesheet' type='text/css'>";
         }
     }
 
