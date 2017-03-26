@@ -11,7 +11,7 @@ Font Organizer is the complete solution for font implementation including upload
 
 == Description ==
 
-**Note: WordPress 4.7.2 has an [open issue](https://core.trac.wordpress.org/ticket/39550 "Offical open bug link") that fail non-image uploads.
+**Note: WordPress 4.7.2 has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail non-image uploads.
 To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until version 4.7.3.**
 
 Font Organizer is the complete solution for font implementation including uploading custom fonts and using google fonts in WordPress websites.

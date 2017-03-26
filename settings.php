@@ -433,7 +433,12 @@ class FoSettingsPage
             $strip_key = str_replace('_font', '', $key);
             $important = $this->elements_options[$key . '_important'];
             $important_content =  $important ? '!important' : '';
-            $weight = fo_get_weight_style_value($this->elements_options[$key . '_weight']);
+            if(array_key_exists($key . '_weight', $this->elements_options)){
+                $weight = fo_get_weight_style_value($this->elements_options[$key . '_weight']);
+            }else{
+                $weight = fo_get_weight_style_value("");
+            }
+
             $font_weight = $weight['weight'] ? sprintf("font-weight:%s%s;", $weight['weight'], $important_content) : '';
             $font_style = $weight['style'] ? sprintf("font-style:%s;", $weight['style']) : '';
             $content .= sprintf("%s { font-family: '%s'%s; %s %s }\n", $strip_key, $value, $important_content, $font_weight, $font_style);
@@ -444,8 +449,10 @@ class FoSettingsPage
             // if name is valid create a css for it.
             if($custom_element_db->name){
                 $important_content = $custom_element_db->important ? '!important' : '';
-                $font_weight = $custom_element_db->font_weight ? sprintf("font-weight:%s%s; ", $custom_element_db->font_weight, $important_content) : '';
-                $content .= sprintf("%s { font-family: '%s'%s; %s}\n", $custom_element_db->custom_elements, $custom_element_db->name, $important_content, $font_weight);
+                $weight = fo_get_weight_style_value($custom_element_db->font_weight);
+                $font_weight = $weight['weight'] ? sprintf("font-weight:%s%s;", $weight['weight'], $important_content) : '';
+                $font_style = $weight['style'] ? sprintf("font-style:%s;", $weight['style']) : '';
+                $content .= sprintf("%s { font-family: '%s'%s; %s %s}\n", $custom_element_db->custom_elements, $custom_element_db->name, $important_content, $font_weight, $font_style);
             }
         }
 
@@ -467,9 +474,11 @@ class FoSettingsPage
             // and add them to include in the font file request.
             foreach ($this->elements as $id => $title) {
                 if($this->elements_options[$id] == $usable_font_db->name){
-                    $weight = fo_get_weight_style_value($this->elements_options[$id . '_weight']);
-                    if(($weight['weight'] || $weight['style']) && !in_array($weight, $weights)){
-                        $weights[] = $weight;
+                    if(array_key_exists($id . '_weight', $this->elements_options)){
+                        $weight = fo_get_weight_style_value($this->elements_options[$id . '_weight']);
+                        if(($weight['weight'] || $weight['style']) && !in_array($weight, $weights)){
+                            $weights[] = $weight;
+                        }
                     }
                 }
             }
