@@ -11,8 +11,8 @@ Font Organizer is the complete solution for font implementation including upload
 
 == Description ==
 
-**Note: WordPress 4.7.2 has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail non-image uploads.
-To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until version 4.7.3.**
+**Note: WordPress 4.7 has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail otf font format uploads.
+To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until further notice.**
 
 Font Organizer is the complete solution for font implementation including uploading custom fonts and using google fonts in WordPress websites.
 
@@ -31,7 +31,7 @@ Key Features:
 * Multi upload allow you to upload more font formats to support more browsers.
 * Add any google fonts in one click and apply them on any element.
 * Apply fonts for known elements or custom elements of your choosing easily.
-* Select font weight for every font you use with custom elements and known.
+* Select font weight for every font you use with known & custom elements.
 * Edit and remove custom elements assigned quickly.
 * Delete and remove fonts from your website in one click.
 * Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
