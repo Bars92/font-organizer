@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Font_Organizer
- * @version 2.0.0
+ * @version 2.0.1
  */
 /*
 Plugin Name: Font Organizer
 Plugin URI: https://wordpress.org/plugins/font-organizer/
 Description: Font Organizer is the complete solution for font implementation in WordPress websites.
 Author: Hive
-Version: 2.0.0
+Version: 2.0.1
 Author URI: https://hivewebstudios.com
 Text Domain: font-organizer
 */
@@ -21,7 +21,7 @@ define( 'FO_DEFAULT_ROLE', 'administrator' );
 require_once FO_ABSPATH . 'helpers/helpers.php';
 
 global $fo_db_version;
-$fo_db_version = '2.0.0';
+$fo_db_version = '2.0.1';
 
 $upload_dir = wp_upload_dir(); // Must create a temp variable for PHP 5.3.
 global $fo_css_directory_path;
@@ -174,7 +174,6 @@ function fo_install() {
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
 		name varchar(255) NOT NULL,
 		url text DEFAULT NULL,
-		font_weight varchar(255),
 		custom int(1) DEFAULT 0,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
@@ -184,6 +183,7 @@ function fo_install() {
 	$sql = "CREATE TABLE IF NOT EXISTS $elements_table_name (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
 		font_id mediumint(9) NOT NULL,
+		font_weight varchar(255),
 		important int(1) DEFAULT 0,
 		custom_elements TEXT DEFAULT NULL,
 		PRIMARY KEY  (id)
