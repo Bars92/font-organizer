@@ -74,7 +74,6 @@ function fo_update_db_check() {
 
 add_action( 'plugins_loaded', 'fo_update_db_check' );
 register_activation_hook( __FILE__, 'fo_install' );
-register_deactivation_hook( __FILE__, 'fo_uninstall' );
 add_action( 'init', 'fo_init' );
 add_action('plugins_loaded', 'fo_load_textdomain');
 
@@ -149,19 +148,41 @@ function fo_allow_upload_types($existing_mimes = array()){
 }
 
 function fo_uninstall(){
-	// This is disabled and may move to permanent unistall option.
-	//$roles = wp_roles();
+    global $fo_css_directory_path;
+	global $wpdb;
+	$roles = wp_roles();
+
+	// Delete all content only if marked so in the system settings options.
+    $advanced_options = get_option( 'fo_advanced_options', array() );
+    if(!array_key_exists('uninstall_all', $advanced_options) || $advanced_options['unistall_all'] != 1){
+    	return;
+    }
 
 	// Remove all capabilities added by this plugin.
-	//foreach ($roles as $role_name => $role) {
-	//	if(array_key_exists('manage_fonts', $role['capabilities']) && $role['capabilities']['manage_fonts'])
-	//		 $roles->remove_cap( $role_name, 'manage_fonts' ); 
-	//}
+	foreach ($roles as $role_name => $role) {
+		if(array_key_exists('manage_fonts', $role['capabilities']) && $role['capabilities']['manage_fonts'])
+			 $roles->remove_cap( $role_name, 'manage_fonts' ); 
+	}
+
+	// Remove all files in uploaded folder.
+	$files_to_remove = scandir($fo_css_directory_path);
+	foreach ($files_to_remove as $file_name) {
+		wp_delete_file($fo_css_directory_path . '/' . $file_name);
+	}
+
+	// Remove all database content.
+    $wpdb->query( "DROP TABLE IF EXISTS " . FO_USABLE_FONTS_DATABASE);
+    $wpdb->query( "DROP TABLE IF EXISTS " . FO_ELEMENTS_DATABASE);
+
+    // Delete db version option.    
+    delete_option('fo_db_version');
 }
 
 function fo_install() {
 	global $wpdb;
 	global $fo_db_version;
+
+	register_uninstall_hook( __FILE__, 'fo_uninstall' );
 
 	$usable_table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
 	$elements_table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;

@@ -136,3 +136,50 @@ label.required:after {
   padding: 15px;
   margin-bottom: 15px;
 }
+
+/* Tabs */
+#tabs{
+  float: left;
+  background: transparent; 
+  border: none;
+  width: 100%;
+}
+ul.tabs{
+  margin: 0px;
+  padding: 0px;
+  border-bottom: 1px solid #ccc;
+}
+ul.tabs li{
+  background: none;
+  color: #222;
+  display: inline-block;
+  padding: 10px 0px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #e5e5e5;
+  margin-bottom: 0;
+}
+
+ul.tabs li.ui-state-active{
+  border-bottom: 1px solid #f1f1f1;
+}
+
+ul.tabs li a {
+    padding: 10px 10px;
+    text-decoration: none;
+    font-size: 15px;
+    color: #555;
+    font-weight: 500;
+}
+
+ul.tabs li.ui-state-active a {
+  color: black;
+}
+
+/* CSS editor */
+div#editor {
+    display: block;
+    width: 100%;
+    min-width: 100px;
+    min-height: 165px;
+}
