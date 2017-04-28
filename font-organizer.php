@@ -175,7 +175,7 @@ function fo_uninstall(){
     $wpdb->query( "DROP TABLE IF EXISTS " . FO_ELEMENTS_DATABASE);
 
     // Delete db version option.    
-    delete_option('fo_db_version');
+    delete_site_option('fo_db_version');
 }
 
 function fo_install() {
@@ -213,7 +213,7 @@ function fo_install() {
 	dbDelta( $sql );
 
 	// Set the db version to current.
-	update_option( 'fo_db_version', $fo_db_version );
+	update_site_option( 'fo_db_version', $fo_db_version );
 
 	// Set roles
 	$role = get_role( 'administrator' );
