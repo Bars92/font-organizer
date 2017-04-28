@@ -61,7 +61,7 @@ function fo_update_db_check() {
 
 		require_once FO_ABSPATH . 'settings.php'; 
 
-	    $settings_page = new FoSettingsPage();
+	    $settings_page = new FoSettingsPage(false);
 	    $settings_page->init();
 	    $settings_page->create_css_file(true);
 

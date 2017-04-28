@@ -125,10 +125,7 @@ class FoSettingsPage
      */
     private $is_google_static;
 
-    /**
-     * Start up
-     */
-    public function __construct()
+    public function __construct($should_hook = true)
     {
         require_once FO_ABSPATH . 'classes/class-ElementsTable.php'; 
         require_once FO_ABSPATH . 'classes/class-FontsDatabaseHelper.php';
@@ -203,10 +200,13 @@ class FoSettingsPage
         if(isset($_GET['action']) && ($_GET['action'] == 'delete' || $_GET['action'] == 'bulk-delete') && isset($_GET['custom_element'])){
             $this->should_create_css = true;
         }
-
-        add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
-        add_action( 'admin_init', array( $this, 'page_init' ) );
-        add_action( 'wp_ajax_edit_custom_elements', array( $this, 'edit_custom_elements_callback' ) );
+        
+        if($should_hook){
+            add_action( 'network_admin_menu', array( $this, 'add_plugin_page' ) );
+            add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
+            add_action( 'admin_init', array( $this, 'page_init' ) );
+            add_action( 'wp_ajax_edit_custom_elements', array( $this, 'edit_custom_elements_callback' ) );
+        }
     }
 
     /**
