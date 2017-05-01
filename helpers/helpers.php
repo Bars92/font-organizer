@@ -123,6 +123,10 @@
                     return "<option style=\"".$font_style."\" value=\"800\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer'). "</option>";
                 case "800italic":
                     return "<option style=\"".$font_style."\" value=\"800italic\"" . selected($weight, $selected, false) . ">" . __('Extra-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                case "900":
+                    return "<option style=\"".$font_style."\" value=\"900\"" . selected($weight, $selected, false) . ">" . __('Black', 'font-organizer'). "</option>";
+                case "900italic":
+                    return "<option style=\"".$font_style."\" value=\"900italic\"" . selected($weight, $selected, false) . ">" . __('Black', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
         }
 
         return "";
@@ -150,6 +154,10 @@
                     return __('Extra-Bold', 'font-organizer');
                 case "800italic":
                     return __('Extra-Bold', 'font-organizer') . " " . __('Italic', 'font-organizer');
+                case "900":
+                    return __('Black', 'font-organizer');
+                case "900italic":
+                    return __('Black', 'font-organizer') . " " . __('Italic', 'font-organizer');
         }
 
         return "";

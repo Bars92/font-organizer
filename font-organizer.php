@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Font_Organizer
- * @version 2.0.1
+ * @version 2.1.0
  */
 /*
 Plugin Name: Font Organizer
 Plugin URI: https://wordpress.org/plugins/font-organizer/
 Description: Font Organizer is the complete solution for font implementation in WordPress websites.
 Author: Hive
-Version: 2.0.1
+Version: 2.1.0
 Author URI: https://hivewebstudios.com
 Text Domain: font-organizer
 */
@@ -21,7 +21,7 @@ define( 'FO_DEFAULT_ROLE', 'administrator' );
 require_once FO_ABSPATH . 'helpers/helpers.php';
 
 global $fo_db_version;
-$fo_db_version = '2.0.1';
+$fo_db_version = '2.1.0';
 
 $upload_dir = wp_upload_dir(); // Must create a temp variable for PHP 5.3.
 global $fo_css_directory_path;
@@ -74,6 +74,7 @@ function fo_update_db_check() {
 
 add_action( 'plugins_loaded', 'fo_update_db_check' );
 register_activation_hook( __FILE__, 'fo_install' );
+register_uninstall_hook( __FILE__, 'fo_uninstall' );
 add_action( 'init', 'fo_init' );
 add_action('plugins_loaded', 'fo_load_textdomain');
 
@@ -153,8 +154,8 @@ function fo_uninstall(){
 	$roles = wp_roles();
 
 	// Delete all content only if marked so in the system settings options.
-    $advanced_options = get_option( 'fo_advanced_options', array() );
-    if(!array_key_exists('uninstall_all', $advanced_options) || $advanced_options['unistall_all'] != 1){
+    $general_options = get_option( 'fo_general_options', array() );
+    if(!array_key_exists('uninstall_all', $general_options) || !$general_options['uninstall_all']){
     	return;
     }
 
@@ -171,8 +172,8 @@ function fo_uninstall(){
 	}
 
 	// Remove all database content.
-    $wpdb->query( "DROP TABLE IF EXISTS " . FO_USABLE_FONTS_DATABASE);
-    $wpdb->query( "DROP TABLE IF EXISTS " . FO_ELEMENTS_DATABASE);
+    $wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->prefix . FO_USABLE_FONTS_DATABASE);
+    $wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->prefix . FO_ELEMENTS_DATABASE);
 
     // Delete db version option.    
     delete_site_option('fo_db_version');
@@ -181,8 +182,6 @@ function fo_uninstall(){
 function fo_install() {
 	global $wpdb;
 	global $fo_db_version;
-
-	register_uninstall_hook( __FILE__, 'fo_uninstall' );
 
 	$usable_table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
 	$elements_table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;

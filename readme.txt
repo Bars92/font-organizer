@@ -2,8 +2,8 @@
 Contributors: hivewebstudios,basaar,yardensade
 Tags: fonts,google fonts,upload font,font,google
 Requires at least: 3.8
-Tested up to: 4.7.3
-Stable tag: 2.0.1
+Tested up to: 4.7.4
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,7 +39,7 @@ Key Features:
 * Full support for language translation, including RTL languages.
 * It's awesome like its users.
 
-Coming up soon: Custom css, unistall options & more! Stay tuned.
+Coming up soon: ! Stay tuned.
 
 == Installation ==
 
@@ -110,6 +110,14 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 5. Choosing added fonts in any post and page in one click.
 
 == Changelog ==
+
+= 2.1.0 =
+* Added Black & Black italic to font weights.
+* Added new advanced section.
+* Moved general settings to advanced tab.
+* Added custom css area to advanced tab.
+* Added uninstall option to remove everything from font organizer (database, fonts and files).
+* Fixed plugin misbehave in multisite.
 
 = 2.0.1 =
 * Fixed new installs errors.

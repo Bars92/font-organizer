@@ -185,6 +185,10 @@ jQuery(document).ready(function(){
                 return data.labels.extrabold;
             case "800italic":
                 return data.labels.extrabold + " " + data.labels.italic;
+            case "900":
+                return data.labels.black;
+            case "900italic":
+                return data.labels.black + " " + data.labels.italic;
             default:
                 return "";
         }

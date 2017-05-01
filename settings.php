@@ -156,7 +156,7 @@ class FoSettingsPage
                                 'a_font'    =>  __('<a> Font', 'font-organizer'),
                                 );
 
-         $this->font_weights = array('300','300italic','regular','italic','600','600italic','700','700italic','800','800italic');
+         $this->font_weights = array('300','300italic','regular','italic','600','600italic','700','700italic','800','800italic', '900', '900italic');
 
         // An upload is made. Upload the file and proccess it.
         if (isset($_POST['submit_upload_font'])){  
@@ -230,6 +230,7 @@ class FoSettingsPage
                                     'semibold' => __('Semi-Bold', 'font-organizer'),
                                     'bold' => __('Bold', 'font-organizer'),
                                     'extrabold' => __('Extra-Bold', 'font-organizer'),
+                                    'black' => __('Black', 'font-organizer'),
                                     'italic' => __('Italic', 'font-organizer'),
                                 ),
                 );
@@ -1334,7 +1335,7 @@ class FoSettingsPage
         printf(
             '<fieldset>
                 <legend class="screen-reader-text"><span>%s</span></legend>
-                <label for="include_font_link">
+                <label for="uninstall_all">
                     <input name="fo_general_options[uninstall_all]" type="checkbox" id="uninstall_all" value="1" %s>
                     %s
                 </label>
