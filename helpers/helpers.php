@@ -73,9 +73,20 @@
                 return 'truetype';            
             case 'otf':
                 return 'opentype';
+            case 'eot':
+                return 'embedded-opentype';
             default:
                 return $extension;
         }
+    }
+
+    function fo_get_font_url($url, $isEOT, $isSVG) {
+        // In eot we fix the second src with query string.
+        $url = $isEOT ? $url . "?#iefix" : $url;
+        // Add svg font name to url.
+        $url = $isSVG ? $url . "#" . basename($url) : $url;
+
+        return $url;
     }
 
     function fo_print_source($kind){

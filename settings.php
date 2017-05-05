@@ -131,7 +131,7 @@ class FoSettingsPage
         require_once FO_ABSPATH . 'classes/class-FontsDatabaseHelper.php';
 
         $this->fonts_per_link = 150;
-        $this->supported_font_files = array('.woff', '.woff2', '.ttf','.otf');
+        $this->supported_font_files = array('.woff', '.woff2', '.ttf','.otf', '.svg', '.eot');
         $this->custom_fonts = array();
         $this->available_fonts = array();
         $this->usable_fonts = array();
@@ -537,8 +537,29 @@ class FoSettingsPage
                 foreach ($usable_font->files as $custom_weight => $urls) {
                     // Set all the urls content under the same src.
                     $urls_content_arr = array();
+                    $eot_fix = '';
+                    $svg_url = '';
                     foreach ($urls as $url) {
-                        $urls_content_arr[] = "url('" . $url . "') format('" . fo_get_font_format($url) . "')";
+                        $isEOT = strpos($url, 'eot') !== false;
+                        $isSVG = strpos($url, 'svg') !== false;
+
+                        // In eot we fix IE<9 the format by adding another src.
+                        if($isEOT) {
+                            $eot_fix = "src: url('" . $url . "');";   
+                        }
+
+                        $url_str = "url('" . fo_get_font_url($url, $isEOT, $isSVG) . "') format('" . fo_get_font_format($url) . "')";
+                        if($isSVG) {
+                            // Dont save in array to make sure svg is last on the list.
+                            $svg_url = $url_str;
+                        } else {
+                            $urls_content_arr[] = $url_str;
+                        }
+                    }
+
+                    // If the svg exists push it last.
+                    if($svg_url !== '') {
+                        array_push($urls_content_arr, $svg_url);
                     }
 
                     $urls_content = implode(",\n", $urls_content_arr) . ';';
@@ -546,6 +567,7 @@ class FoSettingsPage
                     $custom_fonts_content .= "
 @font-face {
     font-family: '" . $usable_font->family . "';
+    " . $eot_fix . "
     src: " . $urls_content . "\n";
 
                     $custom_fonts_content .= $styles['weight'] ? "font-weight: " . $styles['weight'] . ";\n" : "";

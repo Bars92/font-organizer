@@ -21,7 +21,7 @@ jQuery(document).ready(function(){
 
 jQuery(document).ready(function(){
     var l = jQuery('.font_file').clone();
-    var maxField = 4; //Input fields increment limitation
+    var maxField = 6; //Input fields increment limitation
     var addButton = jQuery('.add_button'); //Add button selector
     var fieldHTML = '<tr class="font_file_wrapper"><td></td><td>' + jQuery('#font_file_parent').html() + '</td><td><a href="javascript:void(0);" class="remove_button"><i class="fa fa-times fa-2x" aria-hidden="true"></i></a></td></tr>'; //New input field html 
     var x = 1; //Initial field counter is 1
