@@ -714,7 +714,7 @@ class FoSettingsPage
             <div id="poststuff">  
                 <div id="post-body" class="metabox-holder columns-2">
 
-                <div id="tabs">
+                <div id="tabs" class="<?php echo is_rtl() ? ' rtl' : 'ltr'; ?>">
                     <ul class="tabs">
                         <li><a href="#tabs-1"><?php _e('General', 'font-organizer'); ?></a></li>
                         <li><a href="#tabs-2"><?php _e('Advanced', 'font-organizer'); ?></a></li>

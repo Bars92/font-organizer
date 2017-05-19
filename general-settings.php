@@ -193,11 +193,12 @@
             </tr>
             <tr>
                 <th scope="row"><?php _e('Urls', 'font-organizer'); ?></th>
-                <td style="direction:ltr;text-align:left;line-height:20px;">
-                    <span>
+                <td>
                     <?php
                     foreach ($this->selected_manage_font->files as $weight => $urls) {
+                        echo '<div style="margin-bottom: 10px;">';
                         echo '<span style="font-weight:bold">' . fo_get_font_weight($weight) . '</span><br />';
+                        echo '<div style="direction:ltr;text-align:left;line-height:20px;">';
                         if(is_array($urls)){
                             foreach($urls as $url)
                                 echo $url, '<br>';
@@ -206,9 +207,10 @@
                         }
 
                         echo '<br />';
+                        echo '</div>';
+                        echo '</div>';
                     }
                     ?>
-                    </span>
                 </td>
             </tr>
         </table>
