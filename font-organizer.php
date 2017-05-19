@@ -144,6 +144,7 @@ function fo_allow_upload_types($existing_mimes = array()){
 	$existing_mimes['woff'] = 'application/font-woff';
 	$existing_mimes['woff2'] = 'font/woff2';
 	$existing_mimes['otf'] = 'font/otf';
+	$existing_mimes['svg'] = 'image/svg+xml';
 
 	return $existing_mimes;
 }

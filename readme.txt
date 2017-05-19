@@ -113,6 +113,7 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 
 = 2.1.0 =
 * Added Black & Black italic to font weights.
+* Added support for upload svg and eot font formats.
 * Added new advanced section.
 * Moved general settings to advanced tab.
 * Added custom css area to advanced tab.

@@ -399,7 +399,8 @@ class FoSettingsPage
         // Initialize what is a must for the elements file.
         $this->load_custom_elements();
         $this->elements_options = get_option( 'fo_elements_options' );
-
+        $this->advanced_options = get_option( 'fo_advanced_options' );
+        
         $this->create_elements_file();
 
         wp_die(true); // this is required to terminate immediately and return a proper response
