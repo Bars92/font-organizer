@@ -1,6 +1,6 @@
 === Font Organizer ===
-Contributors: hivewebstudios,basaar,yardensade
-Tags: fonts,google fonts,upload font,font,google
+Contributors: basaar,yardensade, hivewebstudios
+Tags: fonts,google fonts,upload font,font,google,custom, free, download, style
 Requires at least: 3.8
 Tested up to: 4.7.5
 Stable tag: 2.1.0
