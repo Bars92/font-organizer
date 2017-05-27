@@ -270,7 +270,12 @@
     function fo_get_full_url($url){
         // Fix full url is saved in database. Create the full url
         // with the current website url.
-        $relative_url = strstr($url, "wp-content");
+        if (stripos($url, get_site_url()) !== false) { 
+            $relative_url = substr($url, strlen(get_site_url()));
+        } else {
+            $relative_url = $url;
+        }
+
         $full_url = get_site_url(null, $relative_url);
 
         // Fix everyone saved with http or https and let the browser decide.

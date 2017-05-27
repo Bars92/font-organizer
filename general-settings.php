@@ -3,10 +3,10 @@
     <a name="step2"></a>
     <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('1. Add Fonts', 'font-organizer'); ?></span></h2>
     <div class="inside">
-        <span><?php _e('Step 1: Select and add fonts to be used in your website. Select as many as you wish.', 'font-organizer'); ?></span>
+        <span><?php _e('Step 1: Select and add fonts to be used in your website.', 'font-organizer'); ?></span>
         <br />
         <span><?php _e('You can select google or regular fonts.', 'font-organizer'); ?></span>
-        <form action="" id="add_usable_font_form" name="add_usable_font_form" method="post"> 
+        <form action="#0" id="add_usable_font_form" name="add_usable_font_form" method="post"> 
             <table class="form-table">
                 <tr>
                     <th scope="row"><?php _e('Available Fonts', 'font-organizer'); ?></th>
@@ -29,17 +29,17 @@
     <a name="step3"></a>
     <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('2. Custom Fonts', 'font-organizer'); ?></span></h2>
     <div class="inside">
-        <span><?php _e('Step 2: Upload custom fonts to be used in your website. Here too, you can upload as many as you wish.', 'font-organizer'); ?></span>
+        <span><?php _e('Step 2: Upload custom fonts to be used in your website.', 'font-organizer'); ?></span>
         <br />
-        <span><?php _e('Name the font you want to upload and upload all the files formats for this font. In order to support more browsers you can click the green plus to upload more font formats. We suggest at least .woff and .woff2.', 'font-organizer'); ?></span>
-        <p style="font-weight: 600;"><?php _e('You can now set font weight for this upload. If font name is set to an existing font name, the font weight will be added to the existing font and will be free to be used under said font name. You can always leave it Normal.', 'font-organizer'); ?></p>
+        <span><?php _e('Name the font you want to upload with the actual name of the font or similar (no need to write the font weight as well). In order to support more browsers, you can click the green plus to upload more font formats.', 'font-organizer'); ?></span>
+        <p style="font-weight: 600;"><?php _e('You can now set font weight for this upload. If the font name is the same as an existing font name, the font weight will then be added to the existing font and can be used under that font name. You can always leave it Normal.', 'font-organizer'); ?></p>
         <div class="custom_font_message fo_warning" style="display: none;">
                 <i class="fa fa-warning"></i>
                 <?php _e("This font format is already selected. Reminder: you need to upload the font files for the same font weight.", "font-organizer"); ?>
                 <span></span>
         </div>
 
-        <form action="#" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data">
+        <form action="#0" id="add_font_form" name="add_font_form" method="post" enctype="multipart/form-data">
             <table class="form-table">
                 <tr>
                     <th scope="row"><label for="font_name" class="required"><?php _e('Font Name', 'font-organizer'); ?></label></th>
@@ -81,10 +81,9 @@
     <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('3. Known Elements Settings', 'font-organizer'); ?></span></h2>
     <div class="inside">
 
-        <span><?php _e('Step 3: For each element you can assign a font you have added in step 1 & 2.', 'font-organizer'); ?></span>
-        <p><strong><?php _e('Note: ', 'font-organizer'); ?></strong> <?php _e('Custom fonts you uploaded are automatically used in your website.', 'font-organizer'); ?></p>
-        <p><strong><?php _e('In case of font not displaying in your website after saving, try clear the cache using Shift+F5 or Ctrl+Shift+Delete to clear all.', 'font-organizer'); ?></strong>
-        <form method="post" action="options.php">
+        <span><?php _e('Step 3: In this section you can apply your fonts to the various elements of the website. Simply select the font you want to use for each element.', 'font-organizer'); ?></span>
+        <p><strong><?php _e('In case of font not displaying in your website after saving, try clear the cache using Shift+F5 or Ctrl+Shift+Delete to clear all. (You may need to hard clear cache, just search in google "Hard clear cache" + browser name. Example: "Hard clear chrome").', 'font-organizer'); ?></strong>
+        <form method="post" action="options.php#0">
         <?php
             // This prints out all hidden setting fields
             settings_fields( 'fo_elements_options' );
@@ -101,7 +100,7 @@
     <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('4. Custom Elements Settings', 'font-organizer'); ?></span></h2>
     <div class="inside">
 
-        <span><?php _e('Step 4: Assign font that you have added to your website to custom elements.', 'font-organizer'); ?></span>
+        <span><?php _e('Step 4: Assign a font to custom elements in your website. Simply select the font, and then type the elements you want to assign with the font.', 'font-organizer'); ?></span>
         <form action="#" id="add_custom_elements_form" name="add_custom_elements_form" method="post"> 
             <table class="form-table">
                 <tr>
@@ -145,7 +144,7 @@
     <h2 class="hndle ui-sortable-handle" style="cursor:default;"><span><?php _e('5. Manage Fonts', 'font-organizer'); ?></span></h2>
     <div class="inside">
             <span>
-                <?php _e('Step 5: Select a font to manage, delete and view the source and custom elements assigned to it.', 'font-organizer'); ?>    
+                <?php _e('Step 5: Select a font to delete, edit or view its source and custom elements assigned to it.', 'font-organizer'); ?>    
             </span>
              <p>
                 <strong><?php _e('Note: ', 'font-organizer'); ?></strong> 

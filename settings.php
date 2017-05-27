@@ -886,7 +886,7 @@ class FoSettingsPage
             }
             
             // Save relative url in the database.
-            $urls[] = stristr($movefile['url'], "/wp-content");
+            $urls[] = substr($movefile['url'], strlen(get_site_url()));
         }
 
         // Find the font if does exist.
@@ -1320,21 +1320,14 @@ class FoSettingsPage
      */
     public function google_key_callback()
     {
-        echo '<span class="highlight info">';
-
-        $url = 'https://developers.google.com/fonts/docs/developer_api#acquiring_and_using_an_api_key';
         $faq_url = 'http://hivewebstudios.com/font-organizer/#faq';
-        echo sprintf( __( 'To get all the current fonts, Google requires the mandatory use of an API key, get one from <a href="%s" target="_blank">HERE</a>', 'font-organizer' ), esc_url( $url ) );
-        echo  sprintf( __( ' Need help? Click <a href="%s" target="_blank">here</a>', 'font-organizer' ), esc_url( $faq_url ) );
-        echo '</span> <br />';
-
         $value = isset( $this->general_options['google_key'] ) ? esc_attr( $this->general_options['google_key']) : '';
         printf(
             '<div class="validate"><input type="text" id="google_key" name="fo_general_options[google_key]" value="%s" class="large-text %s %s" placeholder="Ex: AIzaSyB1I0couKSmsW1Nadr68IlJXXCaBi9wYwM" /><span></span></div>', $value , $this->is_google_static ? '' : 'valid', is_rtl() ? 'rtl' : 'ltr'
         );
 
         if($this->is_google_static){
-            echo '<span style="color:#0073aa;font-weight: 500;">' . __('You are using a static google fonts list, if you want the current list you can specify an API key.') . '</span>';
+            echo '<span style="color:#0073aa;font-weight: 500;">' . sprintf( __('The plugin uses static google fonts list. In order to get the most current fonts list, Google requires an API key, generated via their interface. For more information read <a href="%s" target="_blank">our FAQ</a>.'), esc_url( $faq_url )) . '</span>';
         }
     }
 
