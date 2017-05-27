@@ -1,5 +1,5 @@
 === Font Organizer ===
-Contributors: basaar,yardensade, hivewebstudios
+Contributors: basaar,yardensade,hivewebstudios
 Tags: fonts,google fonts,upload font,font,google,custom, free, download, style
 Requires at least: 3.8
 Tested up to: 4.7.5
@@ -11,7 +11,7 @@ Font Organizer is the complete solution for font implementation including upload
 
 == Description ==
 
-**Note: WordPress 4.7.1 has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail otf font format uploads.
+**Note: WordPress 4.7.X has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail some font format uploads.
 To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until further notice.**
 
 Font Organizer is the complete solution for font implementation including uploading custom fonts and using google fonts in WordPress websites.
@@ -35,11 +35,12 @@ Key Features:
 * Edit and remove custom elements assigned quickly.
 * Delete and remove fonts from your website in one click.
 * Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
+* Add custom css easily with ace editor.
 * Our code is extremely clean, well written, commented, and optimized for maximum performance for your website.
 * Full support for language translation, including RTL languages.
 * It's awesome like its users.
 
-Coming up soon: ! Stay tuned.
+Coming up soon: Tutorial video & DIVI support! Stay tuned.
 
 == Installation ==
 
@@ -119,6 +120,8 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 * Added custom css area to advanced tab.
 * Added uninstall option to remove everything from font organizer (database, fonts and files).
 * Fixed plugin misbehave in multisite.
+* Fixed plugin fail to load fonts on custom media folder.
+* Changed some UI to better guide new users.
 
 = 2.0.1 =
 * Fixed new installs errors.
