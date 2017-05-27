@@ -14,10 +14,12 @@ Font Organizer is the complete solution for font implementation including upload
 **Note: WordPress 4.7.X has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail some font format uploads.
 To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until further notice.**
 
-Font Organizer is the complete solution for font implementation including uploading custom fonts and using google fonts in WordPress websites.
+Font Organizer is the only complete & free solution for font implementation, including uploading custom fonts and using google fonts in WordPress websites.
+No technical knowledge, no hassle, simply click and use.
 
-The plugin is intended for both developers and regular users in order to easily add native, google and custom fonts then assign
+Our plugin is intended for any user in order to easily add native, google and custom fonts - then assign
 them to different elements in your website effortlessly.
+The plugin is totally free, no "pro" features, all of the functions are totally available to you free of charge.
 
 Want to find out more? go to [our website](https://hivewebstudios.com/ "HiveWebStudios website") and find out more from us.
 
@@ -27,79 +29,81 @@ Have any problems? Check out our new [Official Font Organizer page](http://hivew
 
 Key Features:
 
-* Upload fonts to your website and apply it on any element.
-* Multi upload allow you to upload more font formats to support more browsers.
-* Add any google fonts in one click and apply them on any element.
-* Apply fonts for known elements or custom elements of your choosing easily.
+* Upload fonts to your website and apply it in few clicks.
+* Multi upload allow you to upload more font formats to support more browsers at ease, we now support all font formats, which means full browser support!
+* Add any google font in one click and apply them instantly.
+* Apply fonts for generic elements or custom elements in your website easily.
 * Select font weight for every font you use with known & custom elements.
 * Edit and remove custom elements assigned quickly.
 * Delete and remove fonts from your website in one click.
-* Choose your fonts & font sizes in the editor (tinyMCE & tinyMCE Advanced).
-* Add custom css easily with ace editor.
+* Choose your fonts & font sizes from within the text editor (tinyMCE & tinyMCE Advanced).
 * Our code is extremely clean, well written, commented, and optimized for maximum performance for your website.
 * Full support for language translation, including RTL languages.
-* It's awesome like its users.
+* Custom CSS for developers to quickly test and deploy changes to your fonts.
+* It’s awesome like its users.
 
 Coming up soon: Tutorial video & DIVI support! Stay tuned.
 
 == Installation ==
 
-Just download & install the plugin from your wordpress site. Or
-
-1. Download the plugin from here.
-
-2. Upload the plugin files to the `/wp-content/plugins/font-organizer` directory.
-
-3. Activate the plugin through the 'Plugins' screen in your WordPress site.
-
-4. Use the Settings->Font Settings screen to configure the plugin and follow the steps.
+1. Just download & install the plugin from your wordpress site. Or Download the plugin from this page.
+2. Upload the plugin files to the /wp-content/plugins/font-organizer directory of your WordPress website using FTP or the File Manager of your control panel via your host.
+3. Activate the plugin through the "Plugins" screen in your WordPress admin dashboard.
+4. Go to "Settings" -> "Font Settings" in order to configure the plugin.
+5. Simply follow the steps with their explanations.
 
 == Frequently Asked Questions ==
 
-Q: What is API key, and why do I need it?
+= When trying to upload a font I get the following error: "Error uploading the file: Sorry, this file type is not permitted for security reasons."? =
 
-A: API key is a special key made by google in order to let users view their full list of fonts and use them in the plugin.
-Without it the entire function of google fonts will not work.
+There is an open bug since WordPress 4.7.1 (it is not plugin related)
+([https://core.trac.wordpress.org/ticket/39550](https://core.trac.wordpress.org/ticket/39550 "open ticket")) that blocks upload for
+some non-image files. This bug should have been fixed in version 4.7.3, but it was not fully solved yet. Until the issue is fixed, you may use this plugin: [https://wordpress.org/plugins/disable-real-mime-check/](https://wordpress.org/plugins/disable-real-mime-check/ "open ticket")
+Installing this plugin work around the bug and until further notice there is nothing else to be done.
 
-Q: How do I create API key for the plugin?
+= How do I create API key for the plugin? =
 
-A: Inside the plugin click on "HERE" at Settings->Font Settings->General Settings->Google API Key.
-Open the Credentials page link. Select "Create a project".
+Browse to [Google Developer API](https://developers.google.com/fonts/docs/developer_api#identifying_your_application_to_google "google developer API").
+Click on "GET A KEY". -> Select "Create a project".
 Give the project a name, any name that makes sense to you is ok, then press OK.
 Click on "Create credentials" > "API key".
 There you go, google generated a brand new API key for you.
 Copy the entire key and paste it on the designated place in the plugin settings.
 
-In order to enable the API key go to API Manager dashboard or use the link: "https://console.developers.google.com/apis/dashboard"
-Press "ENABLE API", Then Choose "Web Fonts Developer API" under "Other popular APIs" section. - This step is a must.
+In order to enable the API key go to API Manager dashboard or use the link: [https://console.developers.google.com/apis/dashboard](https://console.developers.google.com/apis/dashboard "google developer API console").
+Press "ENABLE API", Then Choose "Web Fonts Developer API" under "Other popular APIs" section. – This step is a must.
 
-Congrats, your API key is now enabled.
+Congrats, your API key is now enabled. you may use it inside the plugin to get the full current font list.
 
-Q: What the option "Show Font Family Preview" means?
+= What the option "Show Font Family Preview" means? =
 
-A: When selecting fonts in section 1, you will see a lot of different fonts, ticking this option will let you to actually
+When selecting fonts in section 1, you will see a lot of different fonts, ticking this option will let you to actually
 see example of the font you are about to use.
 Due to the need of loading each font example from google, this option will slow down the performance of the plugin page.
 
-Q: What the option "Access Settings Role" means?
+= What the option "Access Settings Role" means? =
 
-A: We wanted to give you the option to decide which roles in your wordpress website are allowed to use the plugin, so you may or may not allow other users with access to the website the ability to use the plugin.
+We wanted to give you the option to decide which roles in your wordpress website are allowed to use the plugin, so you may or may not allow other users with access to the website the ability to use the plugin.
 
-Q: Why can't I see assigned fonts even after I have done everything correctly?
+= Why can't I see assigned fonts even after I have done everything correctly? =
 
-A: Sometimes some browsers save a cached version of the page when browsing it to display it faster.
-If you can't see a new font you have assigned, make sure to clean the cache using Shift+F5 to clean the current page, or Ctrl+Shift+Delete to clean all. (Some websites might use cache plugin that must be refreshed before)
+Sometimes some browsers save a cached version of the page when browsing it in orderto display the pages faster.
+If you can't see a new font you have assigned, make sure to "hard clean" the cache using Shift+F5 to clean the current page, or Ctrl+Shift+Delete to clean all. (Some websites might use cache plugin that must be refreshed before)
 
-Q: I have some element in the website - and the font would not change for it, what do I do?
+Sometimes it is a matter of font format compatibility with different browsers.
+At the moment we are working on automatic font format conversion but until then you may use a service such as [Font Squirrel](https://www.fontsquirrel.com/tools/webfont-generator "font squirrel") or similar font conversion service online.
 
-A: In some cases some elements are assigned with fonts in a very specific ways via other plugins or themes, and thus you will need to target those elements using CSS id or class, in section 4 of the plugin "Custom Elements Settings".
+= I have some element in the website - and the font would not change for it, what do I do? =
+
+In some cases some elements are assigned with fonts in a very specific ways via other plugins or themes, and thus you will need to target those elements using CSS id or class, in section 4 of the plugin "Custom Elements Settings".
 If you have absolutley no knowledge of what is CSS, you might need help of a webmaster.
 
-Q: I have bought a font and it came with many font weights, what is the best way to upload all of them using the plugin?
+= I have bought a font and it came with many font weights, what is the best way to upload all of them using the plugin? =
 
-A: Each upload process at the moment is used for 1 font weight only.
+Each upload process at the moment is used for 1 font weight only.
 Uploading more then 1 font weight is done by doing the upload process several times, once for each font weight.
 When uploading the font weight you should write its weight in the font name.
+
 Example: "Arial Bold" or "Arial Italic", so you could easily use them later in the plugin.
 
 == Screenshots ==
