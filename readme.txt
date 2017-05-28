@@ -3,7 +3,7 @@ Contributors: basaar,yardensade,hivewebstudios
 Tags: fonts,google fonts,upload font,font,google,custom, free, download, style
 Requires at least: 3.8
 Tested up to: 4.7.5
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,7 +40,7 @@ Key Features:
 * Our code is extremely clean, well written, commented, and optimized for maximum performance for your website.
 * Full support for language translation, including RTL languages.
 * Custom CSS for developers to quickly test and deploy changes to your fonts.
-* It’s awesome like its users.
+* It's awesome like its users.
 
 Coming up soon: Tutorial video & DIVI support! Stay tuned.
 
@@ -71,7 +71,7 @@ There you go, google generated a brand new API key for you.
 Copy the entire key and paste it on the designated place in the plugin settings.
 
 In order to enable the API key go to API Manager dashboard or use the link: [https://console.developers.google.com/apis/dashboard](https://console.developers.google.com/apis/dashboard "google developer API console").
-Press "ENABLE API", Then Choose "Web Fonts Developer API" under "Other popular APIs" section. – This step is a must.
+Press "ENABLE API", Then Choose "Web Fonts Developer API" under "Other popular APIs" section. **This step is a must**.
 
 Congrats, your API key is now enabled. you may use it inside the plugin to get the full current font list.
 
@@ -102,9 +102,9 @@ If you have absolutley no knowledge of what is CSS, you might need help of a web
 
 Each upload process at the moment is used for 1 font weight only.
 Uploading more then 1 font weight is done by doing the upload process several times, once for each font weight.
-When uploading the font weight you should write its weight in the font name.
+When uploading the font weight you should write its name (only!) in the font name, then choose in the "Font Weight" select menu its weight.
 
-Example: "Arial Bold" or "Arial Italic", so you could easily use them later in the plugin.
+Example: Both "Arial Bold" or "Arial Italic" would get the "Font Name" of "Arial", so you could easily use them later in the plugin.
 
 == Screenshots ==
 
@@ -115,6 +115,10 @@ Example: "Arial Bold" or "Arial Italic", so you could easily use them later in t
 5. Choosing added fonts in any post and page in one click.
 
 == Changelog ==
+
+= 2.1.1 =
+* Fixed plugin issue causing admin to break for some users.
+* Reduced plugin usage consumption when not needed.
 
 = 2.1.0 =
 * Added Black & Black italic to font weights.

@@ -158,49 +158,6 @@ class FoSettingsPage
 
          $this->font_weights = array('300','300italic','regular','italic','600','600italic','700','700italic','800','800italic', '900', '900italic');
 
-        // An upload is made. Upload the file and proccess it.
-        if (isset($_POST['submit_upload_font'])){  
-            if($args = $this->validate_upload()){
-                $this->upload_file($args);
-                $this->should_create_css = true;
-            }else{
-                add_action( 'admin_notices', array($this, 'upload_failed_admin_notice') );
-            }
-        }
-
-        if (isset($_POST['submit_usable_font'])){  
-            if($args = $this->validate_add_usable()){
-                $this->use_font($args);
-                $this->should_create_css = true;
-            }else{
-                add_action( 'admin_notices', array($this, 'use_font_failed_admin_notice') );
-            }
-        }
-
-        if (isset($_POST['delete_usable_font'])){  
-            if($args = $this->validate_delete_usable()){
-                $this->delete_font($args);
-                $this->should_create_css = true;
-                wp_cache_delete ( 'alloptions', 'options' );
-
-            }else{
-                add_action( 'admin_notices', array($this, 'delete_font_failed_admin_notice') );
-            }
-        }
-
-        if(isset($_POST['submit_custom_elements'])){
-            if($args = $this->validate_custom_elements()){
-                $this->add_custom_elements($args);
-                $this->should_create_css = true;
-            }else{
-                add_action( 'admin_notices', array($this, 'add_custom_elements_failed_admin_notice') );
-            }
-        }
-
-        if(isset($_GET['action']) && ($_GET['action'] == 'delete' || $_GET['action'] == 'bulk-delete') && isset($_GET['custom_element'])){
-            $this->should_create_css = true;
-        }
-        
         if($should_hook){
             add_action( 'network_admin_menu', array( $this, 'add_plugin_page' ) );
             add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
@@ -213,6 +170,7 @@ class FoSettingsPage
      * Register all the required scripts for this page.
      */
     public function register_scripts() {
+        add_action( 'admin_footer', array( $this, 'add_footer_styles' ) );
         wp_enqueue_script( 'jquery-ui-core' );
         wp_enqueue_script( 'jquery-ui-autocomplete' );
         wp_enqueue_script( 'jquery-ui-tabs' );
@@ -259,7 +217,7 @@ class FoSettingsPage
                 editor.$blockScrolling = Infinity;
                 editor.getSession().setUseWrapMode( true );
                 editor.getSession().setMode( "ace/mode/css" );
-                editor.setValue("<?php echo array_key_exists('additional_css', $this->advanced_options) ? preg_replace('/[\r\n]+/', '\n',$this->advanced_options['additional_css']) : ''; ?>");
+                editor.setValue("<?php echo array_key_exists('additional_css', $this->advanced_options) ? preg_replace('/[\r\n]+/', '\n',$this->advanced_options['additional_css']) : ''; ?>", 1);
 
                 // Notify fields on change to allow save in WordPress options.
                 editor.getSession().on('change', function() {
@@ -422,8 +380,6 @@ class FoSettingsPage
 
         add_action( 'load-' . $hook, array( $this, 'init_page' ) );
         add_action( 'load-' . $hook, array( $this, 'register_scripts' ) );
-        add_action( 'load-' . $hook, array( $this, 'create_css_file' ) );
-        add_action( 'admin_footer', array( $this, 'add_footer_styles' ) );
         add_filter( 'option_page_capability_fo_general_options', array($this, 'options_capability') );
         add_filter( 'option_page_capability_fo_elements_options', array($this, 'options_capability') );
         add_filter( 'option_page_capability_fo_advanced_options', array($this, 'options_capability') );
@@ -436,11 +392,54 @@ class FoSettingsPage
 	}
 
     public function init_page(){
+        // First in this page. Make sure to handle all events happend and crete 
+        if (isset($_POST['submit_upload_font'])){  
+            if($args = $this->validate_upload()){
+                $this->upload_file($args);
+                $this->should_create_css = true;
+            }else{
+                add_action( 'admin_notices', array($this, 'upload_failed_admin_notice') );
+            }
+        }
+
+        if (isset($_POST['submit_usable_font'])){  
+            if($args = $this->validate_add_usable()){
+                $this->use_font($args);
+                $this->should_create_css = true;
+            }else{
+                add_action( 'admin_notices', array($this, 'use_font_failed_admin_notice') );
+            }
+        }
+
+        if (isset($_POST['delete_usable_font'])){  
+            if($args = $this->validate_delete_usable()){
+                $this->delete_font($args);
+                $this->should_create_css = true;
+                wp_cache_delete ( 'alloptions', 'options' );
+
+            }else{
+                add_action( 'admin_notices', array($this, 'delete_font_failed_admin_notice') );
+            }
+        }
+
+        if(isset($_POST['submit_custom_elements'])){
+            if($args = $this->validate_custom_elements()){
+                $this->add_custom_elements($args);
+                $this->should_create_css = true;
+            }else{
+                add_action( 'admin_notices', array($this, 'add_custom_elements_failed_admin_notice') );
+            }
+        }
+
+        if(isset($_GET['action']) && ($_GET['action'] == 'delete' || $_GET['action'] == 'bulk-delete') && isset($_GET['custom_element'])){
+            $this->should_create_css = true;
+        }
+        
     	$this->init();
+        $this->create_css_file();
     }
 
     public function create_css_file($force = false){
-
         if(((!isset($_GET['settings-updated']) || !$_GET['settings-updated']) && !$this->should_create_css) && !$force){
             return;
         }
