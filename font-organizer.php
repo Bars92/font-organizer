@@ -73,7 +73,7 @@ function fo_update_db_check() {
 }
 
 add_action( 'plugins_loaded', 'fo_update_db_check' );
-register_activation_hook( __FILE__, 'fo_install' );
+register_activation_hook( __FILE__, 'fo_activate' );
 register_uninstall_hook( __FILE__, 'fo_uninstall' );
 add_action( 'init', 'fo_init' );
 add_action('plugins_loaded', 'fo_load_textdomain');
@@ -96,6 +96,7 @@ function fo_init(){
 		add_filter( 'tiny_mce_before_init', 'fo_add_tinymce_fonts' );
 		add_filter( 'mce_buttons', 'fo_mce_buttons', 1000 );
 		add_action( 'admin_enqueue_scripts', 'fo_enqueue_declarations_fonts_css' );
+		add_action( 'wpmu_new_blog', 'fo_new_multi_site_blog', 10, 6);     
 
 	    $settings_page = new FoSettingsPage();
 	}else{
@@ -119,6 +120,8 @@ function fo_mce_buttons( $buttons ) {
 }
 
 function fo_add_tinymce_fonts($initArray){
+	global $fo_css_base_url_path;
+	global $fo_declarations_css_file_name;
 	$usable_fonts = FontsDatabaseHelper::get_usable_fonts();
 	$font_formats = array();
 	foreach ($usable_fonts as $font) {
@@ -135,7 +138,27 @@ function fo_add_tinymce_fonts($initArray){
 	// Set font sizes.
 	$initArray['fontsize_formats'] = $sizes;
 
+	// Add the css declarations file.
+	$stylesheet_url = $fo_css_base_url_path . '/' . $fo_declarations_css_file_name;
+
+    if(empty($initArray['content_css'])) {
+        $initArray['content_css'] = $stylesheet_url;
+    } else {
+        $initArray['content_css'] = $initArray['content_css'].','.$stylesheet_url;
+    }
+
 	return $initArray;
+}
+ 
+function fo_new_multi_site_blog($blog_id, $user_id, $domain, $path, $site_id, $meta ) {
+    global $wpdb;
+ 
+    if (is_plugin_active_for_network('font-organizer/font-organizer.php')) {
+        $old_blog = $wpdb->blogid;
+        switch_to_blog($blog_id);
+        fo_install();
+        switch_to_blog($old_blog);
+    }
 }
 
 function fo_allow_upload_types($existing_mimes = array()){
@@ -149,7 +172,36 @@ function fo_allow_upload_types($existing_mimes = array()){
 	return $existing_mimes;
 }
 
-function fo_uninstall(){
+function my_network_propagate($pfunction, $networkwide) {
+    global $wpdb;
+ 
+    if (function_exists('is_multisite') && is_multisite()) {
+        // check if it is a network activation - if so, run the activation function 
+        // for each blog id
+        if ($networkwide) {
+            $old_blog = $wpdb->blogid;
+            // Get all blog ids
+            $blogids = $wpdb->get_col("SELECT blog_id FROM {$wpdb->blogs}");
+            foreach ($blogids as $blog_id) {
+                switch_to_blog($blog_id);
+                call_user_func($pfunction, $networkwide);
+            }
+            switch_to_blog($old_blog);
+            return;
+        }   
+    } 
+    call_user_func($pfunction, $networkwide);
+}
+ 
+function fo_activate($networkwide) {
+    my_network_propagate('fo_install', $networkwide);
+}
+ 
+function fo_uninstall($networkwide) {
+    my_network_propagate('fo_uninstall_site', $networkwide);
+}
+
+function fo_uninstall_site(){
     global $fo_css_directory_path;
 	global $wpdb;
 	$roles = wp_roles();
