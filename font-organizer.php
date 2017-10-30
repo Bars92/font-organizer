@@ -93,8 +93,13 @@ function fo_init(){
 
 		add_filter( 'upload_mimes', 'fo_allow_upload_types' );
 		add_filter( 'plugin_action_links', 'fo_add_action_plugin', 10, 5 );
-		add_filter( 'tiny_mce_before_init', 'fo_add_tinymce_fonts' );
-		add_filter( 'mce_buttons', 'fo_mce_buttons', 1000 );
+		
+		// Delete all content only if marked so in the system settings options.
+	    $general_options = get_option( 'fo_general_options', array() );
+	    if(!array_key_exists('remove_font_editor', $general_options) || !$general_options['remove_font_editor']){
+			add_filter( 'tiny_mce_before_init', 'fo_add_tinymce_fonts' );
+			add_filter( 'mce_buttons', 'fo_mce_buttons', 1000 );
+	    }
 		add_action( 'admin_enqueue_scripts', 'fo_enqueue_declarations_fonts_css' );
 		add_action( 'wpmu_new_blog', 'fo_new_multi_site_blog', 10, 6);     
 

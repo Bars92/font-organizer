@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Font Organizer\n"
-"POT-Creation-Date: 2017-05-27 13:42+0300\n"
-"PO-Revision-Date: 2017-05-27 13:44+0300\n"
+"POT-Creation-Date: 2017-10-30 23:22+0200\n"
+"PO-Revision-Date: 2017-10-30 23:23+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -28,7 +28,7 @@ msgstr "הגדרות CSS מתקדם"
 msgid "System Settings"
 msgstr "הגדרות מערכת"
 
-#: classes/class-ElementsTable.php:67 settings.php:227
+#: classes/class-ElementsTable.php:67 settings.php:185
 msgid "Not Stated"
 msgstr "לא צוין"
 
@@ -37,7 +37,7 @@ msgid "Id"
 msgstr "מזהה"
 
 #: classes/class-ElementsTable.php:101 general-settings.php:49
-#: general-settings.php:111 settings.php:1122
+#: general-settings.php:111 settings.php:1120
 msgid "Font Weight"
 msgstr "משקל גופן"
 
@@ -45,15 +45,15 @@ msgstr "משקל גופן"
 msgid "Custom Elements"
 msgstr "אלמנט מותאם אישית"
 
-#: classes/class-ElementsTable.php:103 settings.php:1447 settings.php:1464
+#: classes/class-ElementsTable.php:103 settings.php:1477 settings.php:1494
 msgid "Important"
 msgstr "חשוב"
 
-#: classes/class-ElementsTable.php:114 settings.php:290
+#: classes/class-ElementsTable.php:114 settings.php:247
 msgid "Yes"
 msgstr "כן"
 
-#: classes/class-ElementsTable.php:114 settings.php:293
+#: classes/class-ElementsTable.php:114 settings.php:250
 msgid "No"
 msgstr "לא"
 
@@ -65,7 +65,7 @@ msgstr "מחק"
 msgid "No custom elements found."
 msgstr "לא נמצאו אלמנטים מותאמים אישית."
 
-#: font-organizer.php:232 settings.php:417 settings.php:713
+#: font-organizer.php:289 settings.php:374 settings.php:711
 msgid "Font Settings"
 msgstr "הגדרות גופנים"
 
@@ -86,7 +86,7 @@ msgid "Available Fonts"
 msgstr "גופנים זמינים"
 
 #: general-settings.php:13 general-settings.php:108 general-settings.php:167
-#: settings.php:768
+#: settings.php:766
 msgid "-- Select Font --"
 msgstr "-- בחירת גופן --"
 
@@ -231,7 +231,7 @@ msgstr ""
 "שלב 5: בחר גופן כדי לערוך, למחוק או להציג את מקורו ואת רכיבים מותאמים אישית "
 "מוקצה לו."
 
-#: general-settings.php:150 settings.php:774
+#: general-settings.php:150 settings.php:772
 msgid "Note: "
 msgstr "הערה:"
 
@@ -286,7 +286,7 @@ msgid "Google (Early Access)"
 msgstr "גוגל (גישה מוקדמת)"
 
 #: helpers/helpers.php:118 helpers/helpers.php:120 helpers/helpers.php:149
-#: helpers/helpers.php:151 settings.php:228
+#: helpers/helpers.php:151 settings.php:186
 msgid "Light"
 msgstr "בהיר"
 
@@ -294,32 +294,32 @@ msgstr "בהיר"
 #: helpers/helpers.php:132 helpers/helpers.php:136 helpers/helpers.php:140
 #: helpers/helpers.php:151 helpers/helpers.php:155 helpers/helpers.php:159
 #: helpers/helpers.php:163 helpers/helpers.php:167 helpers/helpers.php:171
-#: settings.php:234
+#: settings.php:192
 msgid "Italic"
 msgstr "נטוי"
 
 #: helpers/helpers.php:122 helpers/helpers.php:124 helpers/helpers.php:153
-#: helpers/helpers.php:155 settings.php:229
+#: helpers/helpers.php:155 settings.php:187
 msgid "Normal"
 msgstr "רגיל"
 
 #: helpers/helpers.php:126 helpers/helpers.php:128 helpers/helpers.php:157
-#: helpers/helpers.php:159 settings.php:230
+#: helpers/helpers.php:159 settings.php:188
 msgid "Semi-Bold"
 msgstr "מודגש למחצה"
 
 #: helpers/helpers.php:130 helpers/helpers.php:132 helpers/helpers.php:161
-#: helpers/helpers.php:163 settings.php:231
+#: helpers/helpers.php:163 settings.php:189
 msgid "Bold"
 msgstr "מודגש"
 
 #: helpers/helpers.php:134 helpers/helpers.php:136 helpers/helpers.php:165
-#: helpers/helpers.php:167 settings.php:232
+#: helpers/helpers.php:167 settings.php:190
 msgid "Extra-Bold"
 msgstr "מודגש מאוד"
 
 #: helpers/helpers.php:138 helpers/helpers.php:140 helpers/helpers.php:169
-#: helpers/helpers.php:171 settings.php:233
+#: helpers/helpers.php:171 settings.php:191
 msgid "Black"
 msgstr "שחור"
 
@@ -367,23 +367,23 @@ msgstr "גופן לתגית <li>"
 msgid "<a> Font"
 msgstr "גופן לתגית <a>"
 
-#: settings.php:654
+#: settings.php:648 settings.php:651
 msgid "Google API key is not valid: "
 msgstr "המפתח של גוגל אינה חוקי:"
 
-#: settings.php:720
+#: settings.php:718
 msgid "General"
 msgstr "כללי"
 
-#: settings.php:721
+#: settings.php:719
 msgid "Advanced"
 msgstr "מתקדם"
 
-#: settings.php:736
+#: settings.php:734
 msgid "Thank you"
 msgstr "תודה לך!"
 
-#: settings.php:741
+#: settings.php:739
 msgid ""
 "Thank you for using an <a href=\"http://hivewebstudios.com\" target=\"_blank"
 "\">Hive</a> plugin! We 5 star you already, so why don't you <a href="
@@ -395,147 +395,151 @@ msgstr ""
 "\"https://wordpress.org/support/plugin/font-organizer/reviews/?rate=5#new-"
 "post\" target=\"_blank\">תדרג אותנו 5 כוכבים גם</a>?"
 
-#: settings.php:743
+#: settings.php:741
 msgid "Anyway, if you need anything, this may help:"
 msgstr "בכל מקרה, אם את/ה צריכ/ה משהו, אולי זה יעזור:"
 
-#: settings.php:745
+#: settings.php:743
 msgid "FAQ"
 msgstr "שאלות נפוצות"
 
-#: settings.php:746
+#: settings.php:744
 msgid "Support forums"
 msgstr "פורום תמיכה"
 
-#: settings.php:747
+#: settings.php:745
 msgid "Contact us"
 msgstr "צרו קשר"
 
-#: settings.php:754
+#: settings.php:752
 msgid "Like Our Facebook Page"
 msgstr "תן לייק לעמוד הפייסבוק שלנו"
 
-#: settings.php:762
+#: settings.php:760
 msgid "Font Preview"
 msgstr "תצוגה מקדימה לגופנים"
 
-#: settings.php:766
+#: settings.php:764
 msgid "Select a font from the list to preview."
 msgstr "בחר גופן מהרשימה כדי להציג בתצוגה מקדימה."
 
-#: settings.php:769 settings.php:772
+#: settings.php:767 settings.php:770
 msgid "This is a preview content."
 msgstr "זוהי תצוגה מקדימה של תוכן."
 
-#: settings.php:769
+#: settings.php:767
 msgid "Font preview free text"
 msgstr "טקסט חופשי לתצוגה מקדימה"
 
-#: settings.php:774
+#: settings.php:772
 msgid "Some fonts may not support your language."
 msgstr "גופנים מסוימים עשויים שלא לתמוך בשפה שלך."
 
-#: settings.php:785 settings.php:827 settings.php:842 settings.php:863
+#: settings.php:783 settings.php:825 settings.php:840 settings.php:861
 msgid "Session ended, please try again."
 msgstr "הסתיים הטיפול, אנא נסה שנית."
 
-#: settings.php:791
+#: settings.php:789
 msgid "Font name is empty or invalid."
 msgstr "שם גופן הוא ריק או לא חוקי."
 
-#: settings.php:797
+#: settings.php:795
 msgid "Font weight is empty or invalid."
 msgstr "משקל גופן הוא ריק או לא חוקי."
 
-#: settings.php:802
+#: settings.php:800
 msgid "Font file is not selected."
 msgstr "לא נבחר קובץ הגופן."
 
-#: settings.php:818
+#: settings.php:816
 msgid "Font file(s) not selected."
 msgstr "לא נבחרו קבצים לגופן."
 
-#: settings.php:833
+#: settings.php:831
 msgid "Usable font is empty or invalid."
 msgstr "גופן לשימוש הוא ריק או לא חוקי."
 
-#: settings.php:848
+#: settings.php:846
 msgid "Custom elements is empty or invalid."
 msgstr "אלמנטים מותאמים אישית ריק או לא חוקי."
 
-#: settings.php:870
+#: settings.php:868
 msgid "Something went horribly wrong. Ask the support!"
 msgstr "משהו השתבש בצורה נוראית. תשאל את התמיכה!"
 
-#: settings.php:1002
+#: settings.php:1000
 msgid "Error adding custom elements: "
 msgstr "שגיאה בעת הוספת אלמנטים מותאמים אישית:"
 
-#: settings.php:1009
+#: settings.php:1007
 msgid "Custom elements added to your website!"
 msgstr "אלמנטים מותאמים אישית התווספו לאתר שלך!"
 
-#: settings.php:1017
+#: settings.php:1015
 msgid "Font can now be used in your website!"
 msgstr "כעת ניתן להשתמש בגופן באתר האינטרנט שלך!"
 
-#: settings.php:1025
+#: settings.php:1023
 msgid "Font deleted from your website!"
 msgstr "גופן נמחק מהאתר שלך!"
 
-#: settings.php:1033
+#: settings.php:1031
 msgid "The file(s) uploaded successfully!"
 msgstr "הקובץ הועלה בהצלחה!"
 
-#: settings.php:1041
+#: settings.php:1039
 msgid "Error uploading the file: "
 msgstr "שגיאה בהעלאת הקובץ:"
 
-#: settings.php:1049
+#: settings.php:1047
 msgid "Error adding font to website fonts: "
 msgstr "שגיאה בעת הוספת גופן לאתר:"
 
-#: settings.php:1057
+#: settings.php:1055
 msgid "Error deleting font: "
 msgstr "שגיאה במחיקת גופן:"
 
-#: settings.php:1065
+#: settings.php:1063
 msgid "Failed to open or create the css file. Check for permissions."
 msgstr "לא ניתן לפתוח או ליצור את קובץ ה-css. בדוק אם יש הרשאות."
 
-#: settings.php:1152
+#: settings.php:1150
 msgid "Additional CSS"
 msgstr "CSS נוסף"
 
-#: settings.php:1165
+#: settings.php:1163
 msgid "Google API Key"
 msgstr "מפתח API של גוגל"
 
-#: settings.php:1172
+#: settings.php:1170
 msgid "Show Font Family Preview"
 msgstr "טען תצוגה מקדימה לגופנים"
 
-#: settings.php:1182
+#: settings.php:1180
 msgid "Access Settings Role"
 msgstr "רמת הרשאה להגדרות"
 
-#: settings.php:1191
+#: settings.php:1189
+msgid "Remove Font Selection From Editor"
+msgstr ""
+
+#: settings.php:1197
 msgid "Uninstall All"
 msgstr "הסר הכל"
 
-#: settings.php:1191
+#: settings.php:1197
 msgid "Caution"
 msgstr "זהירות"
 
-#: settings.php:1300
+#: settings.php:1311
 msgid "This is the general settings for the site."
 msgstr "אלה הם הגדרות כלליות עבור התוסף."
 
-#: settings.php:1308
+#: settings.php:1319
 msgid "This is the advanced css settings for the plugin."
 msgstr "זהו הגדרות css מתקדם של התוסף."
 
-#: settings.php:1330
+#: settings.php:1341
 #, php-format
 msgid ""
 "The plugin uses static google fonts list. In order to get the most current "
@@ -546,17 +550,17 @@ msgstr ""
 "ביותר, גוגל דורש מפתח API, שנוצר באמצעות הממשק שלהם. לקבלת מידע נוסף, קרא <a "
 "href=\"%s\" target=\"_blank\">את השאלות הנפוצות שלנו</a>."
 
-#: settings.php:1342
+#: settings.php:1353
 msgid ""
 "This custom css will be added to the elements css file. Please use with "
 "caution."
 msgstr "Css מותאם אישית זה יתווספו לקובץ css של האלמנטים. אנא השתמש בזהירות."
 
-#: settings.php:1359
+#: settings.php:1370 settings.php:1389
 msgid "Uninstall All Option"
 msgstr "אפשרות הסרת הכל"
 
-#: settings.php:1361
+#: settings.php:1372
 msgid ""
 "When checked uninstalling the plugin will delete all of it's content "
 "including uploaded fonts and database."
@@ -564,19 +568,23 @@ msgstr ""
 "כאשר אפשרות זו מסומנת, הסרת ההתקנה של התוסף תמחק את כל התוכן, כולל גופנים "
 "שהועלו ומסד הנתונים."
 
-#: settings.php:1379
+#: settings.php:1391
+msgid "When checked remove font family & font size from editor."
+msgstr ""
+
+#: settings.php:1409
 msgid "Include Font Family Preview"
 msgstr "הוסף גופן לדף זה לצפיה בתוצגה מוקדמת"
 
-#: settings.php:1381
+#: settings.php:1411
 msgid "Show font preview when listing the fonts (might be slow)"
 msgstr "הצג תצוגה מקדימה של הגופן ברשימה של גופנים (עשוי להיות איטי)."
 
-#: settings.php:1450 settings.php:1467
+#: settings.php:1480 settings.php:1497
 msgid "Include !important to this element to always apply."
 msgstr "הוסף  תגית important! על מנת שגופן זה תמיד יופיע."
 
-#: settings.php:1479
+#: settings.php:1509
 msgid "Default"
 msgstr "ברירת מחדל"
 

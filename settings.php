@@ -217,7 +217,6 @@ class FoSettingsPage
                 editor.$blockScrolling = Infinity;
                 editor.getSession().setUseWrapMode( true );
                 editor.getSession().setMode( "ace/mode/css" );
-                editor.setValue("<?php echo array_key_exists('additional_css', $this->advanced_options) ? preg_replace('/[\r\n]+/', '\n',$this->advanced_options['additional_css']) : ''; ?>", 1);
 
                 // Notify fields on change to allow save in WordPress options.
                 editor.getSession().on('change', function() {
@@ -646,11 +645,11 @@ class FoSettingsPage
                 // Show the most detailed message in the error and display it to the user.
                 if ( is_wp_error( $response ) ) {
                     $error = wp_strip_all_tags( $response->get_error_message() );
+                    add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . $error, 'error');
                 }else{
                     $error = json_decode(wp_remote_retrieve_body($response))->error->errors[0];
+                    add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . ' [' . $error->reason . '] ' . $error->message, 'error');
                 }
-
-                add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . ' [' . $error->reason . '] ' . $error->message, 'error');
             }
         }
 
@@ -1186,12 +1185,20 @@ class FoSettingsPage
         }
 
         add_settings_field(
+            'remove_font_editor', // ID
+            __('Remove Font Selection From Editor', 'font-organizer'), // Title 
+            array( $this, 'remove_font_editor_callback' ), // Callback
+            'font-setting-admin', // Page
+            'setting_general' // Section           
+        );
+
+        add_settings_field(
             'uninstall_all', // ID
             __('Uninstall All', 'font-organizer') . '<span style="color:red;font-weight:bold;"> (' . __('Caution', 'font-organizer') . ')</span>', // Title 
             array( $this, 'uninstall_all_callback' ), // Callback
             'font-setting-admin', // Page
             'setting_general' // Section           
-        );  
+        );
     }
 
     /**
@@ -1214,6 +1221,11 @@ class FoSettingsPage
             $new_input['uninstall_all'] =  0 ;
         else
             $new_input['uninstall_all'] = $input['uninstall_all'];
+
+        if( !isset( $input['remove_font_editor'] ) )
+            $new_input['remove_font_editor'] =  0 ;
+        else
+            $new_input['remove_font_editor'] = $input['remove_font_editor'];
 
         // Do not allow change in permissions if user is not admin.
         if(!$this->is_admin)
@@ -1336,8 +1348,8 @@ class FoSettingsPage
     public function additional_css_callback()
     {
         $value = isset( $this->advanced_options['additional_css'] ) ? $this->advanced_options['additional_css'] : '';
-        echo '<div id="editor">' . $value . '</div>';
-        echo '<textarea style="display: none;" id="additional_css" name="fo_advanced_options[additional_css]">'.$value.'</textarea>';
+        echo '<div id="editor">' . stripslashes($value) . '</div>';
+        echo '<textarea style="display: none;" id="additional_css" name="fo_advanced_options[additional_css]">'.stripslashes($value).'</textarea>';
         echo '<span style="font-size: 11px;font-style:italic;">' . __('This custom css will be added to the elements css file. Please use with caution.', 'font-organizer') . '</span>';
     }
 
@@ -1358,6 +1370,25 @@ class FoSettingsPage
             __('Uninstall All Option', 'font-organizer'),
             $checked, 
             __('When checked uninstalling the plugin will delete all of it\'s content including uploaded fonts and database.', 'font-organizer')
+        );
+    }
+    /** 
+     * Get the settings option array and print one of its values
+     */
+    public function remove_font_editor_callback()
+    {
+        $checked = isset($this->general_options['remove_font_editor']) && $this->general_options['remove_font_editor'] ? 'checked="checked"' : '';
+        printf(
+            '<fieldset>
+                <legend class="screen-reader-text"><span>%s</span></legend>
+                <label for="remove_font_editor">
+                    <input name="fo_general_options[remove_font_editor]" type="checkbox" id="remove_font_editor" value="1" %s>
+                    %s
+                </label>
+            </fieldset>',
+            __('Uninstall All Option', 'font-organizer'),
+            $checked, 
+            __('When checked remove font family & font size from editor.', 'font-organizer')
         );
     }
 
