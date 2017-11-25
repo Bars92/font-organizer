@@ -2,7 +2,7 @@
 Contributors: basaar,yardensade,hivewebstudios
 Tags: fonts,google fonts,upload font,font,google,custom, free, download, style
 Requires at least: 3.8
-Tested up to: 4.8.2
+Tested up to: 4.9
 Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

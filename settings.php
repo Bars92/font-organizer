@@ -156,7 +156,7 @@ class FoSettingsPage
                                 'a_font'    =>  __('<a> Font', 'font-organizer'),
                                 );
 
-         $this->font_weights = array('300','300italic','regular','italic','600','600italic','700','700italic','800','800italic', '900', '900italic');
+         $this->font_weights = array('300','300italic','regular','italic','500','500italic', '600','600italic','700','700italic','800','800italic', '900', '900italic');
 
         if($should_hook){
             add_action( 'network_admin_menu', array( $this, 'add_plugin_page' ) );
@@ -185,6 +185,7 @@ class FoSettingsPage
                                     'default_label' => __('Not Stated', 'font-organizer'),
                                     'light' => __('Light', 'font-organizer'),
                                     'regular' => __('Normal', 'font-organizer'),
+                                    'medium' => __('Medium', 'font-organizer'),
                                     'semibold' => __('Semi-Bold', 'font-organizer'),
                                     'bold' => __('Bold', 'font-organizer'),
                                     'extrabold' => __('Extra-Bold', 'font-organizer'),

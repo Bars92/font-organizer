@@ -173,6 +173,10 @@ jQuery(document).ready(function(){
                 return data.labels.regular;
             case "italic":
                 return data.labels.regular + " " + data.labels.italic;
+            case "500":
+                return data.labels.medium;
+            case "500italic":
+                return data.labels.medium + " " + data.labels.italic;
             case "600":
                 return data.labels.semibold;
             case "600italic":

@@ -122,6 +122,10 @@
                     return "<option style=\"".$font_style."\" value=\"regular\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer'). "</option>";
                 case "italic":
                     return "<option style=\"".$font_style."\" value=\"italic\"" . selected($weight, $selected, false) . ">" . __('Normal', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
+                case "500":
+                    return "<option style=\"".$font_style."\" value=\"500\"" . selected($weight, $selected, false) . ">" . __('Medium', 'font-organizer'). "</option>";
+                case "500italic":
+                    return "<option style=\"".$font_style."\" value=\"500italic\"" . selected($weight, $selected, false) . ">" . __('Medium', 'font-organizer') . " " . __('Italic', 'font-organizer'). "</option>";
                 case "600":
                     return "<option style=\"".$font_style."\" value=\"600\"" . selected($weight, $selected, false) . ">" . __('Semi-Bold', 'font-organizer'). "</option>";
                 case "600italic":
@@ -153,6 +157,10 @@
                     return __('Normal', 'font-organizer');
                 case "italic":
                     return __('Normal', 'font-organizer') . " " . __('Italic', 'font-organizer');
+                case "500":
+                    return __('Medium', 'font-organizer');
+                case "500italic":
+                    return __('Medium', 'font-organizer') . " " . __('Italic', 'font-organizer');
                 case "600":
                     return __('Semi-Bold', 'font-organizer');
                 case "600italic":
