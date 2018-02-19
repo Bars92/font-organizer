@@ -100,6 +100,12 @@ class FoSettingsPage
     private $include_font_link;
 
     /**
+     * Holds the value if it should add font controls to TinyMCE.
+     * If set to false, leaves TinyMCE unmodified.
+     */
+    private $add_tinymce_font_controls;
+
+    /**
      * Holds a list of all the custom elements from the database.
      */
     private $custom_elements;
@@ -127,7 +133,7 @@ class FoSettingsPage
 
     public function __construct($should_hook = true)
     {
-        require_once FO_ABSPATH . 'classes/class-ElementsTable.php'; 
+        require_once FO_ABSPATH . 'classes/class-ElementsTable.php';
         require_once FO_ABSPATH . 'classes/class-FontsDatabaseHelper.php';
 
         $this->fonts_per_link = 150;
@@ -156,7 +162,7 @@ class FoSettingsPage
                                 'a_font'    =>  __('<a> Font', 'font-organizer'),
                                 );
 
-         $this->font_weights = array('300','300italic','regular','italic','500','500italic', '600','600italic','700','700italic','800','800italic', '900', '900italic');
+         $this->font_weights = array('300','300italic','regular','italic','600','600italic','700','700italic','800','800italic', '900', '900italic');
 
         if($should_hook){
             add_action( 'network_admin_menu', array( $this, 'add_plugin_page' ) );
@@ -185,7 +191,6 @@ class FoSettingsPage
                                     'default_label' => __('Not Stated', 'font-organizer'),
                                     'light' => __('Light', 'font-organizer'),
                                     'regular' => __('Normal', 'font-organizer'),
-                                    'medium' => __('Medium', 'font-organizer'),
                                     'semibold' => __('Semi-Bold', 'font-organizer'),
                                     'bold' => __('Bold', 'font-organizer'),
                                     'extrabold' => __('Extra-Bold', 'font-organizer'),
@@ -218,6 +223,7 @@ class FoSettingsPage
                 editor.$blockScrolling = Infinity;
                 editor.getSession().setUseWrapMode( true );
                 editor.getSession().setMode( "ace/mode/css" );
+                editor.setValue("<?php echo array_key_exists('additional_css', $this->advanced_options) ? preg_replace('/[\r\n]+/', '\n',$this->advanced_options['additional_css']) : ''; ?>", 1);
 
                 // Notify fields on change to allow save in WordPress options.
                 editor.getSession().on('change', function() {
@@ -230,7 +236,7 @@ class FoSettingsPage
                 // Exit focus from the text when clicking 'Enter' but don't submit the form.
                 jQuery('table.custom_elements').find('td input:text').on('keyup keypress', function(e) {
                   var keyCode = e.keyCode || e.which;
-                  if (keyCode === 13) { 
+                  if (keyCode === 13) {
                     jQuery(this).blur();
                     e.preventDefault();
                     return false;
@@ -348,8 +354,8 @@ class FoSettingsPage
         global $wpdb;
 
         $table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;
-        $wpdb->update( 
-        $table_name, 
+        $wpdb->update(
+        $table_name,
         array( $_POST['column'] => $_POST['text'] ), // change the column selected with the new value.
         array('id' => $_POST['id']) // where id
         );
@@ -358,7 +364,7 @@ class FoSettingsPage
         $this->load_custom_elements();
         $this->elements_options = get_option( 'fo_elements_options' );
         $this->advanced_options = get_option( 'fo_advanced_options' );
-        
+
         $this->create_elements_file();
 
         wp_die(true); // this is required to terminate immediately and return a proper response
@@ -371,10 +377,10 @@ class FoSettingsPage
     {
         // This page will be under "Settings"
         $hook = add_options_page(
-            'Settings Admin', 
-            __('Font Settings', 'font-organizer'), 
+            'Settings Admin',
+            __('Font Settings', 'font-organizer'),
             'manage_fonts',
-            'font-setting-admin', 
+            'font-setting-admin',
             array( $this, 'create_font_settings_page' )
         );
 
@@ -392,8 +398,8 @@ class FoSettingsPage
 	}
 
     public function init_page(){
-        // First in this page. Make sure to handle all events happend and crete 
-        if (isset($_POST['submit_upload_font'])){  
+        // First in this page. Make sure to handle all events happend and crete
+        if (isset($_POST['submit_upload_font'])){
             if($args = $this->validate_upload()){
                 $this->upload_file($args);
                 $this->should_create_css = true;
@@ -402,7 +408,7 @@ class FoSettingsPage
             }
         }
 
-        if (isset($_POST['submit_usable_font'])){  
+        if (isset($_POST['submit_usable_font'])){
             if($args = $this->validate_add_usable()){
                 $this->use_font($args);
                 $this->should_create_css = true;
@@ -411,7 +417,7 @@ class FoSettingsPage
             }
         }
 
-        if (isset($_POST['delete_usable_font'])){  
+        if (isset($_POST['delete_usable_font'])){
             if($args = $this->validate_delete_usable()){
                 $this->delete_font($args);
                 $this->should_create_css = true;
@@ -434,7 +440,7 @@ class FoSettingsPage
         if(isset($_GET['action']) && ($_GET['action'] == 'delete' || $_GET['action'] == 'bulk-delete') && isset($_GET['custom_element'])){
             $this->should_create_css = true;
         }
-        
+
     	$this->init();
         $this->create_css_file();
     }
@@ -443,7 +449,7 @@ class FoSettingsPage
         if(((!isset($_GET['settings-updated']) || !$_GET['settings-updated']) && !$this->should_create_css) && !$force){
             return;
         }
-        
+
         /* ========= Create the declartions file ========= */
         $this->create_declration_file();
 
@@ -530,7 +536,7 @@ class FoSettingsPage
                     }
                 }
             }
-            
+
             $usable_font = $this->usable_fonts[$usable_font_db->name];
             switch ($usable_font->kind) {
                 case 'custom':
@@ -545,7 +551,7 @@ class FoSettingsPage
 
                         // In eot we fix IE<9 the format by adding another src.
                         if($isEOT) {
-                            $eot_fix = "src: url('" . $url . "');";   
+                            $eot_fix = "src: url('" . $url . "');";
                         }
 
                         $url_str = "url('" . fo_get_font_url($url, $isEOT, $isSVG) . "') format('" . fo_get_font_format($url) . "')";
@@ -586,7 +592,7 @@ class FoSettingsPage
 
                     $font_url = current($usable_font->files->regular);
                      // Fix everyone saved with http or https and let the browser decide.
-                    $font_url = str_replace('http://',  '//', $font_url); 
+                    $font_url = str_replace('http://',  '//', $font_url);
                     $font_url = str_replace('https://', '//', $font_url);
                     $content .= "@import url(".$font_url.");\n";
                     break;
@@ -646,18 +652,18 @@ class FoSettingsPage
                 // Show the most detailed message in the error and display it to the user.
                 if ( is_wp_error( $response ) ) {
                     $error = wp_strip_all_tags( $response->get_error_message() );
-                    add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . $error, 'error');
                 }else{
                     $error = json_decode(wp_remote_retrieve_body($response))->error->errors[0];
-                    add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . ' [' . $error->reason . '] ' . $error->message, 'error');
                 }
+
+                add_settings_error('google_key', '', __('Google API key is not valid: ', 'font-organizer') . ' [' . $error->reason . '] ' . $error->message, 'error');
             }
         }
 
         if(empty($this->google_fonts)){
             // Get a static google fonts list.
             require_once FO_ABSPATH . '/helpers/google-fonts.php';
-            
+
             $this->google_fonts = json_decode(fo_get_all_google_fonts_static_response())->items;
             $this->is_google_static = true;
         }
@@ -705,13 +711,13 @@ class FoSettingsPage
         // Load the google fonts if selected or if not specified. else load just whats usable.
         if($this->include_font_link)
             fo_print_links($this->google_fonts, $this->fonts_per_link);
-        
+
         ?>
         <a href="#" class="go-top <?php echo is_rtl() ? ' rtl' : 'ltr'; ?>"></a>
         <div class="wrap">
             <h1><?php _e('Font Settings', 'font-organizer'); ?></h1>
 
-            <div id="poststuff">  
+            <div id="poststuff">
                 <div id="post-body" class="metabox-holder columns-2">
 
                 <div id="tabs" class="<?php echo is_rtl() ? ' rtl' : 'ltr'; ?>">
@@ -739,7 +745,7 @@ class FoSettingsPage
                                 <p><?php _e(
                                         'Thank you for using an <a href="http://hivewebstudios.com" target="_blank">Hive</a> plugin! We 5 star you already, so why don\'t you <a href="https://wordpress.org/support/plugin/font-organizer/reviews/?rate=5#new-post" target="_blank">5 star us too</a>?', 'font-organizer'); ?>
                                     <br />
-                                    <p><?php _e('Anyway, if you need anything, this may help:', 'font-organizer'); ?></p> 
+                                    <p><?php _e('Anyway, if you need anything, this may help:', 'font-organizer'); ?></p>
                                     <ul style="list-style-type:disc;margin: 0 20px;">
                                         <li><a href="http://hivewebstudios.com/font-organizer/#faq" target="_blank"><?php _e('FAQ', 'font-organizer'); ?></a></li>
                                         <li><a href="https://wordpress.org/support/plugin/font-organizer" target="_blank"><?php _e('Support forums', 'font-organizer'); ?></a></li>
@@ -777,7 +783,7 @@ class FoSettingsPage
                 </div>
         </div>
         <?php
-    } 
+    }
 
     private function validate_upload(){
         if(!isset( $_POST['add_custom_font_nonce'] ) || !wp_verify_nonce( $_POST['add_custom_font_nonce'], 'add_custom_font' )){
@@ -812,12 +818,12 @@ class FoSettingsPage
 
             $i++;
         }
-        
+
         if(empty($args['font_file'])){
             $this->recent_error = __('Font file(s) not selected.', 'font-organizer');
             return false;
         }
-        
+
         return $args;
     }
 
@@ -883,7 +889,7 @@ class FoSettingsPage
                 add_action( 'admin_notices', array($this, 'upload_failed_admin_notice') );
                 return false;
             }
-            
+
             // Save relative url in the database.
             $urls[] = substr($movefile['url'], strlen(get_site_url()));
         }
@@ -894,7 +900,7 @@ class FoSettingsPage
         if($usable_font){
             $urls_str = $usable_font->url . self::CUSTOM_FONT_URL_SPERATOR . $urls_str;
         }
-        
+
         $this->save_usable_font_to_database($args['font_name'], $urls_str, true, $usable_font);
 
         add_action( 'admin_notices', array($this, 'upload_successfull_admin_notice') );
@@ -964,10 +970,10 @@ class FoSettingsPage
         global $wpdb;
         $table_name = $wpdb->prefix . FO_ELEMENTS_DATABASE;
 
-        $wpdb->insert( 
-        $table_name, 
-        array( 
-            'font_id' => $id, 
+        $wpdb->insert(
+        $table_name,
+        array(
+            'font_id' => $id,
             'custom_elements' => $custom_elements,
             'font_weight' => $font_weight,
             'important' => $important ? 1 : 0,
@@ -979,16 +985,16 @@ class FoSettingsPage
         $table_name = $wpdb->prefix . FO_USABLE_FONTS_DATABASE;
 
         if($update){
-            $wpdb->update( 
+            $wpdb->update(
                     $table_name,
-                    array('url' => $url), 
+                    array('url' => $url),
                     array('name' => $name));
         }else{
-            $wpdb->insert( 
-            $table_name, 
-            array( 
-                'name' => $name, 
-                'url' => $url, 
+            $wpdb->insert(
+            $table_name,
+            array(
+                'name' => $name,
+                'url' => $url,
                 'custom' => $is_custom ? 1 : 0,
             ));
         }
@@ -1068,7 +1074,7 @@ class FoSettingsPage
 
     /**
      * Override the default upload path.
-     * 
+     *
      * @param   array   $dir
      * @return  array
      */
@@ -1086,7 +1092,7 @@ class FoSettingsPage
      * Register and add settings
      */
     public function page_init()
-    {   
+    {
         register_setting(
             'fo_general_options', // Option group
             'fo_general_options', // Option name
@@ -1097,42 +1103,42 @@ class FoSettingsPage
             'fo_elements_options', // Option name
             array( $this, 'elements_sanitize' ) // Sanitize
         );
-        
+
         add_settings_section(
             'setting_elements', // ID
             '', // Title
             array( $this, 'print_elements_section_info' ), // Callback
             'font-setting-admin' // Page
-        );  
+        );
 
         // Add all the elements to the elements section.
         foreach ($this->elements as $id => $title) {
             add_settings_field(
                 $id, // ID
-                htmlspecialchars($title), // Title 
+                htmlspecialchars($title), // Title
                 array( $this, 'fonts_list_field_callback' ), // Callback
                 'font-setting-admin', // Page
-                'setting_elements', // Section 
-                $id // Parameter for Callback 
-            );   
+                'setting_elements', // Section
+                $id // Parameter for Callback
+            );
 
              add_settings_field(
                 $id . '_weight', // ID
-                __('Font Weight', 'font-organizer'), // Title 
+                __('Font Weight', 'font-organizer'), // Title
                 array( $this, 'fonts_weight_list_field_callback' ), // Callback
                 'font-setting-admin', // Page
-                'setting_elements', // Section 
-                $id . '_weight' // Parameter for Callback 
-           ); 
+                'setting_elements', // Section
+                $id . '_weight' // Parameter for Callback
+           );
 
             add_settings_field(
                 $id . '_important', // ID
-                '', // Title 
+                '', // Title
                 array( $this, 'is_important_element_field_callback' ), // Callback
                 'font-setting-admin', // Page
-                'setting_elements', // Section 
-                $id . '_important' // Parameter for Callback 
-            );   
+                'setting_elements', // Section
+                $id . '_important' // Parameter for Callback
+            );
         }
 
         register_setting(
@@ -1145,60 +1151,59 @@ class FoSettingsPage
             '', // Title
             array( $this, 'print_advanced_css_section_info' ), // Callback
             'font-setting-admin' // Page
-        );  
+        );
         add_settings_field(
             'additional_css', // ID
-            __('Additional CSS', 'font-organizer'), // Title 
+            __('Additional CSS', 'font-organizer'), // Title
             array( $this, 'additional_css_callback' ), // Callback
             'font-setting-admin', // Page
-            'advanced_css_options' // Section           
-        ); 
+            'advanced_css_options' // Section
+        );
         add_settings_section(
             'setting_general', // ID
             '', // Title
             array( $this, 'print_general_section_info' ), // Callback
             'font-setting-admin' // Page
-        );  
+        );
         add_settings_field(
             'google_key', // ID
-            __('Google API Key', 'font-organizer'), // Title 
+            __('Google API Key', 'font-organizer'), // Title
             array( $this, 'google_key_callback' ), // Callback
             'font-setting-admin', // Page
-            'setting_general' // Section           
-        );   
+            'setting_general' // Section
+        );
         add_settings_field(
             'include_font_link', // ID
-            __('Show Font Family Preview', 'font-organizer'), // Title 
+            __('Show Font Family Preview', 'font-organizer'), // Title
             array( $this, 'include_font_link_callback' ), // Callback
             'font-setting-admin', // Page
-            'setting_general' // Section           
-        );   
+            'setting_general' // Section
+        );
+        add_settings_field(
+            'add_tinymce_font_controls', // ID
+            __('Add Font Controls to TinyMCE', 'font-organizer'), // Title
+            array( $this, 'add_tinymce_font_controls_callback' ), // Callback
+            'font-setting-admin', // Page
+            'setting_general' // Section
+        );
 
         // If user is admin, display the permissions option.
         if ($this->is_admin) {
             add_settings_field(
                 'permissions', // ID
-                __('Access Settings Role', 'font-organizer'), // Title 
+                __('Access Settings Role', 'font-organizer'), // Title
                 array( $this, 'permissions_callback' ), // Callback
                 'font-setting-admin', // Page
-                'setting_general' // Section           
-            );   
+                'setting_general' // Section
+            );
         }
 
         add_settings_field(
-            'remove_font_editor', // ID
-            __('Remove Font Selection From Editor', 'font-organizer'), // Title 
-            array( $this, 'remove_font_editor_callback' ), // Callback
-            'font-setting-admin', // Page
-            'setting_general' // Section           
-        );
-
-        add_settings_field(
             'uninstall_all', // ID
-            __('Uninstall All', 'font-organizer') . '<span style="color:red;font-weight:bold;"> (' . __('Caution', 'font-organizer') . ')</span>', // Title 
+            __('Uninstall All', 'font-organizer') . '<span style="color:red;font-weight:bold;"> (' . __('Caution', 'font-organizer') . ')</span>', // Title
             array( $this, 'uninstall_all_callback' ), // Callback
             'font-setting-admin', // Page
-            'setting_general' // Section           
+            'setting_general' // Section
         );
     }
 
@@ -1218,15 +1223,15 @@ class FoSettingsPage
         else
         	$new_input['include_font_link'] = $input['include_font_link'];
 
+        if( !isset( $input['add_tinymce_font_controls'] ) )
+            $new_input['add_tinymce_font_controls'] =  0 ;
+        else
+        	$new_input['add_tinymce_font_controls'] = $input['add_tinymce_font_controls'];
+
         if( !isset( $input['uninstall_all'] ) )
             $new_input['uninstall_all'] =  0 ;
         else
             $new_input['uninstall_all'] = $input['uninstall_all'];
-
-        if( !isset( $input['remove_font_editor'] ) )
-            $new_input['remove_font_editor'] =  0 ;
-        else
-            $new_input['remove_font_editor'] = $input['remove_font_editor'];
 
         // Do not allow change in permissions if user is not admin.
         if(!$this->is_admin)
@@ -1235,7 +1240,7 @@ class FoSettingsPage
         // Get the old permissions.
        	$this->general_options = get_option( 'fo_general_options' );
        	$old_permissions = isset($this->general_options['permissions']) ? $this->general_options['permissions'] : array();
-       	
+
        	// Get the new permissions.
        	$new_input['permissions'] = isset($input['permissions']) ? $input['permissions'] : array();
        	if($new_input != $old_permissions){
@@ -1304,7 +1309,7 @@ class FoSettingsPage
         return $new_input;
     }
 
-    /** 
+    /**
      * Print the Section text
      */
     public function print_general_section_info()
@@ -1312,7 +1317,7 @@ class FoSettingsPage
         _e('This is the general settings for the site.', 'font-organizer');
     }
 
-    /** 
+    /**
      * Print the Section text
      */
     public function print_advanced_css_section_info()
@@ -1320,14 +1325,14 @@ class FoSettingsPage
         _e('This is the advanced css settings for the plugin.', 'font-organizer');
     }
 
-    /** 
+    /**
      * Print the Section text
      */
     public function print_elements_section_info()
     {
     }
 
-    /** 
+    /**
      * Get the settings option for google key array and print one of its values
      */
     public function google_key_callback()
@@ -1343,18 +1348,18 @@ class FoSettingsPage
         }
     }
 
-    /** 
+    /**
      * Get the settings option for additional css and print its values
      */
     public function additional_css_callback()
     {
         $value = isset( $this->advanced_options['additional_css'] ) ? $this->advanced_options['additional_css'] : '';
-        echo '<div id="editor">' . stripslashes($value) . '</div>';
-        echo '<textarea style="display: none;" id="additional_css" name="fo_advanced_options[additional_css]">'.stripslashes($value).'</textarea>';
+        echo '<div id="editor">' . $value . '</div>';
+        echo '<textarea style="display: none;" id="additional_css" name="fo_advanced_options[additional_css]">'.$value.'</textarea>';
         echo '<span style="font-size: 11px;font-style:italic;">' . __('This custom css will be added to the elements css file. Please use with caution.', 'font-organizer') . '</span>';
     }
 
-    /** 
+    /**
      * Get the settings option array and print one of its values
      */
     public function uninstall_all_callback()
@@ -1369,31 +1374,12 @@ class FoSettingsPage
                 </label>
             </fieldset>',
             __('Uninstall All Option', 'font-organizer'),
-            $checked, 
+            $checked,
             __('When checked uninstalling the plugin will delete all of it\'s content including uploaded fonts and database.', 'font-organizer')
         );
     }
-    /** 
-     * Get the settings option array and print one of its values
-     */
-    public function remove_font_editor_callback()
-    {
-        $checked = isset($this->general_options['remove_font_editor']) && $this->general_options['remove_font_editor'] ? 'checked="checked"' : '';
-        printf(
-            '<fieldset>
-                <legend class="screen-reader-text"><span>%s</span></legend>
-                <label for="remove_font_editor">
-                    <input name="fo_general_options[remove_font_editor]" type="checkbox" id="remove_font_editor" value="1" %s>
-                    %s
-                </label>
-            </fieldset>',
-            __('Uninstall All Option', 'font-organizer'),
-            $checked, 
-            __('When checked remove font family & font size from editor.', 'font-organizer')
-        );
-    }
 
-    /** 
+    /**
      * Get the settings option array and print one of its values
      */
     public function include_font_link_callback()
@@ -1408,19 +1394,39 @@ class FoSettingsPage
                 </label>
             </fieldset>',
             __('Include Font Family Preview', 'font-organizer'),
-            $checked, 
+            $checked,
             __('Show font preview when listing the fonts (might be slow)', 'font-organizer')
         );
     }
 
-    /** 
+    /**
+     * Get the settings option array and print one of its values
+     */
+    public function add_tinymce_font_controls_callback()
+    {
+        $checked = isset($this->general_options['add_tinymce_font_controls']) && $this->general_options['add_tinymce_font_controls'] ? 'checked="checked"' : '';
+        printf(
+            '<fieldset>
+                <legend class="screen-reader-text"><span>%s</span></legend>
+                <label for="add_tinymce_font_controls">
+                    <input name="fo_general_options[add_tinymce_font_controls]" type="checkbox" id="add_tinymce_font_controls" value="1" %s>
+                    %s
+                </label>
+            </fieldset>',
+            __('Add Font Controls to TinyMCE', 'font-organizer'),
+            $checked,
+            __('Add font controls to visual editor toolbar.', 'font-organizer')
+        );
+    }
+
+    /**
      * Get the settings option array and print one of its values
      */
     public function permissions_callback(){
         $wp_roles = new WP_Roles();
 		$roles = $wp_roles->get_names();
         $checked_values = !isset($this->general_options['permissions']) ? array(FO_DEFAULT_ROLE) : $this->general_options['permissions'];
-		
+
 		foreach ($roles as $role_value => $role_name) {
 			$checked = $role_value == 'administrator' || in_array($role_value, $checked_values) ? 'checked' : '';
 
@@ -1428,7 +1434,7 @@ class FoSettingsPage
   		}
     }
 
-    /** 
+    /**
      * Prints the main fonts list.
      */
     public function fonts_list_field_callback($name)
@@ -1453,7 +1459,7 @@ class FoSettingsPage
         echo '</select>';
     }
 
-    /** 
+    /**
      * Prints the main fonts list.
      */
     public function is_important_element_field_callback($name)
@@ -1461,7 +1467,7 @@ class FoSettingsPage
         $this->print_is_important_checkbox_options($name);
     }
 
-    /** 
+    /**
      * Get the settings option array and print one of its values
      */
     public function print_is_important_checkbox_options($name)
@@ -1499,15 +1505,15 @@ class FoSettingsPage
         );
     }
 
-    /** 
+    /**
      * Get the settings option array and print one of its values
      */
     private function print_usable_fonts_list($name)
     {
         $selected = isset( $this->elements_options[$name] ) ? esc_attr( $this->elements_options[$name]) : '';
         echo '<select id="'.$name.'" name="fo_elements_options['.$name.']" class="known_element_fonts">';
-        
-        echo '<option value="" '. selected('', $selected, false) . '>' . __('Default', 'font-organizer') . '</option>'; 
+
+        echo '<option value="" '. selected('', $selected, false) . '>' . __('Default', 'font-organizer') . '</option>';
 
         //fonts section
         foreach($this->usable_fonts as $font)
@@ -1520,13 +1526,13 @@ class FoSettingsPage
         echo '</select>';
     }
 
-    /** 
+    /**
      * Get the settings option array and print one of its values
      */
     private function print_custom_elements_usable_fonts_list($name, $default = '', $validity = '')
     {
         echo '<select id="'.$name.'" name="'.$name.'" required oninvalid="this.setCustomValidity(\'' . $validity . '\')" oninput="setCustomValidity(\'\')">';
-        
+
         if($default){
         	 echo '<option value="">'.$default.'</option>';
         }
@@ -1542,7 +1548,7 @@ class FoSettingsPage
         echo '</select>';
     }
 
-    /** 
+    /**
      * Get the settings option array and print one of its values
      */
     private function print_available_fonts_list($name, $default = "")
@@ -1599,7 +1605,7 @@ class FoSettingsPage
                     if(!array_key_exists($current_weight, $weight_files)){
                         $weight_files[$current_weight] = array();
                     }
-                    
+
                     // Add the current url to the current weight array.
                     array_push($weight_files[$current_weight], fo_get_full_url($url));
                 }
@@ -1613,7 +1619,7 @@ class FoSettingsPage
                 foreach ($this->available_fonts as $available_font) {
                     if($available_font->family == $usable_font->name){
                         $this->usable_fonts[$available_font->family] = $available_font;
-                        
+
                         // Remove the found font from avaiable since it is already used.
                         array_splice($this->available_fonts, $i, 1);
                         break;
