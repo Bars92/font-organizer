@@ -119,8 +119,11 @@ function fo_enqueue_declarations_fonts_css(){
 
 // Enable font size & font family selects in the editor
 function fo_mce_buttons( $buttons ) {
-	array_unshift( $buttons, 'fontselect' ); // Add Font Select
-	array_unshift( $buttons, 'fontsizeselect' ); // Add Font Size Select
+	$general_options = get_option( 'fo_general_options', array() );
+	if(!array_key_exists('add_tinymce_font_controls', $general_options) || $general_options['add_tinymce_font_controls']){
+		array_unshift( $buttons, 'fontselect' ); // Add Font Select
+		array_unshift( $buttons, 'fontsizeselect' ); // Add Font Size Select
+	}
 	return $buttons;
 }
 

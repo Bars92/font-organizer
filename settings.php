@@ -100,6 +100,12 @@ class FoSettingsPage
     private $include_font_link;
 
     /**
+     * Holds the value if it should add font controls to TinyMCE.
+     * If set to false, leaves TinyMCE unmodified.
+     */
+    private $add_tinymce_font_controls;
+
+    /**
      * Holds a list of all the custom elements from the database.
      */
     private $custom_elements;
@@ -1173,6 +1179,13 @@ class FoSettingsPage
             'font-setting-admin', // Page
             'setting_general' // Section           
         );   
+        add_settings_field(
+            'add_tinymce_font_controls', // ID
+            __('Add Font Controls to TinyMCE', 'font-organizer'), // Title
+            array( $this, 'add_tinymce_font_controls_callback' ), // Callback
+            'font-setting-admin', // Page
+            'setting_general' // Section
+        );
 
         // If user is admin, display the permissions option.
         if ($this->is_admin) {
@@ -1217,6 +1230,11 @@ class FoSettingsPage
             $new_input['include_font_link'] =  0 ;
         else
         	$new_input['include_font_link'] = $input['include_font_link'];
+
+        if( !isset( $input['add_tinymce_font_controls'] ) )
+            $new_input['add_tinymce_font_controls'] =  0 ;
+        else
+        	$new_input['add_tinymce_font_controls'] = $input['add_tinymce_font_controls'];
 
         if( !isset( $input['uninstall_all'] ) )
             $new_input['uninstall_all'] =  0 ;
@@ -1410,6 +1428,26 @@ class FoSettingsPage
             __('Include Font Family Preview', 'font-organizer'),
             $checked, 
             __('Show font preview when listing the fonts (might be slow)', 'font-organizer')
+        );
+    }
+
+    /**
+     * Get the settings option array and print one of its values
+     */
+    public function add_tinymce_font_controls_callback()
+    {
+        $checked = isset($this->general_options['add_tinymce_font_controls']) && $this->general_options['add_tinymce_font_controls'] ? 'checked="checked"' : '';
+        printf(
+            '<fieldset>
+                <legend class="screen-reader-text"><span>%s</span></legend>
+                <label for="add_tinymce_font_controls">
+                    <input name="fo_general_options[add_tinymce_font_controls]" type="checkbox" id="add_tinymce_font_controls" value="1" %s>
+                    %s
+                </label>
+            </fieldset>',
+            __('Add Font Controls to TinyMCE', 'font-organizer'),
+            $checked,
+            __('Add font controls to visual editor toolbar.', 'font-organizer')
         );
     }
 
