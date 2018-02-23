@@ -2,14 +2,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Font Organizer\n"
-"POT-Creation-Date: 2017-10-30 23:22+0200\n"
+"POT-Creation-Date: 2018-02-23 15:47+0200\n"
 "PO-Revision-Date: 2016-11-09 15:53+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.2\n"
+"X-Generator: Poedit 2.0.1\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: font-organizer.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -36,7 +36,7 @@ msgid "Id"
 msgstr ""
 
 #: classes/class-ElementsTable.php:101 general-settings.php:49
-#: general-settings.php:111 settings.php:1120
+#: general-settings.php:111 settings.php:1121
 msgid "Font Weight"
 msgstr ""
 
@@ -44,15 +44,15 @@ msgstr ""
 msgid "Custom Elements"
 msgstr ""
 
-#: classes/class-ElementsTable.php:103 settings.php:1477 settings.php:1494
+#: classes/class-ElementsTable.php:103 settings.php:1478 settings.php:1495
 msgid "Important"
 msgstr ""
 
-#: classes/class-ElementsTable.php:114 settings.php:247
+#: classes/class-ElementsTable.php:114 settings.php:248
 msgid "Yes"
 msgstr ""
 
-#: classes/class-ElementsTable.php:114 settings.php:250
+#: classes/class-ElementsTable.php:114 settings.php:251
 msgid "No"
 msgstr ""
 
@@ -64,7 +64,7 @@ msgstr ""
 msgid "No custom elements found."
 msgstr ""
 
-#: font-organizer.php:289 settings.php:374 settings.php:711
+#: font-organizer.php:310 settings.php:375 settings.php:712
 msgid "Font Settings"
 msgstr ""
 
@@ -85,7 +85,7 @@ msgid "Available Fonts"
 msgstr ""
 
 #: general-settings.php:13 general-settings.php:108 general-settings.php:167
-#: settings.php:766
+#: settings.php:767
 msgid "-- Select Font --"
 msgstr ""
 
@@ -210,7 +210,7 @@ msgid ""
 "elements assigned to it."
 msgstr ""
 
-#: general-settings.php:150 settings.php:772
+#: general-settings.php:150 settings.php:773
 msgid "Note: "
 msgstr ""
 
@@ -261,41 +261,46 @@ msgstr ""
 msgid "Google (Early Access)"
 msgstr ""
 
-#: helpers/helpers.php:118 helpers/helpers.php:120 helpers/helpers.php:149
-#: helpers/helpers.php:151 settings.php:186
+#: helpers/helpers.php:118 helpers/helpers.php:120 helpers/helpers.php:153
+#: helpers/helpers.php:155 settings.php:186
 msgid "Light"
 msgstr ""
 
 #: helpers/helpers.php:120 helpers/helpers.php:124 helpers/helpers.php:128
 #: helpers/helpers.php:132 helpers/helpers.php:136 helpers/helpers.php:140
-#: helpers/helpers.php:151 helpers/helpers.php:155 helpers/helpers.php:159
+#: helpers/helpers.php:144 helpers/helpers.php:155 helpers/helpers.php:159
 #: helpers/helpers.php:163 helpers/helpers.php:167 helpers/helpers.php:171
-#: settings.php:192
+#: helpers/helpers.php:175 helpers/helpers.php:179 settings.php:193
 msgid "Italic"
 msgstr ""
 
-#: helpers/helpers.php:122 helpers/helpers.php:124 helpers/helpers.php:153
-#: helpers/helpers.php:155 settings.php:187
+#: helpers/helpers.php:122 helpers/helpers.php:124 helpers/helpers.php:157
+#: helpers/helpers.php:159 settings.php:187
 msgid "Normal"
 msgstr ""
 
-#: helpers/helpers.php:126 helpers/helpers.php:128 helpers/helpers.php:157
-#: helpers/helpers.php:159 settings.php:188
+#: helpers/helpers.php:126 helpers/helpers.php:128 helpers/helpers.php:161
+#: helpers/helpers.php:163 settings.php:188
+msgid "Medium"
+msgstr ""
+
+#: helpers/helpers.php:130 helpers/helpers.php:132 helpers/helpers.php:165
+#: helpers/helpers.php:167 settings.php:189
 msgid "Semi-Bold"
 msgstr ""
 
-#: helpers/helpers.php:130 helpers/helpers.php:132 helpers/helpers.php:161
-#: helpers/helpers.php:163 settings.php:189
+#: helpers/helpers.php:134 helpers/helpers.php:136 helpers/helpers.php:169
+#: helpers/helpers.php:171 settings.php:190
 msgid "Bold"
 msgstr ""
 
-#: helpers/helpers.php:134 helpers/helpers.php:136 helpers/helpers.php:165
-#: helpers/helpers.php:167 settings.php:190
+#: helpers/helpers.php:138 helpers/helpers.php:140 helpers/helpers.php:173
+#: helpers/helpers.php:175 settings.php:191
 msgid "Extra-Bold"
 msgstr ""
 
-#: helpers/helpers.php:138 helpers/helpers.php:140 helpers/helpers.php:169
-#: helpers/helpers.php:171 settings.php:191
+#: helpers/helpers.php:142 helpers/helpers.php:144 helpers/helpers.php:177
+#: helpers/helpers.php:179 settings.php:192
 msgid "Black"
 msgstr ""
 
@@ -343,23 +348,23 @@ msgstr ""
 msgid "<a> Font"
 msgstr ""
 
-#: settings.php:648 settings.php:651
+#: settings.php:649 settings.php:652
 msgid "Google API key is not valid: "
 msgstr ""
 
-#: settings.php:718
+#: settings.php:719
 msgid "General"
 msgstr ""
 
-#: settings.php:719
+#: settings.php:720
 msgid "Advanced"
 msgstr ""
 
-#: settings.php:734
+#: settings.php:735
 msgid "Thank you"
 msgstr ""
 
-#: settings.php:739
+#: settings.php:740
 msgid ""
 "Thank you for using an <a href=\"http://hivewebstudios.com\" target=\"_blank"
 "\">Hive</a> plugin! We 5 star you already, so why don't you <a href="
@@ -367,151 +372,151 @@ msgid ""
 "post\" target=\"_blank\">5 star us too</a>?"
 msgstr ""
 
-#: settings.php:741
+#: settings.php:742
 msgid "Anyway, if you need anything, this may help:"
 msgstr ""
 
-#: settings.php:743
+#: settings.php:744
 msgid "FAQ"
 msgstr ""
 
-#: settings.php:744
+#: settings.php:745
 msgid "Support forums"
 msgstr ""
 
-#: settings.php:745
+#: settings.php:746
 msgid "Contact us"
 msgstr ""
 
-#: settings.php:752
+#: settings.php:753
 msgid "Like Our Facebook Page"
 msgstr ""
 
-#: settings.php:760
+#: settings.php:761
 msgid "Font Preview"
 msgstr ""
 
-#: settings.php:764
+#: settings.php:765
 msgid "Select a font from the list to preview."
 msgstr ""
 
-#: settings.php:767 settings.php:770
+#: settings.php:768 settings.php:771
 msgid "This is a preview content."
 msgstr ""
 
-#: settings.php:767
+#: settings.php:768
 msgid "Font preview free text"
 msgstr ""
 
-#: settings.php:772
+#: settings.php:773
 msgid "Some fonts may not support your language."
 msgstr ""
 
-#: settings.php:783 settings.php:825 settings.php:840 settings.php:861
+#: settings.php:784 settings.php:826 settings.php:841 settings.php:862
 msgid "Session ended, please try again."
 msgstr ""
 
-#: settings.php:789
+#: settings.php:790
 msgid "Font name is empty or invalid."
 msgstr ""
 
-#: settings.php:795
+#: settings.php:796
 msgid "Font weight is empty or invalid."
 msgstr ""
 
-#: settings.php:800
+#: settings.php:801
 msgid "Font file is not selected."
 msgstr ""
 
-#: settings.php:816
+#: settings.php:817
 msgid "Font file(s) not selected."
 msgstr ""
 
-#: settings.php:831
+#: settings.php:832
 msgid "Usable font is empty or invalid."
 msgstr ""
 
-#: settings.php:846
+#: settings.php:847
 msgid "Custom elements is empty or invalid."
 msgstr ""
 
-#: settings.php:868
+#: settings.php:869
 msgid "Something went horribly wrong. Ask the support!"
 msgstr ""
 
-#: settings.php:1000
+#: settings.php:1001
 msgid "Error adding custom elements: "
 msgstr ""
 
-#: settings.php:1007
+#: settings.php:1008
 msgid "Custom elements added to your website!"
 msgstr ""
 
-#: settings.php:1015
+#: settings.php:1016
 msgid "Font can now be used in your website!"
 msgstr ""
 
-#: settings.php:1023
+#: settings.php:1024
 msgid "Font deleted from your website!"
 msgstr ""
 
-#: settings.php:1031
+#: settings.php:1032
 msgid "The file(s) uploaded successfully!"
 msgstr ""
 
-#: settings.php:1039
+#: settings.php:1040
 msgid "Error uploading the file: "
 msgstr ""
 
-#: settings.php:1047
+#: settings.php:1048
 msgid "Error adding font to website fonts: "
 msgstr ""
 
-#: settings.php:1055
+#: settings.php:1056
 msgid "Error deleting font: "
 msgstr ""
 
-#: settings.php:1063
+#: settings.php:1064
 msgid "Failed to open or create the css file. Check for permissions."
 msgstr ""
 
-#: settings.php:1150
+#: settings.php:1151
 msgid "Additional CSS"
 msgstr ""
 
-#: settings.php:1163
+#: settings.php:1164
 msgid "Google API Key"
 msgstr ""
 
-#: settings.php:1170
+#: settings.php:1171
 msgid "Show Font Family Preview"
 msgstr ""
 
-#: settings.php:1180
+#: settings.php:1181
 msgid "Access Settings Role"
 msgstr ""
 
-#: settings.php:1189
+#: settings.php:1190
 msgid "Remove Font Selection From Editor"
 msgstr ""
 
-#: settings.php:1197
+#: settings.php:1198
 msgid "Uninstall All"
 msgstr ""
 
-#: settings.php:1197
+#: settings.php:1198
 msgid "Caution"
 msgstr ""
 
-#: settings.php:1311
+#: settings.php:1312
 msgid "This is the general settings for the site."
 msgstr ""
 
-#: settings.php:1319
+#: settings.php:1320
 msgid "This is the advanced css settings for the plugin."
 msgstr ""
 
-#: settings.php:1341
+#: settings.php:1342
 #, php-format
 msgid ""
 "The plugin uses static google fonts list. In order to get the most current "
@@ -519,39 +524,39 @@ msgid ""
 "more information read <a href=\"%s\" target=\"_blank\">our FAQ</a>."
 msgstr ""
 
-#: settings.php:1353
+#: settings.php:1354
 msgid ""
 "This custom css will be added to the elements css file. Please use with "
 "caution."
 msgstr ""
 
-#: settings.php:1370 settings.php:1389
+#: settings.php:1371 settings.php:1390
 msgid "Uninstall All Option"
 msgstr ""
 
-#: settings.php:1372
+#: settings.php:1373
 msgid ""
 "When checked uninstalling the plugin will delete all of it's content "
 "including uploaded fonts and database."
 msgstr ""
 
-#: settings.php:1391
+#: settings.php:1392
 msgid "When checked remove font family & font size from editor."
 msgstr ""
 
-#: settings.php:1409
+#: settings.php:1410
 msgid "Include Font Family Preview"
 msgstr ""
 
-#: settings.php:1411
+#: settings.php:1412
 msgid "Show font preview when listing the fonts (might be slow)"
 msgstr ""
 
-#: settings.php:1480 settings.php:1497
+#: settings.php:1481 settings.php:1498
 msgid "Include !important to this element to always apply."
 msgstr ""
 
-#: settings.php:1509
+#: settings.php:1510
 msgid "Default"
 msgstr ""
 

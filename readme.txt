@@ -2,8 +2,8 @@
 Contributors: basaar,yardensade,hivewebstudios
 Tags: fonts,google fonts,upload font,font,google,custom, free, download, style
 Requires at least: 3.8
-Tested up to: 4.9
-Stable tag: 2.1.1
+Tested up to: 4.9.4
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,7 @@ Font Organizer is the complete solution for font implementation including upload
 
 == Description ==
 
-**Note: WordPress 4.7.X has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail some font format uploads.
+**Note: WordPress 4.7.X+ has an [open issue](https://core.trac.wordpress.org/ticket/40175 "Offical open bug link") that fail some font format uploads.
 To fix this issue you may download [this plugin](https://wordpress.org/plugins/disable-real-mime-check/ "Plugin fix for non-image uploads") until further notice.**
 
 Font Organizer is the only complete & free solution for font implementation, including uploading custom fonts and using google fonts in WordPress websites.

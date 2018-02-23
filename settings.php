@@ -1339,7 +1339,7 @@ class FoSettingsPage
         );
 
         if($this->is_google_static){
-            echo '<span style="color:#0073aa;font-weight: 500;">' . sprintf( __('The plugin uses static google fonts list. In order to get the most current fonts list, Google requires an API key, generated via their interface. For more information read <a href="%s" target="_blank">our FAQ</a>.'), esc_url( $faq_url )) . '</span>';
+            echo '<span style="color:#0073aa;font-weight: 500;">' . sprintf( __('The plugin uses static google fonts list. In order to get the most current fonts list, Google requires an API key, generated via their interface. For more information read <a href="%s" target="_blank">our FAQ</a>.', 'font-organizer'), esc_url( $faq_url )) . '</span>';
         }
     }
 
