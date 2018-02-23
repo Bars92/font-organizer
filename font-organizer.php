@@ -99,6 +99,9 @@ function fo_init(){
 	    if(!array_key_exists('remove_font_editor', $general_options) || !$general_options['remove_font_editor']){
 			add_filter( 'tiny_mce_before_init', 'fo_add_tinymce_fonts' );
 			add_filter( 'mce_buttons', 'fo_mce_buttons', 1000 );
+			add_filter( 'mce_buttons_2', 'fo_mce_buttons_fix', 1000 );
+			add_filter( 'mce_buttons_3', 'fo_mce_buttons_fix', 1000 );
+			add_filter( 'mce_buttons_4', 'fo_mce_buttons_fix', 1000 );
 	    }
 		add_action( 'admin_enqueue_scripts', 'fo_enqueue_declarations_fonts_css' );
 		add_action( 'wpmu_new_blog', 'fo_new_multi_site_blog', 10, 6);     
@@ -119,8 +122,26 @@ function fo_enqueue_declarations_fonts_css(){
 
 // Enable font size & font family selects in the editor
 function fo_mce_buttons( $buttons ) {
-	array_unshift( $buttons, 'fontselect' ); // Add Font Select
-	array_unshift( $buttons, 'fontsizeselect' ); // Add Font Size Select
+	$new_buttons =  array("fontsizeselect", "fontselect");
+	foreach($new_buttons as $name) {
+		if (!in_array($name, $buttons)) {
+			array_unshift( $buttons, $name );
+		}
+	}
+
+	return $buttons;
+}
+
+// Fix for duplicate font select and font select size selection box in editor
+function fo_mce_buttons_fix( $buttons ) {
+	$new_buttons =  array("fontselect", "fontsizeselect");
+	foreach($new_buttons as $name) {
+		$key = array_search($name, $buttons);
+		if ($key !== false) {
+		    unset($buttons[$key]);
+		}
+	}
+
 	return $buttons;
 }
 
